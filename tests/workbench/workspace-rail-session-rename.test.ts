@@ -19,6 +19,9 @@ import { RAIL_TAB_STORAGE_KEY } from '@/lib/workbench/workspace-rail-tab';
 vi.mock('@/lib/hooks/use-i18n', () => ({
   useI18n: () => ({ t: (key: string) => key }),
 }));
+vi.mock('@/lib/hooks/use-theme', () => ({
+  useTheme: () => ({ resolvedTheme: 'light', theme: 'light', setTheme: vi.fn() }),
+}));
 vi.mock('@/lib/brand/brand-context', () => ({
   useBrand: () => ({ markSrc: '/mark.svg', logoSrc: '/logo.svg' }),
 }));

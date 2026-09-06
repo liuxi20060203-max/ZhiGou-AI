@@ -314,7 +314,7 @@ export function ProLaunchPanel({
     <div data-testid="pro-launch-panel" className="flex w-full flex-col gap-3 text-left">
       {/* ── The composer. It is the card: one border on this whole surface. ──
           Chrome mirrors the classic face's card so the two sides read as one
-          object; the violet seam is the only Pro tell. */}
+          object; the workspace variant uses the shared brand ramp. */}
       <div
         // The face the Pro swap turns over (see `lib/workbench/pro-swap.ts` and
         // `components/workbench/pro-swap.css`). Named here rather than on
@@ -330,7 +330,7 @@ export function ProLaunchPanel({
               // by WorkspaceShell) carries the whole treatment: the classic
               // face's chrome — rounded-2xl, hairline border, translucent
               // surface over a blur — with a layered shadow and a focused
-              // state that draws a violet thread and lifts the card 1px.
+              // state that draws the brand thread and lifts the card 1px.
               'ws-composer'
             : [
                 'rounded-2xl border backdrop-blur-xl transition-colors',
@@ -473,14 +473,22 @@ export function ProLaunchPanel({
             onClick={openSkillMenu}
           />
           <div className="flex-1" />
-          <ProLaunchSend canSend={canSend} onSubmit={submit} />
+          <ProLaunchSend variant={variant} canSend={canSend} onSubmit={submit} />
         </div>
       </div>
     </div>
   );
 }
 
-function ProLaunchSend({ canSend, onSubmit }: { canSend: boolean; onSubmit: () => void }) {
+function ProLaunchSend({
+  variant,
+  canSend,
+  onSubmit,
+}: {
+  variant: 'default' | 'workspace';
+  canSend: boolean;
+  onSubmit: () => void;
+}) {
   const { t } = useI18n();
 
   return (
@@ -498,7 +506,9 @@ function ProLaunchSend({ canSend, onSubmit }: { canSend: boolean; onSubmit: () =
       className={cn(
         'inline-flex size-8 items-center justify-center rounded-lg transition-all duration-200',
         canSend
-          ? 'bg-violet-600 text-white shadow-sm shadow-violet-600/25 hover:opacity-90'
+          ? variant === 'workspace'
+            ? 'ws-launch-send'
+            : 'bg-violet-600 text-white shadow-sm shadow-violet-600/25 hover:opacity-90'
           : 'bg-muted text-muted-foreground/40',
       )}
     >

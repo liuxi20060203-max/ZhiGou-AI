@@ -253,7 +253,7 @@ describe('fold placement', () => {
     // The header row owns all three controls, but auto margin pushes the fold
     // to the rail boundary instead of pinning it beside the PRO badge.
     const row =
-      /<div className="flex h-16 shrink-0 items-center gap-2 px-4">([\s\S]*?)<\/div>/.exec(rail);
+      /<div className="[^\"]*h-16 shrink-0 items-center gap-2 px-4">([\s\S]*?)<\/div>/.exec(rail);
     expect(row, 'the rail’s header row').not.toBeNull();
     expect(row![1]).toContain('testId="pro-nav-home"');
     expect(row![1]).toContain('<ProBadge');

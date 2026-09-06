@@ -749,7 +749,7 @@ export function WorkbenchChat({
     <div
       data-testid="workbench-chat"
       data-panel-open={effectivePanelOpen ? 'true' : 'false'}
-      className="wbchat flex h-full min-w-0 flex-1 flex-col bg-background"
+      className="wbchat flex h-full min-w-0 flex-1 flex-col bg-transparent"
       style={effectivePanelOpen && !hosted ? { minWidth: WORKBENCH_CHAT_MIN_PX } : undefined}
     >
       {/* Nothing the user has not read may sit under the composer: `composerLayout`
@@ -814,7 +814,7 @@ export function WorkbenchChat({
               className="pointer-events-none absolute inset-x-0 top-2 z-10 flex justify-center"
               data-testid="workbench-replay-loading"
             >
-              <span className="inline-flex items-center rounded-full border border-border/60 bg-background/90 px-2 py-1 shadow-sm backdrop-blur-sm">
+              <span className="inline-flex items-center rounded-full border border-[var(--ws-line)] bg-[var(--ws-raised)]/90 px-2 py-1 shadow-sm backdrop-blur-sm">
                 <Loader2
                   className="size-3.5 animate-spin text-muted-foreground motion-reduce:animate-none"
                   aria-label={t('workbench.common.loading')}

@@ -8,14 +8,14 @@
  * INHERITANCE IS THE BRIEF. This workspace is part of the same product, not a
  * second brand, so the vocabulary is lifted from the shared ZhiGou AI system:
  *
- *   - the canvas is the homepage's own `slate-50 → slate-100` gradient, not
- *     the flat `bg-white` v2 shipped (the flat white was the departure);
+ *   - the canvas follows the homepage's brand background gradient, not a
+ *     standalone slate surface;
  *   - the composer keeps the classic face's chrome — `rounded-2xl`, a
  *     `border/60` hairline, `bg-white/80` over `backdrop-blur-xl`;
  *   - the accent is brand teal, spent where the product already spends it:
  *     focus, active state, the Pro badge;
- *   - the neutral ramp is slate, the same one `ClassroomCard` and the home
- *     chrome use.
+ *   - neutral surfaces stay quiet so the primary teal owns focus and active
+ *     states across the rail, chat and classroom panes.
  *
  * What is NEW is craft, not vocabulary:
  *
@@ -39,8 +39,8 @@
 .ws-root {
   --ws-canvas-top: #f4f8fa;
   --ws-canvas-bottom: #eaf3f5;
-  --ws-rail: rgba(255, 255, 255, 0.72);
-  --ws-surface: rgba(255, 255, 255, 0.82);
+  --ws-rail: rgba(255, 255, 255, 0.82);
+  --ws-surface: rgba(255, 255, 255, 0.9);
 
   /* The ink ramp, re-cut. Every step used to sit within one slate shade of its
      neighbour, so the rail read as one grey band: the counts (slate-300) came
@@ -157,8 +157,8 @@
 .dark .ws-root {
   --ws-canvas-top: #071b23;
   --ws-canvas-bottom: #0b2630;
-  --ws-rail: rgba(15, 23, 42, 0.62);
-  --ws-surface: rgba(15, 23, 42, 0.78);
+  --ws-rail: rgba(7, 27, 35, 0.88);
+  --ws-surface: rgba(16, 46, 57, 0.92);
 
   /* Dark's ramp was already the better of the two — it cleared AA at every step
      that carries text — so it is lifted only at the top and the bottom, to keep
@@ -179,7 +179,7 @@
   --ws-tint: rgba(255, 255, 255, 0.06);
   --ws-tint-strong: rgba(255, 255, 255, 0.1);
 
-  --ws-raised: #1e293b; /* slate-800 — one step above the slate-900 canvas */
+  --ws-raised: #102e39; /* product surface — one step above the background */
 
   --ws-accent: #4fb6c5;
   --ws-accent-thread: rgba(79, 182, 197, 0.36);
@@ -246,6 +246,51 @@
   backdrop-filter: blur(14px) saturate(140%);
   -webkit-backdrop-filter: blur(14px) saturate(140%);
   box-shadow: inset -1px 0 0 0 var(--ws-line-soft);
+}
+
+.ws-rail-header {
+  background: linear-gradient(180deg, var(--ws-tint) 0%, transparent 100%);
+}
+
+.ws-rail-header .ws-home img {
+  filter: drop-shadow(0 3px 8px rgba(69, 208, 189, 0.12));
+}
+
+.dark .ws-rail-header .ws-home img {
+  filter: drop-shadow(0 3px 10px rgba(79, 182, 197, 0.2));
+}
+
+.ws-mobile-head {
+  background: linear-gradient(180deg, var(--ws-tint) 0%, transparent 100%);
+  box-shadow: inset 0 -1px 0 0 var(--ws-line-soft);
+}
+
+.ws-mobile-logo {
+  filter: drop-shadow(0 3px 8px rgba(69, 208, 189, 0.12));
+}
+
+.dark .ws-mobile-logo {
+  filter: drop-shadow(0 3px 10px rgba(79, 182, 197, 0.2));
+}
+
+.ws-mobile-exit {
+  min-height: 30px;
+  padding: 0 8px;
+  border-radius: 8px;
+  transition:
+    background-color 160ms var(--ws-ease),
+    color 160ms var(--ws-ease),
+    box-shadow 160ms var(--ws-ease);
+}
+
+.ws-mobile-exit:hover {
+  background: var(--ws-accent-wash);
+  color: var(--ws-accent);
+}
+
+.ws-mobile-exit:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 1px var(--ws-accent-thread);
 }
 
 /* ── Type ────────────────────────────────────────────────────────────────
@@ -423,14 +468,15 @@
 }
 
 .ws-new:hover {
-  border-color: rgba(15, 23, 42, 0.16);
+  border-color: var(--ws-accent-thread);
   color: var(--ws-ink);
+  background-color: var(--ws-accent-wash);
   transform: translateY(-1px);
   box-shadow: var(--ws-lift-sm-hover);
 }
 
 .dark .ws-new:hover {
-  border-color: rgba(255, 255, 255, 0.18);
+  border-color: var(--ws-accent-thread);
 }
 
 .ws-new:focus-visible {
@@ -517,11 +563,11 @@
 }
 
 .ws-composer:hover {
-  border-color: rgba(15, 23, 42, 0.15);
+  border-color: var(--ws-accent-thread);
 }
 
 .dark .ws-composer:hover {
-  border-color: rgba(255, 255, 255, 0.17);
+  border-color: var(--ws-accent-thread);
 }
 
 .ws-composer:focus-within {
@@ -533,6 +579,22 @@
 .ws-composer textarea::placeholder {
   color: var(--ws-ink-mute);
   opacity: 0.75;
+}
+
+.ws-launch-send {
+  background: var(--ws-accent);
+  color: #ffffff;
+  box-shadow: 0 4px 12px var(--ws-accent-thread);
+  transition:
+    background-color 160ms var(--ws-ease),
+    box-shadow 160ms var(--ws-ease),
+    transform 160ms var(--ws-ease);
+}
+
+.ws-launch-send:hover {
+  background: color-mix(in srgb, var(--ws-accent) 88%, var(--ws-ink));
+  box-shadow: 0 6px 16px var(--ws-accent-thread);
+  transform: translateY(-1px);
 }
 
 /* ── Entrance ────────────────────────────────────────────────────────────
@@ -772,10 +834,10 @@
 /* The selected half. A solid ground rather than a mark drawn under the label:
    at 200px a 2px underline is the quietest mark in a column of louder ones. */
 .ws-navtab[aria-selected='true'] {
-  color: var(--ws-ink);
-  background-color: rgba(255, 255, 255, 0.92);
+  color: var(--ws-accent);
+  background-color: var(--ws-accent-wash);
   box-shadow:
-    inset 0 0 0 1px var(--ws-line-soft),
+    inset 0 0 0 1px var(--ws-accent-thread),
     var(--ws-lift-sm);
 }
 
@@ -783,8 +845,8 @@
    reads as a hole, so the selected half goes up the white ramp instead, and
    drops the cast shadow (a shadow on slate-900 is noise, not lift). */
 .dark .ws-navtab[aria-selected='true'] {
-  background-color: rgba(255, 255, 255, 0.12);
-  box-shadow: inset 0 0 0 1px var(--ws-line);
+  background-color: var(--ws-accent-wash);
+  box-shadow: inset 0 0 0 1px var(--ws-accent-thread);
 }
 
 .ws-navtab[aria-selected='true'] .ws-navtab-label {
@@ -1232,6 +1294,14 @@
   box-shadow: inset -1px 0 0 0 var(--ws-line-soft);
 }
 
+/* Keep the chat footer's semantic background class as an opaque-surface
+   contract, while the hosted Workspace chat inherits the same panel material
+   as its surrounding pane. The extra scope deliberately leaves the classic
+   chat surface unchanged. */
+.ws-pane .wbchat .ws-chat-footer {
+  background-color: var(--ws-surface);
+}
+
 /* The last column carries no right seam — it ends at the window. */
 .ws-pane-last {
   box-shadow: none;
@@ -1320,6 +1390,17 @@
   color: var(--ws-ink-soft);
   background: var(--ws-tint);
   box-shadow: inset 0 0 0 1px var(--ws-line-soft);
+}
+
+.ws-learning {
+  color: var(--ws-accent);
+  background: var(--ws-accent-wash);
+}
+
+.ws-learning:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--ws-accent) 18%, transparent);
+  box-shadow: var(--ws-lift-sm);
+  transform: translateY(-1px);
 }
 
 /* ── The right pane's tab strip ───────────────────────────────────────────

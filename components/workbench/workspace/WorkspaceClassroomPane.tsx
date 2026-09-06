@@ -132,7 +132,7 @@ export const WorkspaceClassroomPane = memo(function WorkspaceClassroomPane({
             </span>
           ) : null}
           {/* The workspace frames playback as LEARNING, not presenting: a soft
-              accent-wash chip (the product violet at tint strength) instead of
+              accent-wash chip instead of
               a solid dark block — an invitation, not an office command. The
               1px hover lift is the shell's standard hover vocabulary. */}
           <button
@@ -141,10 +141,9 @@ export const WorkspaceClassroomPane = memo(function WorkspaceClassroomPane({
             disabled={scenes.length === 0}
             onClick={() => setPlaybackOn(true)}
             className={cn(
-              'inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg bg-violet-600/10 px-3 text-[11px] font-medium text-violet-700 transition-[background-color,color,transform,box-shadow] duration-150',
-              'hover:bg-violet-600/15 hover:shadow-sm motion-safe:hover:-translate-y-px disabled:pointer-events-none disabled:opacity-40',
+              'ws-learning inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg px-3 text-[11px] font-medium transition-[background-color,color,transform,box-shadow] duration-150',
+              'disabled:pointer-events-none disabled:opacity-40',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60',
-              'dark:bg-violet-400/10 dark:text-violet-300 dark:hover:bg-violet-400/15 dark:hover:shadow-none',
             )}
           >
             <Play className="size-3.5" aria-hidden="true" />

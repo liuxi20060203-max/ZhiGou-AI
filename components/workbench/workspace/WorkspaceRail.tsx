@@ -843,7 +843,7 @@ export function WorkspaceRail({
       className="ws-rail ws-enter-rail relative z-10 hidden h-full shrink-0 flex-col md:flex"
       style={{ width: 'var(--ws-rail-w)' }}
     >
-      <div className="flex h-16 shrink-0 items-center gap-2 px-4">
+      <div className="ws-rail-header flex h-16 shrink-0 items-center gap-2 px-4">
         {/* The wordmark is the way home; the PRO pill beside it is the switch
             that leaves Pro. Two different destinations, so two hit targets —
             never one control wearing both meanings. */}
@@ -880,7 +880,7 @@ export function WorkspaceRail({
           longer its square sibling: a search box is an action on the LIST, not
           on the act of starting one, so it moved under the tab strip, where it
           filters whichever list the active tab shows (see the findrow below). */}
-      <div className="flex shrink-0 items-center gap-2 px-3 pb-3 pt-3">
+      <div className="ws-rail-action-row flex shrink-0 items-center gap-2 px-3 pb-3 pt-3">
         <button
           type="button"
           data-testid="pro-workspace-new-session"

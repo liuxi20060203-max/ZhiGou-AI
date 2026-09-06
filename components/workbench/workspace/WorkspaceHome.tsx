@@ -84,13 +84,17 @@ export function WorkspaceHome({
       {/* Below `md` the sidebar is gone, so the exit switch needs a home. A
           plain button, not a second ProBadge: two elements answering to
           `pro-mode-exit` would be one testid too many. */}
-      <div className="flex h-12 shrink-0 items-center justify-between px-4 md:hidden">
-        <img src={horizontalLogoSrc} alt={brand.productName} className="h-5 w-auto" />
+      <div className="ws-mobile-head flex h-12 shrink-0 items-center justify-between px-4 md:hidden">
+        <img
+          src={horizontalLogoSrc}
+          alt={brand.productName}
+          className="ws-mobile-logo h-5 w-auto"
+        />
         <button
           type="button"
           data-testid="pro-workspace-exit-compact"
           onClick={onExitPro}
-          className="ws-quiet inline-flex items-center gap-1.5 text-[12px]"
+          className="ws-mobile-exit ws-quiet inline-flex items-center gap-1.5 text-[12px]"
         >
           <ArrowLeft className="size-3.5" aria-hidden="true" />
           {t('workspace.exitPro')}

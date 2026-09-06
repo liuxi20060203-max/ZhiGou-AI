@@ -413,7 +413,7 @@ export function composerLayout(formOpen: boolean): {
   return {
     mode: formOpen ? 'form' : 'input',
     scrollPadding: 'pb-4',
-    footer: 'relative shrink-0 bg-background pb-3 pt-2',
+    footer: 'relative shrink-0 bg-background ws-chat-footer pb-3 pt-2',
     jumpButtonOffset: 'bottom-3',
   };
 }
