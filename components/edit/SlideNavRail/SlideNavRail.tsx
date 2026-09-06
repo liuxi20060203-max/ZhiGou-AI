@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useBrand, useIsDesktop } from '@/lib/brand/brand-context';
+import { useTheme } from '@/lib/hooks/use-theme';
 import { useStageStore } from '@/lib/store';
 import { useSettingsStore } from '@/lib/store/settings';
 import { useI18n } from '@/lib/hooks/use-i18n';
@@ -53,6 +54,8 @@ export function SlideNavRail() {
   const router = useRouter();
   const brand = useBrand();
   const isDesktop = useIsDesktop();
+  const { resolvedTheme } = useTheme();
+  const horizontalLogoSrc = resolvedTheme === 'dark' ? brand.darkLogoSrc : brand.logoSrc;
   const inWorkbenchPanel = useInWorkbenchPanel();
   const scenes = useStageStore.use.scenes();
   const currentSceneId = useStageStore.use.currentSceneId();
@@ -390,7 +393,7 @@ export function SlideNavRail() {
         </button>
       )}
 
-      {/* Header band — mirrors playback `SceneSidebar`: OpenMAIC logo on
+      {/* Header band — mirrors playback `SceneSidebar`: product logo on
           the left (click → home). Height (h-10 + mt-3 + mb-1 = ~56px)
           matches playback so the chrome top edge stays at the same screen
           pixel across the mode swap. Inside the workbench panel the band
@@ -408,7 +411,7 @@ export function SlideNavRail() {
             >
               {/* Desktop client: the Electron title bar already shows the brand icon + name, so the edit rail doesn't repeat it;
                   returning home is handled by the edit bar's CommandBar back arrow. */}
-              <img src={brand.logoSrc} alt={brand.productName} className="h-6 w-auto" />
+              <img src={horizontalLogoSrc} alt={brand.productName} className="h-6 w-auto" />
             </button>
           )}
         </div>

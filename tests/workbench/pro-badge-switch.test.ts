@@ -34,6 +34,8 @@ describe('Pro mode switch semantics', () => {
     expect(markup).toContain('role="switch"');
     expect(markup).toContain('aria-checked="false"');
     expect(markup).toContain('data-testid="pro-mode-enter"');
+    expect(markup).toContain('proMode.badgeAria');
+    expect(markup).not.toContain('>Pro<');
   });
 
   it('reports both workspace exits as checked versions of the same switch', () => {

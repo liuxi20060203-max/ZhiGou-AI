@@ -18,6 +18,8 @@ import { SlideThumbnail } from '@/components/slide-renderer/SlideThumbnail';
 import { ThumbnailInteractive } from '@/components/slide-renderer/components/ThumbnailInteractive';
 import { useStageStore, useCanvasStore } from '@/lib/store';
 import { useI18n } from '@/lib/hooks/use-i18n';
+import { useBrand } from '@/lib/brand/brand-context';
+import { useTheme } from '@/lib/hooks/use-theme';
 import { useNearViewport } from '@/lib/hooks/use-near-viewport';
 import type { SceneType, SlideContent, InteractiveContent } from '@/lib/types/stage';
 import { PENDING_SCENE_ID } from '@/lib/store/stage';
@@ -42,6 +44,9 @@ export function SceneSidebar({
   isCourseComplete,
 }: SceneSidebarProps) {
   const { t } = useI18n();
+  const brand = useBrand();
+  const { resolvedTheme } = useTheme();
+  const horizontalLogoSrc = resolvedTheme === 'dark' ? brand.darkLogoSrc : brand.logoSrc;
   const router = useRouter();
   const { scenes, currentSceneId, setCurrentSceneId, generatingOutlines, generationStatus } =
     useStageStore();
@@ -117,9 +122,9 @@ export function SceneSidebar({
       {!collapsed && (
         <div
           onMouseDown={handleDragStart}
-          className="absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize z-50 group hover:bg-purple-400/30 dark:hover:bg-purple-600/30 active:bg-purple-500/40 dark:active:bg-purple-500/40 transition-colors"
+          className="absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize z-50 group hover:bg-primary/20 active:bg-primary/30 transition-colors"
         >
-          <div className="absolute right-0.5 top-1/2 -translate-y-1/2 w-0.5 h-8 rounded-full bg-gray-300 dark:bg-gray-600 group-hover:bg-purple-400 dark:group-hover:bg-purple-500 transition-colors" />
+          <div className="absolute right-0.5 top-1/2 -translate-y-1/2 w-0.5 h-8 rounded-full bg-gray-300 dark:bg-gray-600 group-hover:bg-primary transition-colors" />
         </div>
       )}
 
@@ -131,7 +136,7 @@ export function SceneSidebar({
             className="flex items-center gap-2 cursor-pointer rounded-lg px-1.5 -mx-1.5 py-1 -my-1 hover:bg-gray-100/80 dark:hover:bg-gray-800/60 active:scale-[0.97] transition-all duration-150"
             title={t('generation.backToHome')}
           >
-            <img src="/logo-horizontal.png" alt="OpenMAIC" className="h-6" />
+            <img src={horizontalLogoSrc} alt={brand.productName} className="h-6" />
           </button>
           <button
             onClick={() => onCollapseChange(true)}

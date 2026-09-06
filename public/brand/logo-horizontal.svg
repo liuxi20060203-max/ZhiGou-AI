@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 300" role="img" aria-labelledby="title desc">
+  <title id="title">知构 AI</title>
+  <desc id="desc">知构 AI 生成式互动课程学习平台</desc>
+  <defs>
+    <mask id="left-page-cutouts">
+      <rect width="300" height="300" fill="#000"/>
+      <path d="M43 44a18 18 0 0 0-26 16v180a18 18 0 0 0 26 16l89-44a23 23 0 0 0 13-21v-82a23 23 0 0 0-13-21Z" fill="#fff"/>
+      <path d="m56 90 65 32M56 122l65 32M56 154l48 24" fill="none" stroke="#000" stroke-width="11" stroke-linecap="round"/>
+    </mask>
+    <mask id="right-page-cutouts">
+      <rect width="300" height="300" fill="#000"/>
+      <path d="M257 44a18 18 0 0 1 26 16v180a18 18 0 0 1-26 16l-89-44a23 23 0 0 1-13-21v-82a23 23 0 0 1 13-21Z" fill="#fff"/>
+      <rect x="179" y="88" width="75" height="61" rx="12" fill="#000" transform="rotate(-8 217 119)"/>
+      <rect x="179" y="160" width="75" height="61" rx="12" fill="#000" transform="rotate(8 217 191)"/>
+    </mask>
+  </defs>
+
+  <g aria-hidden="true">
+    <path d="M43 44a18 18 0 0 0-26 16v180a18 18 0 0 0 26 16l89-44a23 23 0 0 0 13-21v-82a23 23 0 0 0-13-21Z" fill="#176B87" mask="url(#left-page-cutouts)"/>
+    <path d="M257 44a18 18 0 0 1 26 16v180a18 18 0 0 1-26 16l-89-44a23 23 0 0 1-13-21v-82a23 23 0 0 1 13-21Z" fill="#14A99A" mask="url(#right-page-cutouts)"/>
+    <path d="m124 136-36-17M124 164l-36 17M176 136l36-17M176 164l36 17" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/>
+    <circle cx="150" cy="150" r="39" fill="#14A99A" stroke="#fff" stroke-width="9"/>
+    <path d="m203 176 24 15-24 15Z" fill="#14A99A"/>
+  </g>
+
+  <text x="340" y="151" fill="#102A43" font-family="HarmonyOS Sans SC, Microsoft YaHei, PingFang SC, Noto Sans CJK SC, sans-serif" font-size="104" font-weight="700" letter-spacing="2">知构 AI</text>
+  <text x="346" y="207" fill="#5F7482" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="600" letter-spacing="10">ZHIGOU AI</text>
+</svg>

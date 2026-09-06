@@ -15,6 +15,8 @@ export interface BrandConfig {
   shortName: string;
   /** Horizontal logo asset under `public/`. */
   logoSrc: string;
+  /** Horizontal logo variant for dark surfaces. */
+  darkLogoSrc: string;
   /** Whether `logoSrc` already carries the product wordmark. */
   logoHasWordmark: boolean;
   /** Square brand mark under `public/` (favicon, workspace header). */
@@ -25,10 +27,11 @@ export interface BrandConfig {
 
 /** The default brand: the product itself, with no vendor overrides. */
 export const DEFAULT_BRAND: BrandConfig = {
-  productName: 'OpenMAIC',
-  shortName: 'OpenMAIC',
-  logoSrc: '/logo-horizontal.png',
+  productName: '知构 AI',
+  shortName: '知构',
+  logoSrc: '/brand/logo-horizontal.svg',
+  darkLogoSrc: '/brand/logo-horizontal-dark.svg',
   logoHasWordmark: true,
-  markSrc: '/openmaic-mark.png',
-  themeColor: '#722ed1',
+  markSrc: '/brand/mark.svg',
+  themeColor: '#176B87',
 };

@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useI18n } from '@/lib/hooks/use-i18n';
+import { useBrand } from '@/lib/brand/brand-context';
 import { ArrowRight, ShieldCheck, LoaderCircle } from 'lucide-react';
 
 interface AccessCodeModalProps {
@@ -12,6 +13,7 @@ interface AccessCodeModalProps {
 
 export function AccessCodeModal({ open, onSuccess }: AccessCodeModalProps) {
   const { t } = useI18n();
+  const brand = useBrand();
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -68,8 +70,8 @@ export function AccessCodeModal({ open, onSuccess }: AccessCodeModalProps) {
               style={{
                 backgroundImage: `
                   radial-gradient(ellipse 80% 60% at 20% 40%, var(--primary) 0%, transparent 60%),
-                  radial-gradient(ellipse 60% 80% at 80% 20%, oklch(0.6 0.15 280) 0%, transparent 50%),
-                  radial-gradient(ellipse 50% 50% at 60% 80%, oklch(0.5 0.12 300) 0%, transparent 50%)
+                  radial-gradient(ellipse 60% 80% at 80% 20%, #14a99a 0%, transparent 50%),
+                  radial-gradient(ellipse 50% 50% at 60% 80%, #176b87 0%, transparent 50%)
                 `,
               }}
             />
@@ -118,7 +120,7 @@ export function AccessCodeModal({ open, onSuccess }: AccessCodeModalProps) {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.25, duration: 0.4 }}
               >
-                OpenMAIC
+                {brand.productName}
               </motion.p>
 
               {/* Form */}

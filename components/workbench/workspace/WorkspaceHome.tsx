@@ -38,6 +38,7 @@ import { type ReactNode, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useI18n } from '@/lib/hooks/use-i18n';
 import { useBrand, useIsDesktop } from '@/lib/brand/brand-context';
+import { useTheme } from '@/lib/hooks/use-theme';
 import { arrivedByProSwap } from '@/lib/workbench/pro-swap';
 import { cn } from '@/lib/utils/cn';
 import { ProBadge } from '@/components/workbench/ProBadge';
@@ -64,6 +65,8 @@ export function WorkspaceHome({
   const { t } = useI18n();
   const brand = useBrand();
   const isDesktop = useIsDesktop();
+  const { resolvedTheme } = useTheme();
+  const horizontalLogoSrc = resolvedTheme === 'dark' ? brand.darkLogoSrc : brand.logoSrc;
 
   // Someone who arrived through the Pro swap has just watched the surfaces
   // crossfade around a fixed lockup and the composer turn over into this face;
@@ -82,7 +85,7 @@ export function WorkspaceHome({
           plain button, not a second ProBadge: two elements answering to
           `pro-mode-exit` would be one testid too many. */}
       <div className="flex h-12 shrink-0 items-center justify-between px-4 md:hidden">
-        <img src={brand.logoSrc} alt={brand.productName} className="h-5 w-auto" />
+        <img src={horizontalLogoSrc} alt={brand.productName} className="h-5 w-auto" />
         <button
           type="button"
           data-testid="pro-workspace-exit-compact"
@@ -138,7 +141,7 @@ export function WorkspaceHome({
                 </div>
               ) : (
                 <img
-                  src={brand.logoSrc}
+                  src={horizontalLogoSrc}
                   alt={brand.productName}
                   data-testid="pro-workspace-hero-logo"
                   className="ws-hero-logo"

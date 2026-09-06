@@ -5,14 +5,14 @@
  * never receives a byte of it. Nothing here changes behaviour: every rule is
  * colour, type, light, shadow or motion.
  *
- * INHERITANCE IS THE BRIEF. This is the Pro surface of OpenMAIC, not a second
- * brand, so the vocabulary is lifted from what the product already uses:
+ * INHERITANCE IS THE BRIEF. This workspace is part of the same product, not a
+ * second brand, so the vocabulary is lifted from the shared ZhiGou AI system:
  *
  *   - the canvas is the homepage's own `slate-50 → slate-100` gradient, not
  *     the flat `bg-white` v2 shipped (the flat white was the departure);
  *   - the composer keeps the classic face's chrome — `rounded-2xl`, a
  *     `border/60` hairline, `bg-white/80` over `backdrop-blur-xl`;
- *   - the accent is brand violet, spent where the product already spends it:
+ *   - the accent is brand teal, spent where the product already spends it:
  *     focus, active state, the Pro badge;
  *   - the neutral ramp is slate, the same one `ClassroomCard` and the home
  *     chrome use.
@@ -21,10 +21,10 @@
  *
  *   - shadows are layered (contact → mid → wide) instead of one `shadow-xl`
  *     blur, which is most of why v2 read as unstyled;
- *   - the composer gets a real focused state — a violet thread, a widened
- *     violet-tinted cast, and a 1px lift — so the page has one object that
+ *   - the composer gets a real focused state — a teal thread, a widened
+ *     teal-tinted cast, and a 1px lift — so the page has one object that
  *     obviously had attention paid to it;
- *   - the canvas is lit rather than blank: a very low-contrast violet-white
+ *   - the canvas is lit rather than blank: a very low-contrast teal-white
  *     pool behind the hero plus a grain wash, both at the edge of visible;
  *   - rail rows hover into one soft neutral pill and nothing else;
  *   - one staggered entrance on load, then nothing animates unprompted.
@@ -35,7 +35,7 @@
  */
 
 /* ── Tokens ──────────────────────────────────────────────────────────────
-   Slate ramp + brand violet, matching the rest of the product. */
+   Neutral ramp + brand teal, matching the rest of the product. */
 .ws-root {
   --ws-canvas-top: #f8fafc; /* slate-50  */
   --ws-canvas-bottom: #f1f5f9; /* slate-100 */
@@ -119,9 +119,9 @@
      translucent: a popover you can read the list through is not a popover. */
   --ws-raised: #ffffff;
 
-  --ws-accent: #7c3aed; /* violet-600, the product's accent */
-  --ws-accent-thread: rgba(124, 58, 237, 0.32);
-  --ws-accent-wash: rgba(124, 58, 237, 0.08);
+  --ws-accent: #176b87;
+  --ws-accent-thread: rgba(23, 107, 135, 0.32);
+  --ws-accent-wash: rgba(20, 169, 154, 0.1);
 
   --ws-live: #10b981; /* emerald-500, as v2 */
   --ws-fail: #f43f5e; /* rose-500,   as v2 */
@@ -133,12 +133,12 @@
   --ws-lift:
     0 1px 1px rgba(15, 23, 42, 0.035), 0 3px 6px -2px rgba(15, 23, 42, 0.04),
     0 10px 20px -8px rgba(15, 23, 42, 0.05), 0 26px 46px -22px rgba(15, 23, 42, 0.07);
-  /* Focus adds the violet thread the classic composer only hints at
-     (`focus-within:shadow-violet-500/[0.06]`), and commits to it. */
+  /* Focus adds the brand thread the classic composer only hints at and
+     commits to it. */
   --ws-lift-focus:
     0 0 0 1px var(--ws-accent-thread), 0 0 0 4px var(--ws-accent-wash),
     0 2px 3px -1px rgba(15, 23, 42, 0.04), 0 8px 16px -4px rgba(15, 23, 42, 0.055),
-    0 22px 40px -14px rgba(15, 23, 42, 0.08), 0 40px 70px -34px rgba(124, 58, 237, 0.14);
+    0 22px 40px -14px rgba(15, 23, 42, 0.08), 0 40px 70px -34px rgba(20, 169, 154, 0.14);
   --ws-lift-sm:
     0 1px 1px rgba(15, 23, 42, 0.03), 0 2px 4px -1px rgba(15, 23, 42, 0.035),
     0 6px 12px -6px rgba(15, 23, 42, 0.045);
@@ -181,9 +181,9 @@
 
   --ws-raised: #1e293b; /* slate-800 — one step above the slate-900 canvas */
 
-  --ws-accent: #a78bfa; /* violet-400 reads on slate-950 */
-  --ws-accent-thread: rgba(167, 139, 250, 0.36);
-  --ws-accent-wash: rgba(167, 139, 250, 0.1);
+  --ws-accent: #4fb6c5;
+  --ws-accent-thread: rgba(79, 182, 197, 0.36);
+  --ws-accent-wash: rgba(69, 208, 189, 0.12);
 
   --ws-lift:
     0 1px 1px rgba(0, 0, 0, 0.3), 0 4px 10px -3px rgba(0, 0, 0, 0.32),
@@ -191,7 +191,7 @@
   --ws-lift-focus:
     0 0 0 1px var(--ws-accent-thread), 0 0 0 4px var(--ws-accent-wash),
     0 2px 4px -1px rgba(0, 0, 0, 0.3), 0 10px 20px -5px rgba(0, 0, 0, 0.36),
-    0 26px 48px -16px rgba(0, 0, 0, 0.44), 0 44px 76px -36px rgba(167, 139, 250, 0.2);
+    0 26px 48px -16px rgba(0, 0, 0, 0.44), 0 44px 76px -36px rgba(69, 208, 189, 0.2);
   --ws-lift-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 10px -4px rgba(0, 0, 0, 0.34);
   --ws-lift-sm-hover: 0 2px 4px rgba(0, 0, 0, 0.34), 0 8px 16px -6px rgba(0, 0, 0, 0.4);
 
@@ -212,9 +212,9 @@
    pointing at nothing. */
 .ws-canvas {
   background-image:
-    /* the pool behind hero + composer — violet-white, so the brand tints the
+    /* the pool behind hero + composer — teal-white, so the brand tints the
        light rather than sitting in a swatch somewhere */
-    radial-gradient(58% 34% at 50% 43%, rgba(124, 58, 237, 0.062), rgba(124, 58, 237, 0) 72%),
+    radial-gradient(58% 34% at 50% 43%, rgba(20, 169, 154, 0.065), rgba(20, 169, 154, 0) 72%),
     /* a white core inside the pool, so the falloff is not one flat cone and
        the composer sits in the brightest part of the canvas */
     radial-gradient(40% 24% at 50% 47%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 74%),
@@ -232,7 +232,7 @@
 
 .dark .ws-canvas {
   background-image:
-    radial-gradient(62% 36% at 50% 43%, rgba(167, 139, 250, 0.075), rgba(167, 139, 250, 0) 70%),
+    radial-gradient(62% 36% at 50% 43%, rgba(69, 208, 189, 0.08), rgba(69, 208, 189, 0) 70%),
     radial-gradient(36% 22% at 50% 47%, rgba(226, 232, 240, 0.045), rgba(226, 232, 240, 0) 72%),
     var(--ws-grain);
 }
@@ -698,15 +698,14 @@
   width: 46px;
   height: 46px;
   border-radius: 12px;
-  filter: drop-shadow(0 6px 14px rgba(124, 58, 237, 0.22))
+  filter: drop-shadow(0 6px 14px rgba(23, 107, 135, 0.22))
     drop-shadow(0 1px 2px rgba(15, 23, 42, 0.1));
   user-select: none;
   -webkit-user-drag: none;
 }
 
 .dark .ws-hero-mark {
-  filter: drop-shadow(0 6px 18px rgba(167, 139, 250, 0.26))
-    drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+  filter: drop-shadow(0 6px 18px rgba(79, 182, 197, 0.26)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
 }
 
 /* ── The tab switch ──────────────────────────────────────────────────────
@@ -809,7 +808,7 @@
    The prototype's findrow, copied in form and density: one always-visible
    icon+input row heading the tab content, filtering whichever list the
    active tab shows. 30px, tint ground, radius 8 — and the focus state lifts
-   it onto the panel surface with the violet thread and wash, the same
+   it onto the panel surface with the brand thread and wash, the same
    sentence the composer speaks. */
 .ws-find {
   display: flex;

@@ -10,7 +10,7 @@
     "close": "Close"
   },
   "home": {
-    "slogan": "Generative Learning in Multi-Agent Interactive Classroom",
+    "slogan": "Turn knowledge into an interactive course.",
     "greetingWithName": "Hi, {{name}}"
   },
   "toolbar": {
@@ -30,7 +30,7 @@
     "selectProvider": "Select provider",
     "configureProvider": "Set up model",
     "configureProviderHint": "Configure at least one model provider to generate courses",
-    "enterClassroom": "Enter Classroom",
+    "enterClassroom": "Generate Course",
     "advancedSettings": "Advanced Settings",
     "thinking": "Thinking",
     "thinkingBudget": "Budget",
@@ -219,7 +219,7 @@
     "stopListening": "Stop recording"
   },
   "stage": {
-    "currentScene": "Current Scene",
+    "currentScene": "Current Activity",
     "generating": "Generating...",
     "paused": "Paused",
     "generationFailed": "Generation failed",
@@ -231,10 +231,10 @@
     "exitFullscreen": "Exit Fullscreen",
     "editCourse": "Edit course",
     "doneEditing": "Done editing",
-    "proModeDisabledHint": "Editing isn't available on this page — open a course slide to edit with Pro mode."
+    "proModeDisabledHint": "Editing isn't available on this page — open a course page to edit with AI Workspace."
   },
   "edit": {
-    "proMode": "Pro",
+    "proMode": "AI Workspace",
     "undo": "Undo",
     "redo": "Redo",
     "delete": "Delete",
@@ -242,10 +242,10 @@
     "unsupportedScene": "{{type}} is not editable yet",
     "readOnlyBadge": "{{type}} · view-only",
     "sceneType": {
-      "slide": "Slide",
-      "quiz": "Quiz",
-      "interactive": "Interactive",
-      "pbl": "PBL"
+      "slide": "Course Explanation",
+      "quiz": "Knowledge Check",
+      "interactive": "Interactive Exploration",
+      "pbl": "Project Practice"
     },
     "text": {
       "toolbar": "Text toolbar",
@@ -649,10 +649,10 @@
   "classroomComplete": {
     "title": "Course complete",
     "trailLabels": {
-      "slide": "pages",
-      "quiz": "quizzes",
-      "interactive": "interactives",
-      "pbl": "projects"
+      "slide": "explanations",
+      "quiz": "checks",
+      "interactive": "explorations",
+      "pbl": "practices"
     },
     "quizScoreLabel": "{{correct}} / {{total}} correct",
     "encouragement": {
@@ -662,8 +662,8 @@
     }
   },
   "whiteboard": {
-    "title": "Interactive Whiteboard",
-    "open": "Open Whiteboard",
+    "title": "Smart Whiteboard",
+    "open": "Open Smart Whiteboard",
     "clear": "Clear Whiteboard",
     "minimize": "Minimize Whiteboard",
     "ready": "Whiteboard is ready",
@@ -679,12 +679,12 @@
     "elementCount": "{{count}} elements"
   },
   "quiz": {
-    "title": "Quiz",
+    "title": "Knowledge Check",
     "subtitle": "Test your knowledge",
     "questionsCount": "questions",
     "totalPrefix": "",
     "pointsSuffix": "pts",
-    "startQuiz": "Start Quiz",
+    "startQuiz": "Start Check",
     "multipleChoiceHint": "(Multiple choice — select all correct answers)",
     "inputPlaceholder": "Type your answer here...",
     "charCount": "chars",
@@ -704,7 +704,7 @@
     "submitAnswers": "Submit Answers",
     "aiGrading": "AI is grading...",
     "aiGradingWait": "Please wait, analyzing your answers",
-    "quizReport": "Quiz Report",
+    "quizReport": "Check Report",
     "retry": "Retry"
   },
   "roundtable": {
@@ -733,10 +733,10 @@
     "startRecording": "Start recording"
   },
   "pbl": {
-    "emptyProject": "PBL project has not been generated yet. Please create via course generation.",
+    "emptyProject": "Project practice has not been generated yet. Please create it through course generation.",
     "v2": {
       "hero": {
-        "title": "Project-Based Learning",
+        "title": "Project Practice",
         "stage": "Stages",
         "task": "Tasks",
         "tutor": "Tutor",
@@ -961,7 +961,7 @@
     "notReady": "Available after generation completes"
   },
   "classroom": {
-    "recentClassrooms": "Recent",
+    "recentClassrooms": "My Courses",
     "today": "Today",
     "yesterday": "Yesterday",
     "daysAgo": "days ago",
@@ -1014,7 +1014,7 @@
     "pdfSizeLimit": "Supports PDF files up to 50MB",
     "courseMaterialSizeLimit": "Documents, slides, spreadsheets, images, and plain text — up to 50MB (accepted formats depend on the selected extractor)",
     "generateFailed": "Failed to generate classroom, please try again",
-    "requirementPlaceholder": "Tell me anything you want to learn, e.g.\n\"Teach me Python from scratch in 30 minutes\"\n\"Explain Fourier Transform on the whiteboard\"\n\"How to play the board game Avalon\"",
+    "requirementPlaceholder": "Enter a topic or upload learning materials. AI will generate course explanations, knowledge checks, and interactive explorations.\nFor example: \"Learn Python from scratch\" or \"Explain Fourier transforms on a smart whiteboard\"",
     "requirementRequired": "Please enter course requirements",
     "fileTooLarge": "File too large. Please select a file smaller than 50MB",
     "courseMaterialCountLimit": "You can upload up to 5 course material files",
@@ -1032,7 +1032,7 @@
     "generatingOutlines": "Drafting Course Outline",
     "generatingOutlinesDesc": "Structuring the learning path...",
     "generatingSlideContent": "Generating Page Content",
-    "generatingSlideContentDesc": "Creating slides, quizzes, and interactive content...",
+    "generatingSlideContentDesc": "Creating course explanations, knowledge checks, and interactive explorations...",
     "generatingActions": "Generating Teaching Actions",
     "generatingActionsDesc": "Orchestrating narration, spotlights, and interactions...",
     "generationComplete": "Generation complete!",
@@ -1069,10 +1069,10 @@
     "addFirstScene": "Add first scene",
     "noOutlines": "No scene outlines yet",
     "sceneTitlePlaceholder": "Scene title",
-    "sceneTypeSlide": "Slide",
-    "sceneTypeQuiz": "Quiz",
-    "sceneTypeInteractive": "Interactive",
-    "sceneTypePbl": "PBL",
+    "sceneTypeSlide": "Course Explanation",
+    "sceneTypeQuiz": "Knowledge Check",
+    "sceneTypeInteractive": "Interactive Exploration",
+    "sceneTypePbl": "Project Practice",
     "sceneDescriptionPlaceholder": "Briefly describe the purpose and content of this scene",
     "quizQuestionCount": "Question count",
     "quizDifficulty": "Difficulty",
@@ -1107,7 +1107,7 @@
     "interactiveConcept": "Concept",
     "interactiveConceptPlaceholder": "Concept to explore",
     "pblConfigSummary": "Project",
-    "pblSubtype": "PBL type",
+    "pblSubtype": "Project practice type",
     "pblSubtypeProject": "Project",
     "pblSubtypeScenario": "Scenario",
     "pblProjectTopic": "Project topic",
@@ -1862,7 +1862,7 @@
       "download": "Download",
       "detailFailed": "Could not load the skill details",
       "contentLabel": "Content",
-      "builtinDetailNote": "This skill ships with OpenMAIC. Download it to import into another agent workspace.",
+      "builtinDetailNote": "This built-in skill is provided by ZhiGou AI, with selected capabilities based on the open-source OpenMAIC project. Download it to import into another agent workspace.",
       "upload": "Upload",
       "uploading": "Uploading…",
       "uploadFailed": "Could not upload the skill. Check the file and try again.",
@@ -1907,7 +1907,7 @@
     "retry": "Retry",
     "untitledSession": "Untitled chat",
     "pagePosition": "Page {{index}} of {{total}}",
-    "exitPro": "Exit Pro",
+    "exitPro": "Exit AI Workspace",
     "navAria": "Workspace navigation",
     "homeAria": "Back to home",
     "currentSession": "Current chat",
@@ -2010,9 +2010,9 @@
     "skillsLoadFailed": "Skills failed to load. Click to retry",
     "retrySkills": "Retry",
     "noSkillMatch": "No Skills match “{{query}}”",
-    "badgeAria": "Pro mode",
-    "badgeEnter": "Pro mode",
-    "badgeExit": "Back to classic",
+    "badgeAria": "AI Workspace",
+    "badgeEnter": "Enter AI Workspace",
+    "badgeExit": "Back to standard mode",
     "launchPlaceholder": "Describe the learning experience you want to create",
     "launchSend": "Start build"
   },

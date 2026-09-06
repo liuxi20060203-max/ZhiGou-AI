@@ -10,7 +10,7 @@
     "close": "关闭"
   },
   "home": {
-    "slogan": "Generative Learning in Multi-Agent Interactive Classroom",
+    "slogan": "让知识，成为一堂会互动的课",
     "greetingWithName": "嗨，{{name}}"
   },
   "toolbar": {
@@ -30,7 +30,7 @@
     "selectProvider": "选择模型服务商",
     "configureProvider": "配置模型",
     "configureProviderHint": "请先配置至少一个模型服务商才能生成课程",
-    "enterClassroom": "进入课堂",
+    "enterClassroom": "生成课程",
     "advancedSettings": "高级设置",
     "thinking": "思考",
     "thinkingBudget": "预算",
@@ -219,7 +219,7 @@
     "stopListening": "停止录音"
   },
   "stage": {
-    "currentScene": "当前场景",
+    "currentScene": "当前环节",
     "generating": "生成中...",
     "paused": "已暂停",
     "generationFailed": "生成失败",
@@ -231,10 +231,10 @@
     "exitFullscreen": "退出全屏",
     "editCourse": "编辑课程",
     "doneEditing": "完成编辑",
-    "proModeDisabledHint": "本页不支持编辑——打开任意课程页即可使用 Pro 模式编辑。"
+    "proModeDisabledHint": "本页不支持编辑——打开任意课程页即可使用 AI 工作台编辑。"
   },
   "edit": {
-    "proMode": "专业模式",
+    "proMode": "AI 工作台",
     "undo": "撤销",
     "redo": "重做",
     "delete": "删除",
@@ -242,10 +242,10 @@
     "unsupportedScene": "{{type}}暂不支持编辑",
     "readOnlyBadge": "{{type}} · 仅查看",
     "sceneType": {
-      "slide": "幻灯片",
-      "quiz": "测验",
-      "interactive": "互动",
-      "pbl": "PBL"
+      "slide": "课程讲解",
+      "quiz": "理解检测",
+      "interactive": "互动探索",
+      "pbl": "项目实践"
     },
     "text": {
       "toolbar": "文本工具栏",
@@ -649,10 +649,10 @@
   "classroomComplete": {
     "title": "课程完成",
     "trailLabels": {
-      "slide": "页",
-      "quiz": "小测",
-      "interactive": "互动",
-      "pbl": "项目"
+      "slide": "讲解",
+      "quiz": "检测",
+      "interactive": "探索",
+      "pbl": "实践"
     },
     "quizScoreLabel": "答对 {{correct}} / {{total}}",
     "encouragement": {
@@ -662,8 +662,8 @@
     }
   },
   "whiteboard": {
-    "title": "互动白板",
-    "open": "打开白板",
+    "title": "智能白板",
+    "open": "打开智能白板",
     "clear": "清空白板",
     "minimize": "最小化白板",
     "ready": "白板已就绪",
@@ -679,12 +679,12 @@
     "elementCount": "{{count}} 个元素"
   },
   "quiz": {
-    "title": "随堂测验",
+    "title": "理解检测",
     "subtitle": "检测你的学习成果",
     "questionsCount": "道题",
     "totalPrefix": "共",
     "pointsSuffix": "分",
-    "startQuiz": "开始答题",
+    "startQuiz": "开始检测",
     "multipleChoiceHint": "（多选题，请选择所有正确答案）",
     "inputPlaceholder": "请在此输入你的回答...",
     "charCount": "字",
@@ -704,7 +704,7 @@
     "submitAnswers": "提交答案",
     "aiGrading": "AI 正在批改中...",
     "aiGradingWait": "请稍候，正在分析你的答案",
-    "quizReport": "答题报告",
+    "quizReport": "检测报告",
     "retry": "重新答题"
   },
   "roundtable": {
@@ -733,10 +733,10 @@
     "startRecording": "开始录音"
   },
   "pbl": {
-    "emptyProject": "PBL项目尚未生成，请通过课程生成创建",
+    "emptyProject": "项目实践尚未生成，请通过课程生成创建",
     "v2": {
       "hero": {
-        "title": "项目实战 · Project-Based Learning",
+        "title": "项目实践",
         "stage": "阶段",
         "task": "任务",
         "tutor": "导师",
@@ -961,7 +961,7 @@
     "notReady": "生成完成后可分享"
   },
   "classroom": {
-    "recentClassrooms": "最近学习",
+    "recentClassrooms": "我的课程",
     "today": "今天",
     "yesterday": "昨天",
     "daysAgo": "天前",
@@ -1014,7 +1014,7 @@
     "pdfSizeLimit": "支持最大50MB的PDF文件",
     "courseMaterialSizeLimit": "支持文档、演示、表格、图像、纯文本，最大 50MB（具体支持格式随所选解析器而定）",
     "generateFailed": "生成课堂失败，请重试",
-    "requirementPlaceholder": "输入你想学的任何内容，例如：\n「从零学 Python，30 分钟写出第一个程序」\n「用白板给我讲解傅里叶变换」\n「阿瓦隆桌游怎么玩」",
+    "requirementPlaceholder": "输入知识主题或上传学习资料，AI 将为你生成课程讲解、理解检测与互动探索。\n例如：「从零学习 Python」「用智能白板讲解傅里叶变换」",
     "requirementRequired": "请输入课程需求",
     "fileTooLarge": "文件过大，请选择小于 50MB 的文件",
     "courseMaterialCountLimit": "最多可上传 5 个课程材料文件",
@@ -1032,7 +1032,7 @@
     "generatingOutlines": "生成课程大纲",
     "generatingOutlinesDesc": "正在构建学习路径...",
     "generatingSlideContent": "生成页面内容",
-    "generatingSlideContentDesc": "正在创建幻灯片、测验和互动内容...",
+    "generatingSlideContentDesc": "正在创建课程讲解、理解检测和互动探索...",
     "generatingActions": "生成教学动作",
     "generatingActionsDesc": "正在编排讲解、聚焦和互动流程...",
     "generationComplete": "生成完成！",
@@ -1069,10 +1069,10 @@
     "addFirstScene": "添加第一个场景",
     "noOutlines": "暂无场景大纲",
     "sceneTitlePlaceholder": "场景标题",
-    "sceneTypeSlide": "幻灯片",
-    "sceneTypeQuiz": "测验",
-    "sceneTypeInteractive": "互动",
-    "sceneTypePbl": "项目式学习",
+    "sceneTypeSlide": "课程讲解",
+    "sceneTypeQuiz": "理解检测",
+    "sceneTypeInteractive": "互动探索",
+    "sceneTypePbl": "项目实践",
     "sceneDescriptionPlaceholder": "简短描述这个场景的目的和内容",
     "quizQuestionCount": "题目数量",
     "quizDifficulty": "难度",
@@ -1107,7 +1107,7 @@
     "interactiveConcept": "概念",
     "interactiveConceptPlaceholder": "要探索的概念",
     "pblConfigSummary": "项目",
-    "pblSubtype": "PBL 类型",
+    "pblSubtype": "项目实践类型",
     "pblSubtypeProject": "项目",
     "pblSubtypeScenario": "情景模拟",
     "pblProjectTopic": "项目主题",
@@ -1862,7 +1862,7 @@
       "download": "下载",
       "detailFailed": "技能详情加载失败",
       "contentLabel": "正文",
-      "builtinDetailNote": "该技能随 OpenMAIC 提供。下载后可导入其他智能体工作台。",
+      "builtinDetailNote": "该内置技能由知构 AI 提供，部分能力基于 OpenMAIC 开源项目。下载后可导入其他智能体工作台。",
       "upload": "上传",
       "uploading": "正在上传…",
       "uploadFailed": "技能上传失败。请检查文件后重试。",
@@ -1907,7 +1907,7 @@
     "retry": "重试",
     "untitledSession": "未命名对话",
     "pagePosition": "第 {{index}} / {{total}} 页",
-    "exitPro": "退出 Pro",
+    "exitPro": "退出 AI 工作台",
     "navAria": "工作区导航",
     "homeAria": "返回首页",
     "currentSession": "当前对话",
@@ -2015,9 +2015,9 @@
     "skillsLoadFailed": "Skill 加载失败，点击重试",
     "retrySkills": "重试",
     "noSkillMatch": "没有匹配“{{query}}”的 Skill",
-    "badgeAria": "专业模式",
-    "badgeEnter": "专业模式",
-    "badgeExit": "返回普通模式",
+    "badgeAria": "AI 工作台",
+    "badgeEnter": "进入 AI 工作台",
+    "badgeExit": "返回标准模式",
     "launchPlaceholder": "描述你想创造的学习体验",
     "launchSend": "开始构建"
   },

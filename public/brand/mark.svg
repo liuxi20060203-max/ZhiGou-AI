@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">知构 AI 品牌图标</title>
+  <desc id="desc">展开的知识页面通过中央节点连接为互动课程</desc>
+  <defs>
+    <mask id="left-page-cutouts">
+      <rect width="256" height="256" fill="#000"/>
+      <path d="M31 35a16 16 0 0 0-23 14v158a16 16 0 0 0 23 14l78-39a20 20 0 0 0 11-18V92a20 20 0 0 0-11-18Z" fill="#fff"/>
+      <path d="m42 75 57 28M42 103l57 28M42 131l42 21" fill="none" stroke="#000" stroke-width="10" stroke-linecap="round"/>
+    </mask>
+    <mask id="right-page-cutouts">
+      <rect width="256" height="256" fill="#000"/>
+      <path d="M225 35a16 16 0 0 1 23 14v158a16 16 0 0 1-23 14l-78-39a20 20 0 0 1-11-18V92a20 20 0 0 1 11-18Z" fill="#fff"/>
+      <rect x="157" y="74" width="66" height="54" rx="11" fill="#000" transform="rotate(-8 190 101)"/>
+      <rect x="157" y="137" width="66" height="54" rx="11" fill="#000" transform="rotate(8 190 164)"/>
+    </mask>
+  </defs>
+
+  <path d="M31 35a16 16 0 0 0-23 14v158a16 16 0 0 0 23 14l78-39a20 20 0 0 0 11-18V92a20 20 0 0 0-11-18Z" fill="#176B87" mask="url(#left-page-cutouts)"/>
+  <path d="M225 35a16 16 0 0 1 23 14v158a16 16 0 0 1-23 14l-78-39a20 20 0 0 1-11-18V92a20 20 0 0 1 11-18Z" fill="#14A99A" mask="url(#right-page-cutouts)"/>
+
+  <path d="M105 116 74 101M105 140l-31 15M151 116l31-15M151 140l31 15" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="128" cy="128" r="34" fill="#14A99A" stroke="#fff" stroke-width="8"/>
+  <path d="m178 151 21 13-21 13Z" fill="#14A99A"/>
+</svg>

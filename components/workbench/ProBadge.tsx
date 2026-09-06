@@ -45,28 +45,23 @@ export function ProBadge({ active, onToggle, className, testId }: ProBadgeProps)
       onClick={onToggle}
       whileTap={reduceMotion || !interactive ? undefined : { scale: 0.94 }}
       className={cn(
-        'relative inline-flex select-none items-center rounded-full border',
-        'px-[7px] py-[2px] text-[9.5px] font-semibold uppercase leading-[1.35]',
-        'tracking-[0.2em] transition-[color,background-color,border-color,box-shadow] duration-300',
+        'relative inline-flex select-none items-center whitespace-nowrap rounded-full border',
+        'px-2 py-[3px] text-[10px] font-semibold leading-[1.3]',
+        'tracking-[0.04em] transition-[color,background-color,border-color,box-shadow] duration-300',
         interactive ? 'cursor-pointer' : 'cursor-default',
         active
           ? [
-              'border-violet-500/70 bg-violet-600 text-white',
-              'shadow-[0_0_0_3px_rgba(139,92,246,0.14),0_1px_6px_rgba(109,40,217,0.35)]',
-              'dark:border-violet-400/60 dark:bg-violet-500',
+              'border-primary/70 bg-primary text-primary-foreground',
+              'shadow-[0_0_0_3px_rgba(20,169,154,0.14),0_1px_6px_rgba(23,107,135,0.3)]',
             ]
           : [
               'border-border bg-background/70 text-muted-foreground',
-              'hover:border-violet-400/70 hover:bg-violet-50/60 hover:text-violet-600',
-              'dark:hover:bg-violet-500/10',
-              'dark:hover:border-violet-400/40 dark:hover:text-violet-300',
+              'hover:border-primary/70 hover:bg-accent hover:text-primary',
             ],
         className,
       )}
     >
-      {/* The negative right margin pays back the trailing letter-space that
-          `tracking` adds after the O, so the word sits centred in the pill. */}
-      <span className="-mr-[0.2em]">Pro</span>
+      <span>{t('proMode.badgeAria')}</span>
     </motion.button>
   );
 

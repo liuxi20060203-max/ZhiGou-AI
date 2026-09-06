@@ -94,6 +94,7 @@ import {
 import { toast } from 'sonner';
 import { useI18n } from '@/lib/hooks/use-i18n';
 import { useBrand } from '@/lib/brand/brand-context';
+import { useTheme } from '@/lib/hooks/use-theme';
 import type { HomeDiscoveryState, useHomeDiscovery } from '@/lib/hooks/use-home-discovery';
 import { ProBadge } from '@/components/workbench/ProBadge';
 import { LanguageSwitcher } from '@/components/language-switcher';
@@ -232,6 +233,8 @@ export function WorkspaceRail({
 }) {
   const { t } = useI18n();
   const brand = useBrand();
+  const { resolvedTheme } = useTheme();
+  const horizontalLogoSrc = resolvedTheme === 'dark' ? brand.darkLogoSrc : brand.logoSrc;
   const foldersAvailable = workspaceFoldersAvailable();
 
   const coursesSection = useListSearch();
@@ -621,10 +624,10 @@ export function WorkspaceRail({
         aria-label={t('workspace.navAria')}
         className="ws-rail ws-mini relative z-10 hidden h-full shrink-0 flex-col items-center md:flex"
       >
-        <div className="flex h-16 shrink-0 items-center">
+        <div className="flex h-16 shrink-0 flex-col items-center justify-center gap-1">
+          <img src={brand.markSrc} alt="" aria-hidden="true" className="size-5 shrink-0" />
           {/* The expanded header's fold stays in the same spatial slot when the
-              rail closes. The mark disappears so this compact state exposes
-              its primary recovery action without changing the logo's meaning. */}
+              rail closes, directly below the compact brand mark. */}
           <PaneFoldButton
             testId="pro-nav-expand"
             label={t('workspace.expandNav')}
@@ -846,7 +849,7 @@ export function WorkspaceRail({
             never one control wearing both meanings. */}
         <HomeLink testId="pro-nav-home" onGoHome={onGoHome} className="-ml-1.5 px-1.5 py-1">
           <img
-            src={brand.logoSrc}
+            src={horizontalLogoSrc}
             alt=""
             aria-hidden="true"
             className="h-[21px] w-auto max-w-[110px] shrink-0"
