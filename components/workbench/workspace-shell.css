@@ -37,8 +37,8 @@
 /* ── Tokens ──────────────────────────────────────────────────────────────
    Neutral ramp + brand teal, matching the rest of the product. */
 .ws-root {
-  --ws-canvas-top: #f8fafc; /* slate-50  */
-  --ws-canvas-bottom: #f1f5f9; /* slate-100 */
+  --ws-canvas-top: #f4f8fa;
+  --ws-canvas-bottom: #eaf3f5;
   --ws-rail: rgba(255, 255, 255, 0.72);
   --ws-surface: rgba(255, 255, 255, 0.82);
 
@@ -155,8 +155,8 @@
 }
 
 .dark .ws-root {
-  --ws-canvas-top: #020617; /* slate-950 */
-  --ws-canvas-bottom: #0f172a; /* slate-900 */
+  --ws-canvas-top: #071b23;
+  --ws-canvas-bottom: #0b2630;
   --ws-rail: rgba(15, 23, 42, 0.62);
   --ws-surface: rgba(15, 23, 42, 0.78);
 
@@ -1206,13 +1206,12 @@
   }
 }
 
-/* The open course / the attached conversation: the SAME neutral pill hover
-   draws, one step stronger and permanent. No accent bar, no border, no second
-   colour — "what am I looking at" is answered by one fill that covers the whole
-   row, which is also why selection cannot shift a single pixel of the text. */
+/* The open course / attached conversation uses the brand wash permanently;
+   the same fill vocabulary remains shared with hover and focus, while the
+   teal tint gives the active destination a clear home in the rail. */
 .ws-row-active {
-  color: var(--ws-ink);
-  background: var(--ws-tint-strong);
+  color: var(--ws-accent);
+  background: var(--ws-accent-wash);
 }
 
 /* ── Panes ───────────────────────────────────────────────────────────────

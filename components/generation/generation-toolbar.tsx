@@ -225,7 +225,7 @@ export function GenerationToolbar({
   const pillCls =
     'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-all cursor-pointer select-none whitespace-nowrap border';
   const pillMuted = `${pillCls} border-border/50 text-muted-foreground/70 hover:text-foreground hover:bg-muted/60`;
-  const pillActive = `${pillCls} border-violet-200/60 dark:border-violet-700/50 bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300`;
+  const pillActive = `${pillCls} border-primary/20 bg-primary/10 text-primary dark:border-primary/30 dark:bg-primary/20 dark:text-primary`;
 
   return (
     <div className="flex items-center gap-1 flex-wrap">
@@ -350,8 +350,8 @@ export function GenerationToolbar({
                   className={cn(
                     'flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-4 transition-colors',
                     isDragging
-                      ? 'border-violet-400 bg-violet-50 dark:bg-violet-950/20'
-                      : 'border-muted-foreground/20 hover:border-violet-300',
+                      ? 'border-primary bg-primary/[0.06]'
+                      : 'border-muted-foreground/20 hover:border-primary/40',
                     materialsLocked ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
                   )}
                   onClick={() => {
@@ -393,8 +393,8 @@ export function GenerationToolbar({
                             key={file.id}
                             className="flex items-center gap-2 rounded-lg border border-border/50 px-2 py-2"
                           >
-                            <div className="size-8 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center shrink-0">
-                              <FileText className="size-4 text-violet-600 dark:text-violet-400" />
+                            <div className="size-8 rounded-lg bg-primary/10 dark:bg-primary/20 flex items-center justify-center shrink-0">
+                              <FileText className="size-4 text-primary" />
                             </div>
                             <div className="min-w-0 flex-1">
                               <p className="text-sm font-medium truncate">
@@ -453,7 +453,7 @@ export function GenerationToolbar({
                 className={cn(
                   'w-full flex items-center gap-2.5 rounded-lg border px-3 py-2.5 text-left transition-all',
                   webSearch
-                    ? 'bg-violet-50 dark:bg-violet-950/20 border-violet-200 dark:border-violet-800'
+                    ? 'bg-primary/[0.06] border-primary/20 dark:bg-primary/15 dark:border-primary/30'
                     : 'border-border hover:bg-muted/50',
                   !selectedWebSearchAvailable && 'opacity-60',
                   materialsLocked && 'opacity-60 cursor-not-allowed',
@@ -462,7 +462,7 @@ export function GenerationToolbar({
                 <Globe2
                   className={cn(
                     'size-4 shrink-0',
-                    webSearch ? 'text-violet-600 dark:text-violet-400' : 'text-muted-foreground',
+                    webSearch ? 'text-primary' : 'text-muted-foreground',
                   )}
                 />
                 <div className="flex-1 min-w-0">
@@ -607,7 +607,7 @@ function InlineThinkingControl({
   };
 
   const selectTriggerCls =
-    'h-6 min-w-[84px] rounded-full border-0 bg-violet-100 px-2 py-0 !text-[10px] font-medium leading-none text-violet-700 shadow-none focus-visible:ring-0 data-[size=sm]:h-6 dark:bg-violet-900/40 dark:text-violet-200 [&_svg]:size-3';
+    'h-6 min-w-[84px] rounded-full border-0 bg-primary/10 px-2 py-0 !text-[10px] font-medium leading-none text-primary shadow-none focus-visible:ring-0 data-[size=sm]:h-6 dark:bg-primary/20 dark:text-primary [&_svg]:size-3';
   const selectItemCls = 'py-1 text-xs';
   const hasAutoBudget =
     (thinking.control === 'toggle-budget' || thinking.control === 'budget-only') &&
@@ -633,8 +633,8 @@ function InlineThinkingControl({
       onPointerDown={(event) => event.stopPropagation()}
       onKeyDown={(event) => event.stopPropagation()}
     >
-      <Brain className="size-3.5 shrink-0 text-violet-500" />
-      <div className="flex min-w-0 items-center gap-0.5 rounded-full border border-violet-200/70 bg-white/65 p-0.5 dark:border-violet-800/70 dark:bg-violet-950/25">
+      <Brain className="size-3.5 shrink-0 text-primary" />
+      <div className="flex min-w-0 items-center gap-0.5 rounded-full border border-primary/20 bg-background/65 p-0.5 dark:border-primary/30 dark:bg-primary/10">
         {hasAutoBudget && (
           <Select
             value={autoBudgetMode}
@@ -642,7 +642,7 @@ function InlineThinkingControl({
           >
             <SelectTrigger
               size="sm"
-              className="h-6 min-w-[76px] rounded-full border-0 bg-violet-100 px-2 py-0 !text-[10px] font-medium leading-none text-violet-700 shadow-none focus-visible:ring-0 data-[size=sm]:h-6 dark:bg-violet-900/40 dark:text-violet-200 [&_svg]:size-3"
+              className="h-6 min-w-[76px] rounded-full border-0 bg-primary/10 px-2 py-0 !text-[10px] font-medium leading-none text-primary shadow-none focus-visible:ring-0 data-[size=sm]:h-6 dark:bg-primary/20 dark:text-primary [&_svg]:size-3"
             >
               <SelectValue />
             </SelectTrigger>
@@ -671,7 +671,7 @@ function InlineThinkingControl({
           >
             <SelectTrigger
               size="sm"
-              className="h-6 min-w-[76px] rounded-full border-0 bg-violet-100 px-2 py-0 !text-[10px] font-medium leading-none text-violet-700 shadow-none focus-visible:ring-0 data-[size=sm]:h-6 dark:bg-violet-900/40 dark:text-violet-200 [&_svg]:size-3"
+              className="h-6 min-w-[76px] rounded-full border-0 bg-primary/10 px-2 py-0 !text-[10px] font-medium leading-none text-primary shadow-none focus-visible:ring-0 data-[size=sm]:h-6 dark:bg-primary/20 dark:text-primary [&_svg]:size-3"
             >
               <SelectValue />
             </SelectTrigger>
@@ -738,8 +738,8 @@ function InlineThinkingControl({
         {(thinking.control === 'toggle-budget' || thinking.control === 'budget-only') &&
           thinking.budgetRange &&
           (!hasAutoBudget || autoBudgetMode === 'enabled') && (
-            <label className="ml-0.5 grid h-6 shrink-0 grid-cols-[auto_60px] items-stretch overflow-hidden rounded-full border border-violet-200/70 bg-background dark:border-violet-800/70">
-              <span className="grid h-[22px] shrink-0 place-items-center border-r border-violet-200/70 bg-muted/30 px-2 font-sans text-[11px] font-medium leading-[22px] text-muted-foreground dark:border-violet-800/70">
+            <label className="ml-0.5 grid h-6 shrink-0 grid-cols-[auto_60px] items-stretch overflow-hidden rounded-full border border-primary/20 bg-background dark:border-primary/30">
+              <span className="grid h-[22px] shrink-0 place-items-center border-r border-primary/20 bg-muted/30 px-2 font-sans text-[11px] font-medium leading-[22px] text-muted-foreground dark:border-primary/30">
                 {t('toolbar.thinkingBudget')}
               </span>
               <input
@@ -868,9 +868,8 @@ function ModelSettingsPopover({
               aria-label={`${currentProviderName} / ${currentModelLabel}`}
               className={cn(
                 'inline-flex h-8 min-w-0 items-center gap-1.5 rounded-full border px-2 text-xs font-medium transition-all',
-                'border-violet-200/70 bg-violet-50 text-violet-700 hover:bg-violet-100 dark:border-violet-800/70 dark:bg-violet-950/30 dark:text-violet-300',
-                currentModelId &&
-                  'shadow-[0_0_0_1px_rgba(124,58,237,0.12)] dark:shadow-[0_0_0_1px_rgba(167,139,250,0.16)]',
+                'border-primary/20 bg-primary/[0.06] text-primary hover:bg-primary/10 dark:border-primary/30 dark:bg-primary/15 dark:text-primary',
+                currentModelId && 'shadow-sm',
               )}
             >
               {currentProviderIcon ? (
@@ -883,7 +882,7 @@ function ModelSettingsPopover({
                 <Bot className="size-3.5 shrink-0" />
               )}
               {currentThinkingLabel && (
-                <span className="shrink-0 rounded-full bg-white/80 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-violet-700 ring-1 ring-violet-200/70 dark:bg-violet-950/50 dark:text-violet-200 dark:ring-violet-800/70">
+                <span className="shrink-0 rounded-full bg-background/80 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-primary ring-1 ring-primary/20 dark:bg-primary/10 dark:text-primary dark:ring-primary/30">
                   {currentThinkingLabel}
                 </span>
               )}
@@ -943,7 +942,7 @@ function ModelSettingsPopover({
                           {provider.models.length}
                         </div>
                       </div>
-                      {isCurrent && <span className="size-1.5 rounded-full bg-violet-500" />}
+                      {isCurrent && <span className="size-1.5 rounded-full bg-primary" />}
                     </button>
                   );
                 })
@@ -997,7 +996,7 @@ function ModelSettingsPopover({
                       className={cn(
                         'mb-1 flex min-h-11 w-full items-center gap-2 rounded-md px-2.5 py-2 text-left transition-colors',
                         isSelected
-                          ? 'bg-violet-50 text-violet-700 ring-1 ring-violet-200 dark:bg-violet-950/25 dark:text-violet-300 dark:ring-violet-800'
+                          ? 'bg-primary/[0.06] text-primary ring-1 ring-primary/20 dark:bg-primary/15 dark:text-primary dark:ring-primary/30'
                           : 'hover:bg-muted/60',
                       )}
                     >
@@ -1017,9 +1016,7 @@ function ModelSettingsPopover({
                           t={t}
                         />
                       )}
-                      {isSelected && (
-                        <Check className="size-3.5 shrink-0 text-violet-600 dark:text-violet-400" />
-                      )}
+                      {isSelected && <Check className="size-3.5 shrink-0 text-primary" />}
                     </div>
                   );
                 })

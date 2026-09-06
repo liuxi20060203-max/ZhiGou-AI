@@ -11,7 +11,12 @@
   },
   "home": {
     "slogan": "マルチエージェント対話型教室で生成的に学ぶ",
-    "greetingWithName": "こんにちは、{{name}}さん"
+    "greetingWithName": "こんにちは、{{name}}さん",
+    "createEyebrow": "AI インタラクティブコース作成",
+    "createTitle": "ひとつのテーマから、完成されたインタラクティブコースへ",
+    "createDescription": "学習目標、教材、希望する設定を入力すると、ZhiGou AI がコースの設計・生成・インタラクション構成を支援します。",
+    "libraryDescription": "インタラクティブコースの作成、整理、管理を続ける",
+    "emptyLibraryTitle": "最初のインタラクティブコースを作成"
   },
   "toolbar": {
     "pdfParser": "パーサー",

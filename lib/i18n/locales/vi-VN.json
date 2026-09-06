@@ -11,7 +11,12 @@
   },
   "home": {
     "slogan": "Học tập sinh tạo trong lớp học tương tác đa tác nhân",
-    "greetingWithName": "Chào {{name}}"
+    "greetingWithName": "Chào {{name}}",
+    "createEyebrow": "Tạo khóa học tương tác bằng AI",
+    "createTitle": "Biến một chủ đề thành khóa học tương tác hoàn chỉnh",
+    "createDescription": "Mô tả mục tiêu học tập, thêm tài liệu và tùy chọn để ZhiGou AI hỗ trợ thiết kế, tạo nội dung và tổ chức tương tác cho khóa học.",
+    "libraryDescription": "Tiếp tục tạo, sắp xếp và quản lý các khóa học tương tác",
+    "emptyLibraryTitle": "Tạo khóa học tương tác đầu tiên"
   },
   "toolbar": {
     "pdfParser": "Bộ đọc PDF",

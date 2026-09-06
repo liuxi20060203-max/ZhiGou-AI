@@ -11,7 +11,12 @@
   },
   "home": {
     "slogan": "让知识，成为一堂会互动的课",
-    "greetingWithName": "嗨，{{name}}"
+    "greetingWithName": "嗨，{{name}}",
+    "createEyebrow": "AI 互动课程创作",
+    "createTitle": "从一个主题，构建完整互动课程",
+    "createDescription": "描述你的教学目标，添加材料与偏好，知构 AI 将协助你完成课程设计、内容生成与互动编排。",
+    "libraryDescription": "继续创作、整理并管理你生成的互动课程",
+    "emptyLibraryTitle": "创建你的第一堂互动课程"
   },
   "toolbar": {
     "pdfParser": "解析器",

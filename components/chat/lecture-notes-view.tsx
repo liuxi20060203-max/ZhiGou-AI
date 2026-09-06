@@ -39,8 +39,7 @@ const ACTION_ICON_ONLY: Record<string, { Icon: typeof Flashlight; style: string 
   },
   widget_setState: {
     Icon: SlidersHorizontal,
-    style:
-      'bg-indigo-50 dark:bg-indigo-500/15 border-indigo-300/40 dark:border-indigo-500/30 text-indigo-700 dark:text-indigo-300',
+    style: 'bg-primary/10 dark:bg-primary/15 border-primary/25 dark:border-primary/30 text-primary',
   },
   widget_annotation: {
     Icon: StickyNote,
@@ -85,7 +84,7 @@ export function LectureNotesView({
   if (notes.length === 0) {
     return (
       <div className="h-full flex flex-col items-center justify-center text-center p-6">
-        <div className="w-12 h-12 bg-purple-50 dark:bg-purple-900/20 rounded-2xl flex items-center justify-center mb-3 text-purple-300 dark:text-purple-600 ring-1 ring-purple-100 dark:ring-purple-800/30">
+        <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/20 dark:bg-primary/20">
           <BookOpen className="w-6 h-6" />
         </div>
         <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
@@ -115,7 +114,7 @@ export function LectureNotesView({
             className={cn(
               'relative mb-3 last:mb-0 rounded-lg px-3 py-2.5 transition-colors duration-200',
               isCurrent
-                ? 'bg-purple-50/80 dark:bg-purple-950/25 ring-1 ring-purple-200/60 dark:ring-purple-700/30'
+                ? 'bg-primary/[0.06] ring-1 ring-primary/20 dark:bg-primary/15 dark:ring-primary/30'
                 : 'bg-gray-50/50 dark:bg-gray-800/30',
             )}
           >
@@ -126,22 +125,20 @@ export function LectureNotesView({
                 className={cn(
                   'w-2 h-2 rounded-full shrink-0',
                   isCurrent
-                    ? 'bg-purple-500 dark:bg-purple-400 shadow-sm shadow-purple-400/40'
+                    ? 'bg-primary shadow-sm shadow-primary/30'
                     : 'bg-gray-300 dark:bg-gray-600',
                 )}
               />
               <span
                 className={cn(
                   'text-[10px] font-semibold tracking-wide',
-                  isCurrent
-                    ? 'text-purple-600 dark:text-purple-400'
-                    : 'text-gray-400 dark:text-gray-500',
+                  isCurrent ? 'text-primary' : 'text-gray-400 dark:text-gray-500',
                 )}
               >
                 {pageLabel}
               </span>
               {isCurrent && (
-                <span className="text-[9px] font-bold px-1.5 py-px rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300">
+                <span className="rounded-full bg-primary/10 px-1.5 py-px text-[9px] font-bold text-primary dark:bg-primary/20">
                   {t('chat.lectureNotes.currentPage')}
                 </span>
               )}
@@ -259,10 +256,10 @@ export function LectureNotesView({
                         className={cn(
                           'block w-full text-left rounded-md px-1 py-0.5 text-[12px] leading-[1.8] transition-colors',
                           isActiveSpeech
-                            ? 'bg-purple-100/80 text-purple-800 dark:bg-purple-900/35 dark:text-purple-200'
+                            ? 'bg-primary/10 text-primary dark:bg-primary/20'
                             : 'text-gray-700 dark:text-gray-300',
                           canJump
-                            ? 'cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-950/25'
+                            ? 'cursor-pointer hover:bg-primary/10 dark:hover:bg-primary/15'
                             : 'cursor-default',
                         )}
                         aria-label={jumpTitle}

@@ -11,7 +11,12 @@
   },
   "home": {
     "slogan": "Generatives Lernen im interaktiven Lernraum mit mehreren KI-Agenten",
-    "greetingWithName": "Hallo, {{name}}"
+    "greetingWithName": "Hallo, {{name}}",
+    "createEyebrow": "Interaktive Kurse mit KI erstellen",
+    "createTitle": "Von einem Thema zum vollständigen interaktiven Kurs",
+    "createDescription": "Beschreibe deine Lernziele, füge Materialien und Präferenzen hinzu und lass ZhiGou AI den Kurs entwerfen, erstellen und interaktiv gestalten.",
+    "libraryDescription": "Interaktive Kurse weiterentwickeln, organisieren und verwalten",
+    "emptyLibraryTitle": "Erstelle deinen ersten interaktiven Kurs"
   },
   "toolbar": {
     "pdfParser": "Parser",

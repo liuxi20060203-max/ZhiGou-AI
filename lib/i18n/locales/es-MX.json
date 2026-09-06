@@ -11,7 +11,12 @@
   },
   "home": {
     "slogan": "Aprendizaje generativo en un aula interactiva multiagente",
-    "greetingWithName": "Hola, {{name}}"
+    "greetingWithName": "Hola, {{name}}",
+    "createEyebrow": "Creación de cursos interactivos con IA",
+    "createTitle": "Convierte un tema en un curso interactivo completo",
+    "createDescription": "Describe tus objetivos de aprendizaje, agrega materiales y preferencias, y deja que ZhiGou AI te ayude a diseñar, generar y organizar el curso.",
+    "libraryDescription": "Continúa creando, organizando y gestionando tus cursos interactivos",
+    "emptyLibraryTitle": "Crea tu primer curso interactivo"
   },
   "toolbar": {
     "pdfParser": "Analizador",

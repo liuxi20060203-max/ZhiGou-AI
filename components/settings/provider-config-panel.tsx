@@ -212,7 +212,7 @@ export function ProviderConfigPanel({
     <div className="space-y-6 max-w-3xl">
       {/* Server-configured notice */}
       {isServerConfigured && (
-        <div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/30 p-3 text-sm text-blue-700 dark:text-blue-300">
+        <div className="rounded-lg border border-primary/20 bg-primary/[0.06] p-3 text-sm text-primary">
           {t('settings.serverConfiguredNotice')}
         </div>
       )}
@@ -382,7 +382,7 @@ export function ProviderConfigPanel({
       {/* Models - No selection state, just list for management */}
       <div className="space-y-3">
         {provider.id === 'azure' && (
-          <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-700 dark:border-blue-800 dark:bg-blue-950/30 dark:text-blue-300">
+          <div className="rounded-lg border border-primary/20 bg-primary/[0.06] p-3 text-sm text-primary">
             {t('settings.azureDeploymentHint')}
           </div>
         )}

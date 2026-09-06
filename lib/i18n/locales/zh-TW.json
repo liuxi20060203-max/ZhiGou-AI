@@ -11,7 +11,12 @@
   },
   "home": {
     "slogan": "多智能體互動課室中的生成式學習",
-    "greetingWithName": "嗨，{{name}}"
+    "greetingWithName": "嗨，{{name}}",
+    "createEyebrow": "AI 互動課程創作",
+    "createTitle": "從一個主題，建構完整互動課程",
+    "createDescription": "描述你的教學目標，加入材料與偏好，知構 AI 將協助你完成課程設計、內容生成與互動編排。",
+    "libraryDescription": "繼續創作、整理並管理你生成的互動課程",
+    "emptyLibraryTitle": "建立你的第一堂互動課程"
   },
   "toolbar": {
     "pdfParser": "解析器",

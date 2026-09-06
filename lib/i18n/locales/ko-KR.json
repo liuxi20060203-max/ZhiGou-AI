@@ -11,7 +11,12 @@
   },
   "home": {
     "slogan": "멀티 에이전트 인터랙티브 교실에서 펼치는 생성형 학습",
-    "greetingWithName": "안녕하세요, {{name}}!"
+    "greetingWithName": "안녕하세요, {{name}}!",
+    "createEyebrow": "AI 인터랙티브 코스 제작",
+    "createTitle": "하나의 주제를 완성된 인터랙티브 코스로",
+    "createDescription": "학습 목표와 자료, 선호 설정을 입력하면 ZhiGou AI가 코스 설계, 생성, 인터랙션 구성을 지원합니다.",
+    "libraryDescription": "인터랙티브 코스를 계속 만들고 정리하고 관리하세요",
+    "emptyLibraryTitle": "첫 인터랙티브 코스 만들기"
   },
   "toolbar": {
     "pdfParser": "파서",

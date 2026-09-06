@@ -11,7 +11,12 @@
   },
   "home": {
     "slogan": "Turn knowledge into an interactive course.",
-    "greetingWithName": "Hi, {{name}}"
+    "greetingWithName": "Hi, {{name}}",
+    "createEyebrow": "AI interactive course creation",
+    "createTitle": "Turn one topic into a complete interactive course",
+    "createDescription": "Describe your learning goals, add source material and preferences, and let ZhiGou AI help design, generate, and orchestrate the course.",
+    "libraryDescription": "Continue creating, organizing, and managing your interactive courses",
+    "emptyLibraryTitle": "Create your first interactive course"
   },
   "toolbar": {
     "pdfParser": "Parser",

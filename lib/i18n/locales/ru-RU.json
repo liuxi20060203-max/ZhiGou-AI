@@ -11,7 +11,12 @@
   },
   "home": {
     "slogan": "Generative Learning in Multi-Agent Interactive Classroom",
-    "greetingWithName": "Привет, {{name}}"
+    "greetingWithName": "Привет, {{name}}",
+    "createEyebrow": "Создание интерактивных курсов с ИИ",
+    "createTitle": "Превратите одну тему в полноценный интерактивный курс",
+    "createDescription": "Опишите цели обучения, добавьте материалы и предпочтения — ZhiGou AI поможет спроектировать, создать и организовать курс.",
+    "libraryDescription": "Продолжайте создавать, упорядочивать и управлять интерактивными курсами",
+    "emptyLibraryTitle": "Создайте свой первый интерактивный курс"
   },
   "toolbar": {
     "pdfParser": "Парсер",

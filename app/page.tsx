@@ -705,7 +705,7 @@ function HomePage() {
   };
 
   return (
-    <div className="min-h-[100dvh] w-full bg-gradient-to-b from-background to-secondary/70 flex flex-col items-center p-4 pt-16 md:p-8 md:pt-16 overflow-x-hidden">
+    <div className="relative min-h-[100dvh] w-full overflow-x-hidden bg-[linear-gradient(180deg,var(--background)_0%,color-mix(in_oklab,var(--secondary)_62%,var(--background))_100%)] flex flex-col items-center px-4 pb-4 pt-16 md:px-8 md:pb-8 md:pt-16">
       <input
         ref={fileInputRef}
         type="file"
@@ -822,12 +822,14 @@ function HomePage() {
         />
       </div>
 
-      {/* ═══ Hero section: title + input (centered, wider) ═══ */}
+      {/* ═══ Course creation hero ═══ */}
       <motion.div
         initial={heroEnter({ opacity: 0, y: 20 })}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
-        className={cn('relative z-20 w-full max-w-[800px] flex flex-col items-center mt-[10vh]')}
+        className={cn(
+          'relative z-20 mt-[6vh] flex w-full max-w-[920px] flex-col items-center md:mt-[8vh]',
+        )}
       >
         {/* ── Logo ── */}
         <div className="relative" data-pro-morph="lockup">
@@ -842,7 +844,7 @@ function HomePage() {
               stiffness: 200,
               damping: 20,
             }}
-            className="h-12 md:h-16 mb-2 -ml-2 md:-ml-3"
+            className="mb-2 h-11 -ml-2 md:h-14 md:-ml-3"
           />
           {workbenchEntryEnabled ? (
             <div
@@ -859,10 +861,28 @@ function HomePage() {
           initial={heroEnter({ opacity: 0 })}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.25 }}
-          className="text-sm text-muted-foreground/60 mb-8"
+          className="mb-5 text-sm font-medium text-primary/80"
         >
           {t('home.slogan')}
         </motion.p>
+
+        <motion.div
+          initial={heroEnter({ opacity: 0, y: 10 })}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mb-7 max-w-[720px] text-center"
+        >
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/[0.06] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
+            <Sparkles className="size-3.5" aria-hidden="true" />
+            {t('home.createEyebrow')}
+          </div>
+          <h1 className="text-balance text-[30px] font-semibold leading-[1.16] tracking-[-0.035em] text-foreground sm:text-[38px] md:text-[44px]">
+            {t('home.createTitle')}
+          </h1>
+          <p className="mx-auto mt-4 max-w-[640px] text-pretty text-sm leading-6 text-muted-foreground sm:text-[15px]">
+            {t('home.createDescription')}
+          </p>
+        </motion.div>
 
         {/* ── Unified input area ── */}
         <motion.div
@@ -873,7 +893,7 @@ function HomePage() {
         >
           <div
             data-pro-morph="composer"
-            className="w-full rounded-2xl border border-border/60 bg-card/80 backdrop-blur-xl shadow-xl shadow-black/[0.03] dark:shadow-black/20 transition-shadow focus-within:shadow-2xl focus-within:shadow-primary/[0.08]"
+            className="w-full rounded-[24px] border border-primary/15 bg-card/90 backdrop-blur-xl shadow-[0_24px_80px_-36px_color-mix(in_oklab,var(--primary)_38%,transparent)] transition-[border-color,box-shadow] focus-within:border-primary/35 focus-within:shadow-[0_28px_90px_-34px_color-mix(in_oklab,var(--primary)_46%,transparent)]"
           >
             {/* ── Greeting + Profile + Agents ── */}
             <div className="relative z-20 flex min-w-0 items-start justify-between">
@@ -887,7 +907,7 @@ function HomePage() {
             <textarea
               ref={textareaRef}
               placeholder={t('upload.requirementPlaceholder')}
-              className="w-full resize-none border-0 bg-transparent px-4 pt-1 pb-2 text-[13px] leading-relaxed placeholder:text-muted-foreground/40 focus:outline-none min-h-[140px] max-h-[300px]"
+              className="min-h-[150px] max-h-[300px] w-full resize-none border-0 bg-transparent px-5 pb-3 pt-2 text-[14px] leading-relaxed placeholder:text-muted-foreground/45 focus:outline-none"
               value={form.requirement}
               onChange={(e) => updateForm('requirement', e.target.value)}
               onKeyDown={handleKeyDown}
@@ -1025,7 +1045,7 @@ function HomePage() {
         </AnimatePresence>
       </motion.div>
 
-      {/* ═══ Recent classrooms — collapsible ═══ */}
+      {/* ═══ Course library — collapsible ═══ */}
       {/* The library action bar is always present after hydration: it carries
           the New-folder / import / search actions, so a brand-new user with
           zero courses and zero folders can still create the first folder or
@@ -1035,42 +1055,49 @@ function HomePage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="relative z-10 mt-10 w-full max-w-6xl flex flex-col items-center"
+          className="relative z-10 mt-14 flex w-full max-w-6xl flex-col rounded-[28px] border border-border/60 bg-card/55 p-4 shadow-[0_30px_90px_-58px_rgba(16,42,67,0.55)] backdrop-blur-sm sm:p-6 md:mt-20 md:p-8"
         >
-          {/* Trigger — divider-line with centered text. Fixed height keeps the
-              bar geometrically stable when the New-folder action or the folder
-              path appears/disappears (entering vs leaving a folder). */}
-          <div className="group w-full flex items-center gap-4 h-9">
-            <div className="flex-1 h-px bg-border/40 group-hover:bg-border/70 transition-colors" />
-            <div className="shrink-0 flex items-center gap-3 text-[13px] text-muted-foreground/60 select-none">
-              <button
-                onClick={() => {
-                  if (currentFolderId) setCurrentFolderId(undefined);
-                  else persistRecentOpen(!recentOpen);
-                }}
-                className="flex items-center gap-2 hover:text-foreground/70 transition-colors cursor-pointer"
-              >
-                <Clock className="size-3.5" />
-                {t('classroom.recentClassrooms')}
-                {currentFolder && (
-                  <>
-                    <ChevronRight className="size-3 opacity-40" />
-                    <span className="text-foreground/80 truncate max-w-[160px]">
-                      {currentFolder.name}
-                    </span>
-                  </>
-                )}
-                <span className="text-[11px] tabular-nums opacity-60">
-                  {currentFolder ? currentFolderClassrooms.length : classrooms.length}
+          <div className="flex w-full flex-col gap-4 border-b border-border/50 pb-5 sm:flex-row sm:items-center sm:justify-between">
+            <button
+              type="button"
+              onClick={() => {
+                if (currentFolderId) setCurrentFolderId(undefined);
+                else persistRecentOpen(!recentOpen);
+              }}
+              className="group/library min-w-0 text-left"
+            >
+              <span className="flex items-center gap-2.5">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <Clock className="size-4.5" aria-hidden="true" />
                 </span>
-                <motion.div
-                  animate={{ rotate: recentOpen ? 180 : 0 }}
-                  transition={{ duration: 0.3, ease: 'easeInOut' }}
-                >
-                  <ChevronDown className="size-3.5" />
-                </motion.div>
-              </button>
+                <span className="min-w-0">
+                  <span className="flex items-center gap-2 text-lg font-semibold tracking-tight text-foreground">
+                    {t('classroom.recentClassrooms')}
+                    {currentFolder && (
+                      <>
+                        <ChevronRight className="size-4 text-muted-foreground/50" />
+                        <span className="max-w-[180px] truncate">{currentFolder.name}</span>
+                      </>
+                    )}
+                    <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium tabular-nums text-muted-foreground">
+                      {currentFolder ? currentFolderClassrooms.length : classrooms.length}
+                    </span>
+                    <motion.span
+                      animate={{ rotate: recentOpen ? 180 : 0 }}
+                      transition={{ duration: 0.25, ease: 'easeInOut' }}
+                      className="text-muted-foreground transition-colors group-hover/library:text-foreground"
+                    >
+                      <ChevronDown className="size-4" />
+                    </motion.span>
+                  </span>
+                  <span className="mt-0.5 block text-xs text-muted-foreground sm:text-[13px]">
+                    {t('home.libraryDescription')}
+                  </span>
+                </span>
+              </span>
+            </button>
 
+            <div className="flex shrink-0 items-center gap-2 text-[13px] text-muted-foreground select-none">
               {/* Search toggle — icon that expands into an input in place */}
               <AnimatePresence initial={false}>
                 {!searchOpen ? (
@@ -1088,7 +1115,7 @@ function HomePage() {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.12, ease: 'easeOut' }}
-                    className="flex items-center justify-center size-6 rounded-full text-muted-foreground/50 hover:text-foreground/70 hover:bg-muted/50 transition-colors cursor-pointer"
+                    className="flex size-8 items-center justify-center rounded-lg border border-border/60 bg-background/70 text-muted-foreground transition-colors hover:border-primary/25 hover:bg-primary/[0.06] hover:text-primary cursor-pointer"
                   >
                     <Search className="size-3.5" />
                   </motion.button>
@@ -1156,23 +1183,19 @@ function HomePage() {
               <button
                 onClick={triggerImport}
                 disabled={importing}
-                className="group/import grid grid-cols-[auto_0fr] hover:grid-cols-[auto_1fr] items-center gap-1 rounded-full px-1.5 py-0.5 text-[12px] text-muted-foreground/35 hover:text-muted-foreground/70 hover:bg-muted/50 transition-all duration-200 cursor-pointer"
+                className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border/60 bg-background/70 px-2.5 text-[12px] text-muted-foreground transition-colors hover:border-primary/25 hover:bg-primary/[0.06] hover:text-primary cursor-pointer"
               >
-                <Upload className="size-3" />
-                <span className="overflow-hidden opacity-0 group-hover/import:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                  {t('import.classroom')}
-                </span>
+                <Upload className="size-3.5" />
+                <span className="hidden whitespace-nowrap sm:inline">{t('import.classroom')}</span>
               </button>
               {PPTX_IMPORT_ENABLED && (
                 <button
                   onClick={triggerPptxFileSelect}
                   disabled={pptxImporting}
-                  className="group/import-pptx grid grid-cols-[auto_0fr] hover:grid-cols-[auto_1fr] items-center gap-1 rounded-full px-1.5 py-0.5 text-[12px] text-muted-foreground/35 hover:text-muted-foreground/70 hover:bg-muted/50 transition-all duration-200 cursor-pointer"
+                  className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border/60 bg-background/70 px-2.5 text-[12px] text-muted-foreground transition-colors hover:border-primary/25 hover:bg-primary/[0.06] hover:text-primary cursor-pointer"
                 >
-                  <Presentation className="size-3" />
-                  <span className="overflow-hidden opacity-0 group-hover/import-pptx:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                    {t('import.pptx')}
-                  </span>
+                  <Presentation className="size-3.5" />
+                  <span className="hidden whitespace-nowrap sm:inline">{t('import.pptx')}</span>
                 </button>
               )}
               {/* New folder — round icon button, matches the import/upload affordances. */}
@@ -1185,13 +1208,12 @@ function HomePage() {
                   }}
                   aria-label={t('classroom.newFolderTitle')}
                   title={t('classroom.newFolderTitle')}
-                  className="inline-flex items-center justify-center size-7 rounded-full bg-muted/40 text-muted-foreground ring-1 ring-border/50 hover:bg-muted hover:text-foreground hover:ring-border transition-[background-color,color,box-shadow] cursor-pointer"
+                  className="inline-flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm transition-opacity hover:opacity-90 cursor-pointer"
                 >
-                  <FolderPlus className="size-3.5" />
+                  <FolderPlus className="size-4" />
                 </button>
               )}
             </div>
-            <div className="flex-1 h-px bg-border/40 group-hover:bg-border/70 transition-colors" />
           </div>
 
           {/* Expandable content */}
@@ -1205,8 +1227,16 @@ function HomePage() {
                 className="w-full overflow-hidden"
               >
                 {folders.length === 0 && classrooms.length === 0 ? (
-                  <div className="pt-8 pb-2 text-center text-[13px] text-muted-foreground/60">
-                    {t('classroom.emptyLibraryHint')}
+                  <div className="flex flex-col items-center px-4 pb-5 pt-12 text-center">
+                    <span className="mb-4 flex size-14 items-center justify-center rounded-2xl border border-primary/15 bg-primary/[0.06] text-primary">
+                      <Sparkles className="size-6" aria-hidden="true" />
+                    </span>
+                    <h3 className="text-base font-semibold text-foreground">
+                      {t('home.emptyLibraryTitle')}
+                    </h3>
+                    <p className="mt-1.5 max-w-md text-[13px] leading-5 text-muted-foreground">
+                      {t('classroom.emptyLibraryHint')}
+                    </p>
                   </div>
                 ) : !isSearching && currentFolderId && currentFolderClassrooms.length === 0 ? (
                   // Empty folder: hint directly below the centered path bar.

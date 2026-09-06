@@ -143,7 +143,7 @@ export function HeaderControls({
           'shrink-0 flex items-center gap-1 backdrop-blur-md shadow-sm rounded-full',
           compact
             ? 'bg-zinc-100/70 dark:bg-zinc-800/70 border border-zinc-200/60 dark:border-zinc-700/60 px-1.5 py-1'
-            : 'bg-white/60 dark:bg-gray-800/60 border border-gray-100/50 dark:border-gray-700/50 px-2 py-1.5',
+            : 'bg-background/60 border border-border/50 px-2 py-1.5',
         )}
       >
         {/* Language — Radix DropdownMenu so its menu portals to body
@@ -168,8 +168,7 @@ export function HeaderControls({
               onSelect={() => setTheme('light')}
               className={cn(
                 'cursor-pointer gap-2',
-                theme === 'light' &&
-                  'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400',
+                theme === 'light' && 'bg-primary/10 dark:bg-primary/20 text-primary',
               )}
             >
               <Sun className="w-4 h-4" />
@@ -179,8 +178,7 @@ export function HeaderControls({
               onSelect={() => setTheme('dark')}
               className={cn(
                 'cursor-pointer gap-2',
-                theme === 'dark' &&
-                  'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400',
+                theme === 'dark' && 'bg-primary/10 dark:bg-primary/20 text-primary',
               )}
             >
               <Moon className="w-4 h-4" />
@@ -190,8 +188,7 @@ export function HeaderControls({
               onSelect={() => setTheme('system')}
               className={cn(
                 'cursor-pointer gap-2',
-                theme === 'system' &&
-                  'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400',
+                theme === 'system' && 'bg-primary/10 dark:bg-primary/20 text-primary',
               )}
             >
               <Monitor className="w-4 h-4" />
@@ -223,11 +220,11 @@ export function HeaderControls({
             'bg-white/60 dark:bg-gray-800/60 backdrop-blur-md',
             compact ? 'h-8 px-2.5' : 'h-9 px-3',
             proChecked
-              ? 'border-violet-500/60 dark:border-violet-400/60'
+              ? 'border-primary/60 dark:border-primary/60'
               : 'border-gray-100/50 dark:border-gray-700/50',
             !canEdit && mode !== 'edit'
               ? 'opacity-60 cursor-not-allowed'
-              : 'cursor-pointer hover:border-violet-400/60 dark:hover:border-violet-500/50',
+              : 'cursor-pointer hover:border-primary/50 dark:hover:border-primary/50',
           )}
           // When disabled (e.g. the course-complete placeholder), explain why
           // on hover and point the user to a real scene instead of a bare
@@ -243,9 +240,7 @@ export function HeaderControls({
           <span
             className={cn(
               'text-[11px] font-bold uppercase tracking-[0.14em] tabular-nums select-none transition-colors duration-200',
-              proChecked
-                ? 'text-violet-600 dark:text-violet-300'
-                : 'text-gray-500 dark:text-gray-400',
+              proChecked ? 'text-primary' : 'text-gray-500 dark:text-gray-400',
             )}
           >
             {t('edit.proMode')}
@@ -255,7 +250,7 @@ export function HeaderControls({
             onCheckedChange={onToggleEditMode}
             disabled={!canEdit && mode !== 'edit'}
             aria-label={proChecked ? t('stage.doneEditing') : t('stage.editCourse')}
-            className="data-[state=checked]:bg-violet-600 dark:data-[state=checked]:bg-violet-500"
+            className="data-[state=checked]:bg-primary"
           />
         </label>
       )}

@@ -116,7 +116,7 @@ export function SceneSidebar({
         width: displayWidth,
         transition: isDraggingRef.current ? 'none' : 'width 0.3s ease',
       }}
-      className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-r border-gray-100 dark:border-gray-800 shadow-[2px_0_24px_rgba(0,0,0,0.02)] flex flex-col shrink-0 z-20 relative overflow-visible"
+      className="bg-background/80 backdrop-blur-xl border-r border-border/60 shadow-[2px_0_24px_rgba(0,0,0,0.02)] flex flex-col shrink-0 z-20 relative overflow-visible"
     >
       {/* Drag handle */}
       {!collapsed && (
@@ -173,7 +173,7 @@ export function SceneSidebar({
                 className={cn(
                   'group relative rounded-lg transition-all duration-200 cursor-pointer flex flex-col gap-1 p-1.5',
                   isActive
-                    ? 'bg-purple-50 dark:bg-purple-900/20 ring-1 ring-purple-200 dark:ring-purple-700'
+                    ? 'bg-primary/10 dark:bg-primary/20 ring-1 ring-primary/25 dark:ring-primary/35'
                     : 'hover:bg-gray-50/80 dark:hover:bg-gray-800/50',
                 )}
               >
@@ -184,7 +184,7 @@ export function SceneSidebar({
                       className={cn(
                         'text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center shrink-0',
                         isActive
-                          ? 'bg-purple-600 dark:bg-purple-500 text-white shadow-sm shadow-purple-500/30'
+                          ? 'bg-primary dark:bg-primary text-primary-foreground shadow-sm shadow-primary/30'
                           : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400',
                       )}
                     >
@@ -195,7 +195,7 @@ export function SceneSidebar({
                       className={cn(
                         'text-xs font-bold truncate transition-colors',
                         isActive
-                          ? 'text-purple-700 dark:text-purple-300'
+                          ? 'text-primary'
                           : 'text-gray-600 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-100',
                       )}
                     >
@@ -329,9 +329,9 @@ export function SceneSidebar({
                     {isSlide && (
                       <div
                         className={cn(
-                          'absolute inset-0 bg-purple-500/0 transition-colors',
+                          'absolute inset-0 bg-primary/0 transition-colors',
                           isActive
-                            ? 'bg-purple-500/0'
+                            ? 'bg-primary/0'
                             : 'group-hover:bg-black/5 dark:group-hover:bg-white/5',
                         )}
                       />
@@ -370,7 +370,7 @@ export function SceneSidebar({
                     !isFailed && !isActive && 'opacity-60',
                     isActive &&
                       !isFailed &&
-                      'bg-purple-50 dark:bg-purple-900/20 ring-1 ring-purple-200 dark:ring-purple-700 opacity-100',
+                      'bg-primary/10 dark:bg-primary/20 ring-1 ring-primary/25 dark:ring-primary/35 opacity-100',
                   )}
                 >
                   {/* Scene Header */}
@@ -380,7 +380,7 @@ export function SceneSidebar({
                         className={cn(
                           'text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center shrink-0',
                           isActive && !isFailed
-                            ? 'bg-purple-600 dark:bg-purple-500 text-white shadow-sm shadow-purple-500/30'
+                            ? 'bg-primary dark:bg-primary text-primary-foreground shadow-sm shadow-primary/30'
                             : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500',
                         )}
                       >
@@ -390,7 +390,7 @@ export function SceneSidebar({
                         className={cn(
                           'text-xs font-bold truncate transition-colors',
                           isActive && !isFailed
-                            ? 'text-purple-700 dark:text-purple-300'
+                            ? 'text-primary'
                             : isFailed
                               ? 'text-gray-700 dark:text-gray-200'
                               : 'text-gray-400 dark:text-gray-500',

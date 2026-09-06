@@ -97,21 +97,19 @@ export function CanvasArea({
   );
 
   return (
-    <div className="w-full h-full flex flex-col bg-gray-50 dark:bg-gray-900 group/canvas">
+    <div className="w-full h-full flex flex-col bg-background group/canvas">
       {/* Slide area — takes remaining space */}
       <div
         className={cn(
           'flex-1 min-h-0 relative overflow-hidden flex items-center justify-center p-2 transition-colors duration-500',
-          currentScene?.type === 'interactive'
-            ? 'bg-blue-50/30 dark:bg-blue-900/10'
-            : 'bg-gray-50/30 dark:bg-gray-900/30',
+          currentScene?.type === 'interactive' ? 'bg-accent/20' : 'bg-background/80',
         )}
       >
         <StageViewport
           workbench={inWorkbenchPanel}
           interactive={currentScene?.type === 'interactive'}
           className={cn(
-            'bg-white dark:bg-gray-800 shadow-2xl rounded-lg overflow-hidden relative transition-all duration-700',
+            'bg-card shadow-2xl rounded-lg overflow-hidden relative transition-all duration-700',
             showControls && !isLiveSession && currentScene?.type === 'slide' && 'cursor-pointer',
             currentScene?.type === 'interactive'
               ? 'shadow-blue-200/50 dark:shadow-blue-900/50 ring-1 ring-blue-900/5 dark:ring-blue-500/10'
@@ -167,7 +165,7 @@ export function CanvasArea({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
-                className="absolute inset-0 z-[105] flex flex-col items-center justify-center bg-white dark:bg-gray-800"
+                className="absolute inset-0 z-[105] flex flex-col items-center justify-center bg-card"
               >
                 {isGenerationFailed ? (
                   <div className="flex flex-col items-center gap-3">
@@ -203,7 +201,7 @@ export function CanvasArea({
                     {/* Spinner */}
                     <div className="relative w-12 h-12">
                       <div className="absolute inset-0 rounded-full border-2 border-gray-100 dark:border-gray-700" />
-                      <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-purple-500 dark:border-t-purple-400 animate-spin" />
+                      <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-primary animate-spin" />
                     </div>
                     {/* Text */}
                     <motion.span
@@ -258,10 +256,10 @@ export function CanvasArea({
                         ease: 'easeInOut',
                       },
                     }}
-                    className="w-20 h-20 rounded-full bg-white/95 dark:bg-gray-800/95 flex items-center justify-center shadow-[0_4px_30px_rgba(147,51,234,0.15),inset_0_0_0_1px_rgba(233,213,255,0.5)] dark:shadow-[0_4px_30px_rgba(147,51,234,0.3),inset_0_0_0_1px_rgba(126,34,206,0.3)]"
+                    className="w-20 h-20 rounded-full bg-background/95 flex items-center justify-center shadow-[0_4px_30px_rgba(23,107,135,0.18),inset_0_0_0_1px_rgba(79,182,197,0.35)]"
                     style={{ willChange: 'transform' }}
                   >
-                    <Play className="w-7 h-7 text-purple-600 dark:text-purple-400 fill-purple-600/90 dark:fill-purple-400/90 ml-0.5" />
+                    <Play className="w-7 h-7 text-primary fill-primary/90 ml-0.5" />
                   </motion.div>
                 </motion.div>
               </motion.div>
@@ -275,7 +273,7 @@ export function CanvasArea({
         <CanvasToolbar
           className={cn(
             'shrink-0 h-9 px-2',
-            'bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl',
+            'bg-background/80 backdrop-blur-xl',
             'border-t border-gray-200/40 dark:border-gray-700/40',
           )}
           currentSceneIndex={currentSceneIndex}
