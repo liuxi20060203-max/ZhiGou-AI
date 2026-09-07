@@ -22,7 +22,7 @@ export function QuizRenderer({ content, mode, sceneId: _sceneId }: QuizRendererP
   };
 
   return (
-    <div className="w-full h-full overflow-y-auto p-8">
+    <div className="w-full h-full overflow-y-auto bg-background p-8">
       <div className="max-w-3xl mx-auto space-y-6">
         <h1 className="text-3xl font-bold">{t('quiz.title')}</h1>
         {content.questions.map((question) => (
@@ -43,8 +43,9 @@ export function QuizRenderer({ content, mode, sceneId: _sceneId }: QuizRendererP
                       <label
                         key={`${question.id}-opt-${optIndex}`}
                         className={cn(
-                          'flex items-center space-x-2 p-2 rounded cursor-pointer hover:bg-muted',
-                          answers[question.id] === (optionValue || letterPrefix) && 'bg-muted',
+                          'flex items-center space-x-2 p-2 rounded border border-transparent cursor-pointer hover:border-primary/30 hover:bg-primary/5',
+                          answers[question.id] === (optionValue || letterPrefix) &&
+                            'border-primary/50 bg-primary/10',
                         )}
                       >
                         <input
@@ -65,7 +66,7 @@ export function QuizRenderer({ content, mode, sceneId: _sceneId }: QuizRendererP
               )}
               {question.type === 'short_answer' && (
                 <textarea
-                  className="w-full min-h-24 p-2 border rounded"
+                  className="w-full min-h-24 p-2 border border-border bg-card text-foreground rounded focus:outline-none focus:ring-2 focus:ring-primary/20"
                   placeholder={t('quiz.inputPlaceholder')}
                   value={answers[question.id] || ''}
                   onChange={(e) => handleAnswerChange(question.id, e.target.value)}

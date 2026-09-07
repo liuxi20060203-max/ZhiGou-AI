@@ -370,7 +370,7 @@ export function ClassroomCompletePage({ scenes, title }: ClassroomCompletePagePr
           {t('classroomComplete.title')}
         </span>
         {/* Base background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-900 dark:to-amber-950/30" />
+        <div className="absolute inset-0 bg-background" />
         {/* Radial glow */}
         <motion.div
           aria-hidden
@@ -448,7 +448,7 @@ export function ClassroomCompletePage({ scenes, title }: ClassroomCompletePagePr
             <h2 className="text-3xl md:text-4xl font-black leading-tight bg-gradient-to-br from-amber-700 via-orange-600 to-amber-800 dark:from-amber-200 dark:via-orange-200 dark:to-amber-300 bg-clip-text text-transparent">
               {title || t('classroomComplete.title')}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{dateLabel}</p>
+            <p className="text-sm text-muted-foreground">{dateLabel}</p>
           </motion.div>
 
           {/* Stats cards */}
@@ -475,16 +475,16 @@ export function ClassroomCompletePage({ scenes, title }: ClassroomCompletePagePr
                       stiffness: 260,
                       damping: 20,
                     }}
-                    className="rounded-2xl bg-white/90 dark:bg-gray-900/70 border border-amber-100 dark:border-amber-900/40 shadow-sm px-4 py-4 flex flex-col items-center gap-1.5 backdrop-blur-sm"
+                    className="rounded-2xl bg-card/90 border border-border shadow-sm px-4 py-4 flex flex-col items-center gap-1.5 backdrop-blur-sm"
                   >
                     <Icon
                       className="w-6 h-6 text-amber-500 dark:text-amber-400"
                       strokeWidth={1.8}
                     />
-                    <div className="text-3xl font-black text-gray-900 dark:text-gray-100 leading-none">
+                    <div className="text-3xl font-black text-foreground leading-none">
                       <AnimatedCounter value={count} delay={cardDelay + 0.15} />
                     </div>
-                    <div className="text-[11px] text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <div className="text-[11px] text-muted-foreground uppercase tracking-wider">
                       {label}
                     </div>
                   </motion.div>
@@ -499,7 +499,7 @@ export function ClassroomCompletePage({ scenes, title }: ClassroomCompletePagePr
               initial={{ opacity: 0, y: 14, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ delay: 1.2, type: 'spring', stiffness: 220, damping: 20 }}
-              className="w-full rounded-2xl bg-gradient-to-br from-amber-100 via-orange-50 to-amber-100 dark:from-amber-950/50 dark:via-orange-950/30 dark:to-amber-950/50 border border-amber-200 dark:border-amber-900/50 px-6 py-5 shadow-md shadow-amber-200/30 dark:shadow-amber-950/20"
+              className="w-full rounded-2xl bg-card border border-border px-6 py-5 shadow-md shadow-primary/10"
             >
               <div className="flex items-center gap-5">
                 <QuizRing pct={summary.quiz.pct} delay={1.3} />

@@ -17,12 +17,76 @@ export function postProcessInteractiveHtml(html: string): string {
   // Convert LaTeX delimiters while protecting script tags
   let processed = convertLatexDelimiters(html);
 
+  // Generated widgets are rendered in the classroom's teal visual system.
+  // Keep this as a post-processing step as well as a prompt rule so older
+  // model outputs receive the same semantic surface/control treatment.
+  if (!processed.includes('data-maic-theme')) {
+    processed = injectMaicTheme(processed);
+  }
+
   // Inject KaTeX resources if not already present
   if (!processed.toLowerCase().includes('katex')) {
     processed = injectKatex(processed);
   }
 
   return processed;
+}
+
+function injectMaicTheme(html: string): string {
+  const theme = `<style data-maic-theme>
+:root {
+  --maic-bg: #f4fafb;
+  --maic-surface: #ffffff;
+  --maic-panel: #e8f3f5;
+  --maic-primary: #176b87;
+  --maic-primary-soft: #dceff2;
+  --maic-border: #c7dce2;
+  --maic-text: #102a43;
+  --maic-muted: #587184;
+  --maic-success: #3da276;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --maic-bg: #071b23;
+    --maic-surface: #102e39;
+    --maic-panel: #173e49;
+    --maic-primary: #4fb6c5;
+    --maic-primary-soft: #173e49;
+    --maic-border: #294953;
+    --maic-text: #eef7f8;
+    --maic-muted: #9ac2c9;
+    --maic-success: #63c49a;
+  }
+}
+html, body { background: var(--maic-bg) !important; color: var(--maic-text) !important; }
+#controls, #control-panel, [class*="control-panel"], [class*="controls"], [class*="card"], [class*="panel"] {
+  background: var(--maic-panel) !important;
+  border-color: var(--maic-border) !important;
+}
+button, select, input, textarea { font: inherit; }
+button, select { border-color: var(--maic-border) !important; }
+button[id*="start"], button[id*="reset"], #start-btn, #reset-btn, #mainBtn {
+  background: var(--maic-primary) !important;
+  border-color: var(--maic-primary) !important;
+  color: #fff !important;
+}
+input[type="range"] { accent-color: var(--maic-primary) !important; }
+input[type="range"]::-webkit-slider-thumb { background: var(--maic-primary) !important; }
+[id*="result"], [id*="output"], [class*="result"], [class*="output"] {
+  background: var(--maic-surface) !important;
+  border-color: var(--maic-border) !important;
+}
+</style>`;
+
+  const headCloseIdx = html.indexOf('</head>');
+  if (headCloseIdx !== -1) {
+    return html.substring(0, headCloseIdx) + theme + '\n' + html.substring(headCloseIdx);
+  }
+  const bodyCloseIdx = html.indexOf('</body>');
+  if (bodyCloseIdx !== -1) {
+    return html.substring(0, bodyCloseIdx) + theme + '\n' + html.substring(bodyCloseIdx);
+  }
+  return html + theme;
 }
 
 /**

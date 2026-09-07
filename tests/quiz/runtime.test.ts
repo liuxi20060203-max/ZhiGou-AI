@@ -51,6 +51,7 @@ describe('quiz attempt runtime persistence', () => {
   });
 
   afterEach(() => {
+    vi.unstubAllGlobals();
     vi.useRealTimers();
   });
 
@@ -256,6 +257,7 @@ describe('quiz attempt runtime persistence', () => {
   });
 
   it('recovers when another tab wins the same session create race without Web Locks', async () => {
+    vi.stubGlobal('navigator', {});
     const { store } = makeHarness();
     let missingReads = 0;
     let releaseBoth!: () => void;
@@ -300,6 +302,7 @@ describe('quiz attempt runtime persistence', () => {
   });
 
   it('deduplicates concurrent identical lifecycle writes without Web Locks', async () => {
+    vi.stubGlobal('navigator', {});
     const { store } = makeHarness();
     await store.createSession({
       id: 'attempt-race',
@@ -353,6 +356,7 @@ describe('quiz attempt runtime persistence', () => {
   });
 
   it('rolls over when another tab completes after this tab observed active', async () => {
+    vi.stubGlobal('navigator', {});
     const { store } = makeHarness();
     await store.createSession({
       id: 'attempt-race',
@@ -480,6 +484,7 @@ describe('quiz attempt runtime persistence', () => {
   });
 
   it('reuses one active retry for concurrent retry requests across tabs', async () => {
+    vi.stubGlobal('navigator', {});
     const { store, deps } = makeHarness();
     const base = {
       stageId: 'stage-1',

@@ -33,6 +33,10 @@ describe('interactive HTML post-processing', () => {
     expect(once).toContain('\\(x+1\\)');
     expect(once).toContain('const price = "$5";');
     expect(once).toContain('katex.min.css');
+    expect(once).toContain('data-maic-theme');
+    expect(once).toContain('--maic-primary: #176b87');
+    expect(once).toContain('@media (prefers-color-scheme: dark)');
     expect(twice.match(/katex\.min\.css/g) ?? []).toHaveLength(1);
+    expect(twice.match(/data-maic-theme/g) ?? []).toHaveLength(1);
   });
 });

@@ -161,19 +161,19 @@ function QuizCover({
     <div className="w-full h-full flex flex-col items-center justify-center gap-4 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute top-0 right-0 p-6 opacity-[0.03]">
-        <PieChart className="w-52 h-52 text-violet-500" />
+        <PieChart className="w-52 h-52 text-primary" />
       </div>
       <div className="absolute bottom-0 left-0 p-6 opacity-[0.02]">
-        <BookOpenText className="w-40 h-40 text-violet-500 rotate-12" />
+        <BookOpenText className="w-40 h-40 text-primary rotate-12" />
       </div>
 
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-        className="w-16 h-16 bg-gradient-to-br from-violet-100 to-purple-50 dark:from-violet-900/50 dark:to-purple-900/30 rounded-2xl flex items-center justify-center shadow-lg shadow-violet-100 dark:shadow-violet-900/30 ring-1 ring-violet-200/50 dark:ring-violet-700/50"
+        className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center shadow-lg shadow-primary/10 ring-1 ring-primary/20"
       >
-        <PieChart className="w-8 h-8 text-violet-500" />
+        <PieChart className="w-8 h-8 text-primary" />
       </motion.div>
 
       <motion.div
@@ -182,8 +182,8 @@ function QuizCover({
         transition={{ delay: 0.1 }}
         className="text-center z-10"
       >
-        <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">{t('quiz.title')}</h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('quiz.subtitle')}</p>
+        <h3 className="text-xl font-bold text-foreground">{t('quiz.title')}</h3>
+        <p className="text-sm text-muted-foreground mt-1">{t('quiz.subtitle')}</p>
       </motion.div>
 
       <motion.div
@@ -192,17 +192,17 @@ function QuizCover({
         transition={{ delay: 0.2 }}
         className="flex gap-5 text-sm z-10"
       >
-        <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-          <div className="w-7 h-7 rounded-lg bg-violet-50 dark:bg-violet-900/30 flex items-center justify-center">
-            <BookOpenText className="w-3.5 h-3.5 text-violet-500" />
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+            <BookOpenText className="w-3.5 h-3.5 text-primary" />
           </div>
           <span>
             {questionCount} {t('quiz.questionsCount')}
           </span>
         </div>
-        <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-          <div className="w-7 h-7 rounded-lg bg-violet-50 dark:bg-violet-900/30 flex items-center justify-center">
-            <PieChart className="w-3.5 h-3.5 text-violet-500" />
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+            <PieChart className="w-3.5 h-3.5 text-primary" />
           </div>
           <span>
             {t('quiz.totalPrefix')} {totalPoints} {t('quiz.pointsSuffix')}
@@ -217,7 +217,7 @@ function QuizCover({
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={onStart}
-        className="mt-1 px-8 py-2.5 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-full font-medium shadow-lg shadow-violet-200/50 dark:shadow-violet-900/50 hover:shadow-violet-300/50 transition-shadow z-10 flex items-center gap-2"
+        className="mt-1 px-8 py-2.5 bg-primary text-primary-foreground rounded-full font-medium shadow-lg shadow-primary/20 hover:bg-primary/90 transition-shadow z-10 flex items-center gap-2"
       >
         {t('quiz.startQuiz')}
         <ChevronRight className="w-4 h-4" />
@@ -261,10 +261,8 @@ function SingleChoiceQuestion({
                 // Default state
                 !isReview &&
                   !selected &&
-                  'border-gray-200 dark:border-gray-600 hover:border-violet-200 dark:hover:border-violet-700 hover:bg-violet-50/50 dark:hover:bg-violet-900/30',
-                !isReview &&
-                  selected &&
-                  'border-violet-400 bg-violet-50 dark:bg-violet-900/30 ring-1 ring-violet-200 dark:ring-violet-700',
+                  'border-border hover:border-primary/50 hover:bg-primary/5',
+                !isReview && selected && 'border-primary bg-primary/10 ring-1 ring-primary/30',
                 // Review states
                 isReview &&
                   isCorrectOpt &&
@@ -273,26 +271,18 @@ function SingleChoiceQuestion({
                   isWrong &&
                   !isCorrectOpt &&
                   'border-red-300 bg-red-50 dark:bg-red-900/30',
-                isReview &&
-                  !isCorrectOpt &&
-                  !selected &&
-                  'border-gray-100 dark:border-gray-700 opacity-60',
+                isReview && !isCorrectOpt && !selected && 'border-border/60 opacity-60',
                 disabled && !isReview && 'cursor-default',
               )}
             >
               <span
                 className={cn(
                   'w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
-                  !isReview &&
-                    !selected &&
-                    'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400',
-                  !isReview && selected && 'bg-violet-500 text-white',
+                  !isReview && !selected && 'bg-muted text-muted-foreground',
+                  !isReview && selected && 'bg-primary text-primary-foreground',
                   isReview && isCorrectOpt && 'bg-emerald-500 text-white',
                   isReview && isWrong && !isCorrectOpt && 'bg-red-400 text-white',
-                  isReview &&
-                    !isCorrectOpt &&
-                    !selected &&
-                    'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500',
+                  isReview && !isCorrectOpt && !selected && 'bg-muted text-muted-foreground',
                 )}
               >
                 {opt.value}
@@ -300,7 +290,7 @@ function SingleChoiceQuestion({
               <span
                 className={cn(
                   'flex-1',
-                  isReview && !isCorrectOpt && !selected && 'text-gray-400 dark:text-gray-500',
+                  isReview && !isCorrectOpt && !selected && 'text-muted-foreground',
                 )}
               >
                 <QuizMathText text={opt.label} />
@@ -351,9 +341,7 @@ function MultipleChoiceQuestion({
   return (
     <QuestionCard question={question} index={index} result={result}>
       {!isReview && (
-        <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">
-          {t('quiz.multipleChoiceHint')}
-        </p>
+        <p className="text-xs text-muted-foreground mb-2">{t('quiz.multipleChoiceHint')}</p>
       )}
       <div className="grid gap-2">
         {question.options?.map((opt) => {
@@ -370,34 +358,24 @@ function MultipleChoiceQuestion({
                 'flex items-center gap-3 px-4 py-3 rounded-xl border text-left transition-all text-sm',
                 !isReview &&
                   !isSelected &&
-                  'border-gray-200 dark:border-gray-600 hover:border-violet-200 dark:hover:border-violet-700 hover:bg-violet-50/50 dark:hover:bg-violet-900/30',
-                !isReview &&
-                  isSelected &&
-                  'border-violet-400 bg-violet-50 dark:bg-violet-900/30 ring-1 ring-violet-200 dark:ring-violet-700',
+                  'border-border hover:border-primary/50 hover:bg-primary/5',
+                !isReview && isSelected && 'border-primary bg-primary/10 ring-1 ring-primary/30',
                 isReview &&
                   isCorrectOpt &&
                   'border-emerald-400 bg-emerald-50 dark:bg-emerald-900/30',
                 isReview && isWrong && 'border-red-300 bg-red-50 dark:bg-red-900/30',
-                isReview &&
-                  !isCorrectOpt &&
-                  !isSelected &&
-                  'border-gray-100 dark:border-gray-700 opacity-60',
+                isReview && !isCorrectOpt && !isSelected && 'border-border/60 opacity-60',
                 disabled && !isReview && 'cursor-default',
               )}
             >
               <span
                 className={cn(
                   'w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
-                  !isReview &&
-                    !isSelected &&
-                    'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400',
-                  !isReview && isSelected && 'bg-violet-500 text-white',
+                  !isReview && !isSelected && 'bg-muted text-muted-foreground',
+                  !isReview && isSelected && 'bg-primary text-primary-foreground',
                   isReview && isCorrectOpt && 'bg-emerald-500 text-white',
                   isReview && isWrong && 'bg-red-400 text-white',
-                  isReview &&
-                    !isCorrectOpt &&
-                    !isSelected &&
-                    'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500',
+                  isReview && !isCorrectOpt && !isSelected && 'bg-muted text-muted-foreground',
                 )}
               >
                 {!isReview && isSelected ? <Check className="w-3.5 h-3.5" /> : opt.value}
@@ -405,7 +383,7 @@ function MultipleChoiceQuestion({
               <span
                 className={cn(
                   'flex-1',
-                  isReview && !isCorrectOpt && !isSelected && 'text-gray-400 dark:text-gray-500',
+                  isReview && !isCorrectOpt && !isSelected && 'text-muted-foreground',
                 )}
               >
                 <QuizMathText text={opt.label} />
@@ -454,7 +432,7 @@ function ShortAnswerQuestion({
             onChange={(e) => onChange(e.target.value)}
             disabled={disabled}
             placeholder={t('quiz.inputPlaceholder')}
-            className="w-full min-h-[100px] p-3 pb-10 rounded-xl border border-gray-200 dark:border-gray-600 text-sm resize-none focus:outline-none focus:border-violet-300 dark:focus:border-violet-600 focus:ring-2 focus:ring-violet-100 dark:focus:ring-violet-900/50 transition-all disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:bg-gray-800/50 dark:text-gray-200 dark:placeholder:text-gray-500"
+            className="w-full min-h-[100px] p-3 pb-10 rounded-xl border border-border bg-background text-foreground text-sm resize-none focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all disabled:bg-muted disabled:text-muted-foreground placeholder:text-muted-foreground"
           />
           <SpeechButton
             size="sm"
@@ -465,34 +443,30 @@ function ShortAnswerQuestion({
               onChange(cur + (cur ? ' ' : '') + text);
             }}
           />
-          <span className="absolute bottom-3 right-3 text-xs text-gray-300 dark:text-gray-600">
+          <span className="absolute bottom-3 right-3 text-xs text-muted-foreground/60">
             {(value ?? '').length} {t('quiz.charCount')}
           </span>
         </div>
       ) : (
         <div className="space-y-3">
-          <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-300">
-            <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">{t('quiz.yourAnswer')}</p>
+          <div className="p-3 rounded-xl bg-muted/50 border border-border text-sm text-foreground">
+            <p className="text-xs text-muted-foreground mb-1">{t('quiz.yourAnswer')}</p>
             {value ? (
               <QuizMathText text={value} />
             ) : (
-              <span className="text-gray-400 dark:text-gray-500 italic">
-                {t('quiz.notAnswered')}
-              </span>
+              <span className="text-muted-foreground italic">{t('quiz.notAnswered')}</span>
             )}
           </div>
           {result.aiComment && (
-            <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-violet-50 dark:bg-violet-900/30 border border-violet-100 dark:border-violet-800">
-              <Sparkles className="w-4 h-4 text-violet-500 shrink-0 mt-0.5" />
+            <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-primary/5 border border-primary/20">
+              <Sparkles className="w-4 h-4 text-primary shrink-0 mt-0.5" />
               <div>
-                <p className="text-xs font-medium text-violet-600 dark:text-violet-400 mb-0.5">
-                  {t('quiz.aiComment')}
-                </p>
-                <p className="text-xs text-violet-600/80 dark:text-violet-400/80">
+                <p className="text-xs font-medium text-primary mb-0.5">{t('quiz.aiComment')}</p>
+                <p className="text-xs text-primary/80">
                   <QuizMathText text={result.aiComment} />
                 </p>
               </div>
-              <span className="ml-auto text-xs font-bold text-violet-600 dark:text-violet-400 shrink-0">
+              <span className="ml-auto text-xs font-bold text-primary shrink-0">
                 {result.earned}/{question.points ?? 1}
                 {t('quiz.pointsSuffix')}
               </span>
@@ -525,8 +499,8 @@ function QuestionCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
       className={cn(
-        'bg-white dark:bg-gray-800 rounded-2xl border p-5 relative overflow-hidden',
-        !isReview && 'border-gray-150 dark:border-gray-700 shadow-sm',
+        'bg-card rounded-2xl border p-5 relative overflow-hidden',
+        !isReview && 'border-border shadow-sm',
         isReview &&
           result.status === 'correct' &&
           'border-emerald-200 dark:border-emerald-800 shadow-sm shadow-emerald-50 dark:shadow-emerald-900/20',
@@ -539,7 +513,7 @@ function QuestionCard({
       <div
         className={cn(
           'absolute left-0 top-0 bottom-0 w-1 rounded-l-2xl',
-          !isReview && 'bg-violet-400',
+          !isReview && 'bg-primary',
           isReview && result.status === 'correct' && 'bg-emerald-400',
           isReview && result.status === 'incorrect' && 'bg-red-400',
         )}
@@ -551,8 +525,7 @@ function QuestionCard({
           <span
             className={cn(
               'w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0',
-              !isReview &&
-                'bg-violet-100 dark:bg-violet-900/50 text-violet-600 dark:text-violet-400',
+              !isReview && 'bg-primary/10 text-primary',
               isReview &&
                 result.status === 'correct' &&
                 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400',
@@ -564,10 +537,10 @@ function QuestionCard({
             {index + 1}
           </span>
           <div>
-            <div className="text-sm font-medium text-gray-800 dark:text-gray-100 leading-relaxed">
+            <div className="text-sm font-medium text-foreground leading-relaxed">
               <QuizMathText text={question.question} allowDisplayMode />
             </div>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-xs text-muted-foreground mt-0.5">
               {question.type === 'single'
                 ? t('quiz.singleChoice')
                 : question.type === 'multiple'
@@ -591,7 +564,7 @@ function QuestionCard({
 
       {/* Analysis (review only) */}
       {isReview && question.analysis && (
-        <div className="mt-3 p-3 rounded-lg bg-blue-50/70 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
+        <div className="mt-3 p-3 rounded-lg bg-muted/50 border border-border text-xs text-muted-foreground leading-relaxed">
           <span className="font-medium">{t('quiz.analysis')}</span>
           <QuizMathText text={question.analysis} allowDisplayMode />
         </div>
@@ -880,11 +853,11 @@ export function QuizView({ questions, sceneId, stageId }: QuizViewProps) {
 
   if (runtimeGate.status === 'error') {
     return (
-      <div className="flex h-full w-full items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="flex h-full w-full items-center justify-center bg-background">
         <button
           type="button"
           onClick={() => setHydrationVersion((version) => version + 1)}
-          className="flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-violet-700"
+          className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
         >
           <RotateCcw className="h-4 w-4" />
           {t('quiz.retry')}
@@ -895,14 +868,14 @@ export function QuizView({ questions, sceneId, stageId }: QuizViewProps) {
 
   if (!isQuizRuntimeReady(runtimeGate)) {
     return (
-      <div className="flex h-full w-full items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+      <div className="flex h-full w-full items-center justify-center bg-background">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   return (
-    <div className="w-full h-full bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-900 overflow-hidden flex flex-col">
+    <div className="w-full h-full bg-background overflow-hidden flex flex-col">
       <AnimatePresence mode="wait">
         {phase === 'not_started' && (
           <motion.div
@@ -929,13 +902,11 @@ export function QuizView({ questions, sceneId, stageId }: QuizViewProps) {
             className="flex-1 flex flex-col min-h-0"
           >
             {/* Header bar */}
-            <div className="flex items-center justify-between px-6 py-3 border-b border-gray-100 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur shrink-0">
+            <div className="flex items-center justify-between px-6 py-3 border-b border-border/60 bg-card/80 backdrop-blur shrink-0">
               <div className="flex items-center gap-2">
-                <PieChart className="w-4 h-4 text-violet-500" />
-                <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
-                  {t('quiz.answering')}
-                </span>
-                <span className="text-xs text-gray-400 ml-1">
+                <PieChart className="w-4 h-4 text-primary" />
+                <span className="text-sm font-semibold text-foreground">{t('quiz.answering')}</span>
+                <span className="text-xs text-muted-foreground ml-1">
                   {
                     Object.keys(answers).filter((k) => {
                       const a = answers[k];
@@ -953,8 +924,8 @@ export function QuizView({ questions, sceneId, stageId }: QuizViewProps) {
                 className={cn(
                   'px-4 py-1.5 rounded-lg text-xs font-medium transition-all',
                   allAnswered
-                    ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-sm hover:shadow-md hover:shadow-violet-200/50 dark:hover:shadow-violet-900/50 active:scale-[0.97]'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed',
+                    ? 'bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 active:scale-[0.97]'
+                    : 'bg-muted text-muted-foreground cursor-not-allowed',
                 )}
               >
                 {t('quiz.submitAnswers')}
@@ -1012,19 +983,17 @@ export function QuizView({ questions, sceneId, stageId }: QuizViewProps) {
               animate={{ rotate: 360 }}
               transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
             >
-              <Loader2 className="w-10 h-10 text-violet-500" />
+              <Loader2 className="w-10 h-10 text-primary" />
             </motion.div>
             <div className="text-center">
-              <p className="text-base font-semibold text-gray-700 dark:text-gray-200">
-                {t('quiz.aiGrading')}
-              </p>
-              <p className="text-sm text-gray-400 mt-1">{t('quiz.aiGradingWait')}</p>
+              <p className="text-base font-semibold text-foreground">{t('quiz.aiGrading')}</p>
+              <p className="text-sm text-muted-foreground mt-1">{t('quiz.aiGradingWait')}</p>
             </div>
             <div className="flex gap-1 mt-2">
               {[0, 1, 2].map((i) => (
                 <motion.div
                   key={i}
-                  className="w-2 h-2 rounded-full bg-violet-400"
+                  className="w-2 h-2 rounded-full bg-primary/70"
                   animate={{ opacity: [0.3, 1, 0.3] }}
                   transition={{
                     repeat: Infinity,
@@ -1045,10 +1014,10 @@ export function QuizView({ questions, sceneId, stageId }: QuizViewProps) {
             className="flex-1 flex flex-col min-h-0"
           >
             {/* Header bar */}
-            <div className="flex items-center justify-between px-6 py-3 border-b border-gray-100 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur shrink-0">
+            <div className="flex items-center justify-between px-6 py-3 border-b border-border/60 bg-card/80 backdrop-blur shrink-0">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                <span className="text-sm font-semibold text-foreground">
                   {t('quiz.quizReport')}
                 </span>
               </div>
@@ -1056,7 +1025,7 @@ export function QuizView({ questions, sceneId, stageId }: QuizViewProps) {
                 type="button"
                 onClick={() => void handleRetry()}
                 disabled={retrying}
-                className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 {t('quiz.retry')}

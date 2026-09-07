@@ -169,9 +169,9 @@ export function CanvasArea({
               >
                 {isGenerationFailed ? (
                   <div className="flex flex-col items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center">
                       <svg
-                        className="w-6 h-6 text-red-400 dark:text-red-500"
+                        className="w-6 h-6 text-destructive"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -184,13 +184,13 @@ export function CanvasArea({
                         />
                       </svg>
                     </div>
-                    <span className="text-sm text-red-500 dark:text-red-400 font-medium">
+                    <span className="text-sm text-destructive font-medium">
                       {t('stage.generationFailed')}
                     </span>
                     {onRetryGeneration && (
                       <button
                         onClick={onRetryGeneration}
-                        className="mt-1 px-4 py-1.5 text-xs font-medium rounded-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors active:scale-95"
+                        className="mt-1 px-4 py-1.5 text-xs font-medium rounded-full bg-destructive/10 text-destructive hover:bg-destructive/15 transition-colors active:scale-95"
                       >
                         {t('generation.retryScene')}
                       </button>
@@ -200,7 +200,7 @@ export function CanvasArea({
                   <div className="flex flex-col items-center gap-4">
                     {/* Spinner */}
                     <div className="relative w-12 h-12">
-                      <div className="absolute inset-0 rounded-full border-2 border-gray-100 dark:border-gray-700" />
+                      <div className="absolute inset-0 rounded-full border-2 border-border" />
                       <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-primary animate-spin" />
                     </div>
                     {/* Text */}
@@ -208,7 +208,7 @@ export function CanvasArea({
                       initial={{ opacity: 0, y: 4 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2, duration: 0.3 }}
-                      className="text-sm text-gray-400 dark:text-gray-500 font-medium"
+                      className="text-sm text-muted-foreground font-medium"
                     >
                       {t('stage.generatingNextPage')}
                     </motion.span>
@@ -274,7 +274,7 @@ export function CanvasArea({
           className={cn(
             'shrink-0 h-9 px-2',
             'bg-background/80 backdrop-blur-xl',
-            'border-t border-gray-200/40 dark:border-gray-700/40',
+            'border-t border-border/60',
           )}
           currentSceneIndex={currentSceneIndex}
           scenesCount={scenesCount}

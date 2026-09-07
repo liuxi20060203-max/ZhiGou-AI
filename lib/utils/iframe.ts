@@ -298,6 +298,141 @@ export function patchHtmlForIframe(html: string): string {
   /* Fix min-h-screen: in iframes 100vh is the iframe height, which is correct,
      but ensure body actually fills it */
   body { min-height: 100vh; }
+
+  /* Keep legacy generated interactive pages visually aligned with the host.
+     These selectors intentionally target only the old purple/indigo utility
+     classes; scripts, layout, and the experiment's semantic markup remain
+     untouched. */
+  :root {
+    --maic-iframe-background: #f4fafb;
+    --maic-iframe-surface: #ffffff;
+    --maic-iframe-primary: #176b87;
+    --maic-iframe-primary-soft: #e6f4f6;
+    --maic-iframe-border: #d7e3e8;
+    --maic-iframe-foreground: #102a43;
+    --maic-iframe-panel: #e8f3f5;
+    /* Common variable names used by generated experiment templates. */
+    --primary: #176b87 !important;
+    --primary-color: #176b87 !important;
+    --accent: #176b87 !important;
+    --accent-color: #176b87 !important;
+    --brand: #176b87 !important;
+    --brand-color: #176b87 !important;
+    --surface: #ffffff !important;
+    --surface-color: #ffffff !important;
+    --panel: #ffffff !important;
+    --panel-color: #ffffff !important;
+    --border-color: #d7e3e8 !important;
+    --text-primary: #102a43 !important;
+    --text-secondary: #587184 !important;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --maic-iframe-background: #071b23;
+      --maic-iframe-surface: #102e39;
+      --maic-iframe-primary: #4fb6c5;
+      --maic-iframe-primary-soft: #173e49;
+      --maic-iframe-border: #294953;
+      --maic-iframe-foreground: #eef7f8;
+      --maic-iframe-panel: #173e49;
+      --primary: #4fb6c5 !important;
+      --primary-color: #4fb6c5 !important;
+      --accent: #4fb6c5 !important;
+      --accent-color: #4fb6c5 !important;
+      --brand: #4fb6c5 !important;
+      --brand-color: #4fb6c5 !important;
+      --surface: #102e39 !important;
+      --surface-color: #102e39 !important;
+      --panel: #102e39 !important;
+      --panel-color: #102e39 !important;
+      --border-color: #294953 !important;
+      --text-primary: #eef7f8 !important;
+      --text-secondary: #9ac2c9 !important;
+    }
+  }
+  body {
+    background: var(--maic-iframe-background) !important;
+    color: var(--maic-iframe-foreground) !important;
+  }
+  body > :first-child,
+  body > main,
+  body > #root,
+  body > #app {
+    background-color: var(--maic-iframe-background) !important;
+    color: var(--maic-iframe-foreground) !important;
+  }
+  /* Legacy simulations often use custom classes and hard-coded colors rather
+     than utility classes. Scope compatibility overrides to common generated
+     control/result regions so the experiment behavior and canvas stay intact. */
+  #controls,
+  #control-panel,
+  [class*="control-panel"],
+  [class*="controls"],
+  [class*="card"],
+  [class*="panel"] {
+    background-color: var(--maic-iframe-panel) !important;
+    border-color: var(--maic-iframe-border) !important;
+    color: var(--maic-iframe-foreground) !important;
+  }
+  button[id*="start"],
+  button[id*="reset"],
+  #start-btn,
+  #reset-btn,
+  #mainBtn {
+    background-color: var(--maic-iframe-primary) !important;
+    border-color: var(--maic-iframe-primary) !important;
+    color: #ffffff !important;
+  }
+  input[type="range"] {
+    accent-color: var(--maic-iframe-primary) !important;
+  }
+  input[type="range"]::-webkit-slider-thumb,
+  input[type="range"]::-moz-range-thumb {
+    background-color: var(--maic-iframe-primary) !important;
+    border-color: var(--maic-iframe-primary) !important;
+  }
+  [id*="result"],
+  [id*="output"],
+  [class*="result"],
+  [class*="output"] {
+    background-color: var(--maic-iframe-surface) !important;
+    border-color: var(--maic-iframe-border) !important;
+    color: var(--maic-iframe-foreground) !important;
+  }
+  [class*="bg-slate-950"],
+  [class*="bg-slate-900"],
+  [class*="bg-gray-950"],
+  [class*="bg-gray-900"],
+  [class*="bg-zinc-950"],
+  [class*="bg-zinc-900"] {
+    background-color: var(--maic-iframe-surface) !important;
+    background-image: none !important;
+  }
+  [class*="bg-violet-"],
+  [class*="bg-purple-"],
+  [class*="bg-indigo-"] {
+    background-color: var(--maic-iframe-primary-soft) !important;
+    background-image: none !important;
+  }
+  button[class*="bg-violet-"],
+  button[class*="bg-purple-"],
+  button[class*="bg-indigo-"],
+  a[class*="bg-violet-"],
+  a[class*="bg-purple-"],
+  a[class*="bg-indigo-"] {
+    background-color: var(--maic-iframe-primary) !important;
+    color: #ffffff !important;
+  }
+  [class*="text-violet-"],
+  [class*="text-purple-"],
+  [class*="text-indigo-"] {
+    color: var(--maic-iframe-primary) !important;
+  }
+  [class*="border-violet-"],
+  [class*="border-purple-"],
+  [class*="border-indigo-"] {
+    border-color: var(--maic-iframe-border) !important;
+  }
 </style>`;
 
   const injection =

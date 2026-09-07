@@ -10,6 +10,18 @@ describe('patchHtmlForIframe', () => {
     expect(out).toContain('data-iframe-patch');
   });
 
+  it('injects legacy simulation control theme compatibility without rewriting markup', () => {
+    const html =
+      '<html><head></head><body><aside id="controls"><button id="start-btn">Start</button><input type="range"></aside><section id="result"></section></body></html>';
+    const out = patchHtmlForIframe(html);
+
+    expect(out).toContain('--maic-iframe-panel');
+    expect(out).toContain('button[id*="start"]');
+    expect(out).toContain('input[type="range"]');
+    expect(out).toContain('[id*="result"]');
+    expect(out).toContain(html.slice(html.indexOf('<body>')));
+  });
+
   it('runs the storage shim before the page scripts', () => {
     const html =
       '<!DOCTYPE html><html><head><script>window.__x = localStorage.getItem("k");</script></head><body></body></html>';

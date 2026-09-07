@@ -67,5 +67,5 @@ export function InteractiveRenderer({ content, sceneId }: InteractiveRendererPro
     return () => cancelAnimationFrame(raf);
   }, [sceneId, setRect]);
 
-  return <div ref={slotRef} className="w-full h-full" aria-hidden />;
+  return <div ref={slotRef} className="w-full h-full rounded-lg bg-card/50" aria-hidden />;
 }

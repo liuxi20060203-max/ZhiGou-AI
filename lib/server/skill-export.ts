@@ -1,6 +1,6 @@
 /** Package installed skills for portable download. */
 import { readdir, readFile, stat } from 'node:fs/promises';
-import { join, relative } from 'node:path';
+import { join, relative, sep } from 'node:path';
 import { inflateRawSync } from 'node:zlib';
 import JSZip from 'jszip';
 import { dump as dumpYaml, load as loadYaml } from 'js-yaml';
@@ -35,7 +35,8 @@ export async function buildSkillDirZip(dir: string, root: string): Promise<Buffe
     await stat(dir);
     const bundle = new JSZip();
     for (const file of await walk(dir)) {
-      bundle.file(`${root}/${relative(dir, file)}`, await readFile(file));
+      const zipPath = relative(dir, file).split(sep).join('/');
+      bundle.file(`${root}/${zipPath}`, await readFile(file));
     }
     zip = await bundle.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' });
   } catch {

@@ -1158,7 +1158,7 @@ export function Roundtable({
         {/* Left: Teacher identity */}
         <div
           className={cn(
-            'w-[90px] shrink-0 flex flex-col border-r border-border/50 bg-background/45 overflow-visible relative transition-opacity duration-300',
+            'w-[90px] shrink-0 flex flex-col border-r border-border/60 bg-background/70 overflow-visible relative transition-opacity duration-300',
             isPresenting && !controlsVisible && 'opacity-0 pointer-events-none',
           )}
         >
@@ -1190,7 +1190,7 @@ export function Roundtable({
                           'absolute inset-0 rounded-full border-2 transition-all duration-500',
                           activeRole === 'teacher'
                             ? 'border-primary shadow-[0_0_12px_rgba(23,107,135,0.35)]'
-                            : 'border-gray-200 dark:border-gray-700 group-hover:border-primary/60',
+                            : 'border-border group-hover:border-primary/60',
                         )}
                       />
 
@@ -1214,7 +1214,7 @@ export function Roundtable({
                         'max-w-[80px] truncate px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase border shadow-sm transition-all duration-300 bg-background/90',
                         activeRole === 'teacher' && !speakingStudent
                           ? 'text-primary border-primary/25 dark:border-primary/40'
-                          : 'text-gray-400 dark:text-gray-500 border-gray-100 dark:border-gray-700 group-hover:text-primary group-hover:border-primary/25',
+                          : 'text-muted-foreground border-border group-hover:text-primary group-hover:border-primary/25',
                       )}
                     >
                       {teacherName}
@@ -1855,7 +1855,7 @@ export function Roundtable({
         {/* Right: Participants area */}
         <div
           className={cn(
-            'w-[140px] shrink-0 flex flex-col py-3 border-l border-border/50 bg-background/35 overflow-visible transition-opacity duration-300',
+            'w-[140px] shrink-0 flex flex-col py-3 border-l border-border/60 bg-background/70 overflow-visible transition-opacity duration-300',
             isPresenting && !controlsVisible && 'opacity-0 pointer-events-none',
           )}
         >
@@ -1871,7 +1871,7 @@ export function Roundtable({
               }}
               className="absolute left-0 top-0 bottom-0 w-5 z-10 flex items-center justify-center bg-gradient-to-r from-background/90 to-transparent opacity-0 group-hover/scroll:opacity-100 transition-opacity cursor-pointer"
             >
-              <ChevronLeft className="w-3.5 h-3.5 text-gray-400" />
+              <ChevronLeft className="w-3.5 h-3.5 text-muted-foreground" />
             </button>
 
             <div
@@ -1948,10 +1948,10 @@ export function Roundtable({
                                 'absolute inset-0 rounded-full border-2 transition-all duration-300',
                                 isSpeaking
                                   ? 'border-primary shadow-[0_0_8px_rgba(23,107,135,0.35)]'
-                                  : 'border-white dark:border-gray-700',
+                                  : 'border-border',
                               )}
                             />
-                            <div className="absolute inset-0.5 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+                            <div className="absolute inset-0.5 rounded-full bg-muted overflow-hidden">
                               <img
                                 src={student.avatar}
                                 alt={student.name}
@@ -2020,7 +2020,7 @@ export function Roundtable({
               }}
               className="absolute right-0 top-0 bottom-0 w-5 z-10 flex items-center justify-center bg-gradient-to-l from-background/90 to-transparent opacity-0 group-hover/scroll:opacity-100 transition-opacity cursor-pointer"
             >
-              <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
+              <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
             </button>
 
             {/* ProactiveCard for student/non-teacher agents — rendered via portal */}

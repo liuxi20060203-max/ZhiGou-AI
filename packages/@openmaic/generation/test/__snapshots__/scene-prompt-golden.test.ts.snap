@@ -18,6 +18,32 @@ Your output must be a complete HTML document with:
 5. **Mobile-responsive design**
 6. **postMessage listener** for widget actions (REQUIRED)
 
+## Visual Design: OpenMAIC Classroom Theme
+
+The widget is embedded in the OpenMAIC classroom and must use a calm teal-and-slate
+interface. Do not use purple, violet, or indigo as the primary brand color.
+Define and use these CSS variables instead of hard-coded theme colors:
+
+\`\`\`css
+:root {
+  --maic-bg: #f4fafb;
+  --maic-surface: #ffffff;
+  --maic-panel: #e8f3f5;
+  --maic-primary: #176b87;
+  --maic-primary-soft: #dceff2;
+  --maic-border: #c7dce2;
+  --maic-text: #102a43;
+  --maic-muted: #587184;
+  --maic-success: #3da276;
+}
+\`\`\`
+
+Use \`--maic-panel\` for control cards and toolbars, \`--maic-surface\` for code and
+result areas, \`--maic-primary\` for active controls and buttons, and
+\`--maic-primary-soft\` for secondary controls. Keep contrast accessible and keep
+all existing functional IDs, event handlers, canvas/SVG drawing, and postMessage
+behavior unchanged.
+
 ## Widget Config Schema
 
 \`\`\`json
@@ -63,7 +89,7 @@ window.addEventListener('message', function(event) {
       // Highlight the target element with a pulsing border
       const highlightEl = document.querySelector(target);
       if (highlightEl) {
-        highlightEl.style.outline = '3px solid rgba(139, 92, 246, 0.8)';
+        highlightEl.style.outline = '3px solid rgba(23, 107, 135, 0.8)';
         highlightEl.style.outlineOffset = '4px';
         highlightEl.style.animation = 'pulse-highlight 2s infinite';
         // Remove highlight after 3 seconds
@@ -81,7 +107,7 @@ window.addEventListener('message', function(event) {
         const rect = annotateEl.getBoundingClientRect();
         const tooltip = document.createElement('div');
         tooltip.className = 'teacher-annotation';
-        tooltip.style.cssText = 'position:fixed; top:' + (rect.top - 40) + 'px; left:' + rect.left + 'px; background:rgba(139,92,246,0.95); color:white; padding:8px 12px; border-radius:8px; font-size:14px; z-index:1000; animation:fadeIn 0.3s;';
+        tooltip.style.cssText = 'position:fixed; top:' + (rect.top - 40) + 'px; left:' + rect.left + 'px; background:rgba(23,107,135,0.95); color:white; padding:8px 12px; border-radius:8px; font-size:14px; z-index:1000; animation:fadeIn 0.3s;';
         tooltip.textContent = content;
         document.body.appendChild(tooltip);
         setTimeout(() => tooltip.remove(), 4000);
@@ -101,7 +127,7 @@ window.addEventListener('message', function(event) {
 
 // Add this CSS for animations
 const style = document.createElement('style');
-style.textContent = '@keyframes pulse-highlight { 0%, 100% { outline-color: rgba(139, 92, 246, 0.8); } 50% { outline-color: rgba(139, 92, 246, 0.4); } } @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }';
+style.textContent = '@keyframes pulse-highlight { 0%, 100% { outline-color: rgba(23, 107, 135, 0.8); } 50% { outline-color: rgba(23, 107, 135, 0.4); } } @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }';
 document.head.appendChild(style);
 \`\`\`
 

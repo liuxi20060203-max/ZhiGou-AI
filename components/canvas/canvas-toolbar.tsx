@@ -65,12 +65,12 @@ export interface CanvasToolbarProps {
 const ctrlBtn = cn(
   'relative w-7 h-7 rounded-md flex items-center justify-center',
   'transition-all duration-150 outline-none cursor-pointer',
-  'hover:bg-gray-500/[0.08] dark:hover:bg-gray-400/[0.08] active:scale-90',
+  'hover:bg-muted active:scale-90',
 );
 
 /* Subtle separator */
 function CtrlDivider() {
-  return <div className="w-px h-3 bg-gray-200/80 dark:bg-gray-700/60 mx-0.5 shrink-0" />;
+  return <div className="w-px h-3 bg-border mx-0.5 shrink-0" />;
 }
 
 /* Volume icon based on level */
@@ -166,16 +166,14 @@ export function CanvasToolbar({
             className={cn(
               ctrlBtn,
               'w-6 h-6',
-              sidebarCollapsed
-                ? 'text-gray-400 dark:text-gray-500'
-                : 'text-gray-600 dark:text-gray-300',
+              sidebarCollapsed ? 'text-muted-foreground' : 'text-foreground',
             )}
             aria-label="Toggle sidebar"
           >
             <LayoutList className="w-3.5 h-3.5" />
           </button>
         )}
-        <span className="text-[11px] text-gray-400 dark:text-gray-500 tabular-nums select-none font-medium">
+        <span className="text-[11px] text-muted-foreground tabular-nums select-none font-medium">
           {currentSceneIndex + 1}
           <span className="opacity-35 mx-px">/</span>
           {scenesCount}
@@ -209,10 +207,10 @@ export function CanvasToolbar({
                   ctrlBtn,
                   'w-6 h-6',
                   !ttsEnabled
-                    ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                    ? 'text-muted-foreground/40 cursor-not-allowed'
                     : ttsMuted
                       ? 'text-red-500 dark:text-red-400'
-                      : 'text-gray-500 dark:text-gray-400',
+                      : 'text-muted-foreground',
                 )}
                 aria-label={ttsMuted ? 'Unmute' : 'Mute'}
               >
@@ -228,7 +226,7 @@ export function CanvasToolbar({
                 )}
               >
                 <div className="bg-popover border border-border rounded-lg shadow-lg px-2 py-2.5 flex flex-col items-center gap-1.5">
-                  <span className="text-[10px] text-gray-400 dark:text-gray-500 tabular-nums font-medium select-none">
+                  <span className="text-[10px] text-muted-foreground tabular-nums font-medium select-none">
                     {Math.round(effectiveVolume * 100)}
                   </span>
                   <input
@@ -245,7 +243,7 @@ export function CanvasToolbar({
                     className={cn(
                       'appearance-none cursor-pointer',
                       'h-16 w-1 rounded-full',
-                      'bg-gray-200 dark:bg-gray-600',
+                      'bg-muted',
                       '[writing-mode:vertical-lr] [direction:rtl]',
                       '[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3',
                       '[&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:dark:bg-primary',
@@ -275,7 +273,7 @@ export function CanvasToolbar({
                       'active:scale-90',
                       playbackSpeed !== 1
                         ? 'text-primary bg-primary/10 dark:bg-primary/20'
-                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200',
+                        : 'text-muted-foreground hover:text-foreground',
                     )}
                     aria-label="Playback speed"
                   >
@@ -298,7 +296,7 @@ export function CanvasToolbar({
               disabled={!canGoPrev}
               className={cn(
                 ctrlBtn,
-                'w-6 h-6 text-gray-500 dark:text-gray-400 disabled:opacity-20 disabled:pointer-events-none',
+                'w-6 h-6 text-muted-foreground disabled:opacity-20 disabled:pointer-events-none',
               )}
               aria-label="Previous scene"
             >
@@ -336,7 +334,7 @@ export function CanvasToolbar({
                 >
                   {t('roundtable.softClosing')}
                   {remainingSoftCloseSeconds !== undefined && (
-                    <span className="text-[9px] font-medium tabular-nums text-gray-400 dark:text-gray-500">
+                    <span className="text-[9px] font-medium tabular-nums text-muted-foreground">
                       {remainingSoftCloseSeconds}s
                     </span>
                   )}
@@ -349,7 +347,7 @@ export function CanvasToolbar({
               className={cn(
                 ctrlBtn,
                 'w-7 h-6',
-                engineState === 'playing' ? 'text-primary' : 'text-gray-500 dark:text-gray-400',
+                engineState === 'playing' ? 'text-primary' : 'text-muted-foreground',
               )}
               aria-label={engineState === 'playing' ? 'Pause' : 'Play'}
             >
@@ -368,7 +366,7 @@ export function CanvasToolbar({
               disabled={!canGoNext}
               className={cn(
                 ctrlBtn,
-                'w-6 h-6 text-gray-500 dark:text-gray-400 disabled:opacity-20 disabled:pointer-events-none',
+                'w-6 h-6 text-muted-foreground disabled:opacity-20 disabled:pointer-events-none',
               )}
               aria-label="Next scene"
             >
@@ -388,7 +386,7 @@ export function CanvasToolbar({
                     className={cn(
                       ctrlBtn,
                       'w-8 h-6',
-                      autoPlayLecture ? 'text-primary' : 'text-gray-500 dark:text-gray-400',
+                      autoPlayLecture ? 'text-primary' : 'text-muted-foreground',
                     )}
                     aria-label="Auto-play"
                   >
@@ -411,7 +409,7 @@ export function CanvasToolbar({
             className={cn(
               ctrlBtn,
               'w-6 h-6',
-              whiteboardOpen ? 'text-primary' : 'text-gray-500 dark:text-gray-400',
+              whiteboardOpen ? 'text-primary' : 'text-muted-foreground',
             )}
             title={whiteboardOpen ? t('whiteboard.minimize') : t('whiteboard.open')}
           >
@@ -433,7 +431,7 @@ export function CanvasToolbar({
                 'relative flex h-6 items-center gap-1 rounded-md px-2 text-[11px] font-medium transition-all',
                 elementPickActive
                   ? 'bg-primary/10 text-primary ring-1 ring-primary/30'
-                  : 'text-gray-500 hover:bg-gray-500/[0.08] dark:text-gray-400',
+                  : 'text-muted-foreground hover:bg-muted',
                 !canPickSlideElement && 'cursor-not-allowed opacity-35',
               )}
               aria-label={t('chat.elementReference.button')}
@@ -460,7 +458,7 @@ export function CanvasToolbar({
             className={cn(
               ctrlBtn,
               'w-6 h-6',
-              isPresenting ? 'text-primary' : 'text-gray-500 dark:text-gray-400',
+              isPresenting ? 'text-primary' : 'text-muted-foreground',
             )}
             aria-label={presentationLabel}
             title={presentationLabel}
@@ -478,9 +476,7 @@ export function CanvasToolbar({
             className={cn(
               ctrlBtn,
               'w-6 h-6',
-              chatCollapsed
-                ? 'text-gray-400 dark:text-gray-500'
-                : 'text-gray-600 dark:text-gray-300',
+              chatCollapsed ? 'text-muted-foreground' : 'text-foreground',
             )}
             aria-label="Toggle chat"
           >

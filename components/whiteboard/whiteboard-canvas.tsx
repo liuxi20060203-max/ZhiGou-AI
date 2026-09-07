@@ -331,7 +331,7 @@ const InteractiveWhiteboardCanvas = forwardRef<
     >
       {/* Bounded canvas — white background, positioned and scaled. No overflow-hidden so elements can spill into transparent space. */}
       <div
-        className="absolute bg-white shadow-2xl rounded-lg border border-gray-200 dark:border-gray-600"
+        className="absolute bg-card shadow-2xl rounded-lg border border-border"
         style={{
           width: canvasWidth,
           height: canvasHeight,
@@ -355,7 +355,7 @@ const InteractiveWhiteboardCanvas = forwardRef<
               exit={{ opacity: 0, transition: { duration: 0.15 } }}
               className="absolute inset-0 flex items-center justify-center"
             >
-              <div className="text-center text-gray-400">
+              <div className="text-center text-muted-foreground">
                 <p className="text-lg font-medium">{readyText}</p>
                 <p className="text-sm mt-1">{readyHintText}</p>
               </div>

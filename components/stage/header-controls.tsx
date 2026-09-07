@@ -142,7 +142,7 @@ export function HeaderControls({
         className={cn(
           'shrink-0 flex items-center gap-1 backdrop-blur-md shadow-sm rounded-full',
           compact
-            ? 'bg-zinc-100/70 dark:bg-zinc-800/70 border border-zinc-200/60 dark:border-zinc-700/60 px-1.5 py-1'
+            ? 'bg-muted/70 border border-border/60 px-1.5 py-1'
             : 'bg-background/60 border border-border/50 px-2 py-1.5',
         )}
       >
@@ -155,7 +155,7 @@ export function HeaderControls({
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <button
-              className="p-2 rounded-full text-gray-400 dark:text-gray-500 hover:bg-white dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-gray-200 hover:shadow-sm transition-all group"
+              className="p-2 rounded-full text-muted-foreground hover:bg-primary/10 hover:text-primary hover:shadow-sm transition-all group"
               aria-label={t('settings.theme')}
             >
               {theme === 'light' && <Sun className="w-4 h-4" />}
@@ -200,7 +200,7 @@ export function HeaderControls({
         {/* Settings */}
         <button
           onClick={() => setSettingsOpen(true)}
-          className="p-2 rounded-full text-gray-400 dark:text-gray-500 hover:bg-white dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-gray-200 hover:shadow-sm transition-all group"
+          className="p-2 rounded-full text-muted-foreground hover:bg-primary/10 hover:text-primary hover:shadow-sm transition-all group"
           aria-label={t('settings.title')}
         >
           <Settings className="w-4 h-4 group-hover:rotate-90 transition-transform duration-500" />
@@ -217,11 +217,9 @@ export function HeaderControls({
         <label
           className={cn(
             'shrink-0 inline-flex items-center gap-2.5 rounded-full border shadow-sm transition-colors duration-200',
-            'bg-white/60 dark:bg-gray-800/60 backdrop-blur-md',
+            'bg-background/70 backdrop-blur-md',
             compact ? 'h-8 px-2.5' : 'h-9 px-3',
-            proChecked
-              ? 'border-primary/60 dark:border-primary/60'
-              : 'border-gray-100/50 dark:border-gray-700/50',
+            proChecked ? 'border-primary/60 dark:border-primary/60' : 'border-border/60',
             !canEdit && mode !== 'edit'
               ? 'opacity-60 cursor-not-allowed'
               : 'cursor-pointer hover:border-primary/50 dark:hover:border-primary/50',
@@ -240,7 +238,7 @@ export function HeaderControls({
           <span
             className={cn(
               'text-[11px] font-bold uppercase tracking-[0.14em] tabular-nums select-none transition-colors duration-200',
-              proChecked ? 'text-primary' : 'text-gray-500 dark:text-gray-400',
+              proChecked ? 'text-primary' : 'text-muted-foreground',
             )}
           >
             {t('edit.proMode')}
@@ -271,8 +269,8 @@ export function HeaderControls({
             className={cn(
               'shrink-0 p-2 rounded-full transition-all',
               canExport && !isExporting && !isExportingZip && !isExportingScript
-                ? 'text-gray-400 dark:text-gray-500 hover:bg-white dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-gray-200 hover:shadow-sm'
-                : 'text-gray-300 dark:text-gray-600 cursor-not-allowed opacity-50',
+                ? 'text-muted-foreground hover:bg-primary/10 hover:text-primary hover:shadow-sm'
+                : 'text-muted-foreground cursor-not-allowed opacity-50',
             )}
             aria-label={exportLabel}
           >
