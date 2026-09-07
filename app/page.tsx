@@ -696,6 +696,10 @@ function HomePage() {
   };
 
   const canGenerate = !!form.requirement.trim() && hasUsableProvider;
+  const latestClassroom = useMemo(
+    () => [...classrooms].sort((a, b) => b.updatedAt - a.updatedAt)[0],
+    [classrooms],
+  );
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
@@ -705,7 +709,7 @@ function HomePage() {
   };
 
   return (
-    <div className="relative min-h-[100dvh] w-full overflow-x-hidden bg-[linear-gradient(180deg,var(--background)_0%,color-mix(in_oklab,var(--secondary)_62%,var(--background))_100%)] flex flex-col items-center px-4 pb-4 pt-16 md:px-8 md:pb-8 md:pt-16">
+    <div className="relative flex min-h-[100dvh] w-full flex-col items-center overflow-x-hidden bg-background pb-4">
       <input
         ref={fileInputRef}
         type="file"
@@ -722,85 +726,113 @@ function HomePage() {
           className="hidden"
         />
       )}
-      {/* ═══ Top-right pill (unchanged) ═══ */}
-      <div
-        ref={toolbarRef}
-        className="fixed top-4 right-4 z-50 flex items-center gap-1 bg-card/70 backdrop-blur-md px-2 py-1.5 rounded-full border border-border/60 shadow-sm"
-      >
-        {/* Language Selector */}
-        <LanguageSwitcher onOpen={() => setThemeOpen(false)} />
-
-        <div className="w-[1px] h-4 bg-border" />
-
-        {/* Theme Selector */}
-        <div className="relative">
-          <button
-            onClick={() => {
-              setThemeOpen(!themeOpen);
-            }}
-            className="p-2 rounded-full text-muted-foreground hover:bg-card hover:text-foreground hover:shadow-sm transition-all"
-          >
-            {theme === 'light' && <Sun className="w-4 h-4" />}
-            {theme === 'dark' && <Moon className="w-4 h-4" />}
-            {theme === 'system' && <Monitor className="w-4 h-4" />}
-          </button>
-          {themeOpen && (
-            <div className="absolute top-full mt-2 right-0 bg-popover border border-border rounded-lg shadow-lg overflow-hidden z-50 min-w-[140px]">
-              <button
-                onClick={() => {
-                  setTheme('light');
-                  setThemeOpen(false);
-                }}
-                className={cn(
-                  'w-full px-4 py-2 text-left text-sm hover:bg-accent transition-colors flex items-center gap-2',
-                  theme === 'light' && 'bg-accent text-primary',
-                )}
-              >
-                <Sun className="w-4 h-4" />
-                {t('settings.themeOptions.light')}
+      {/* ═══ Product navigation ═══ */}
+      <header className="sticky top-0 z-50 w-full border-b border-border/70 bg-background/90 backdrop-blur-xl">
+        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 md:px-8">
+          <div className="flex min-w-0 items-center gap-7">
+            <div className="relative shrink-0" data-pro-morph="lockup">
+              <img
+                data-testid="home-brand-logo"
+                src={resolvedTheme === 'dark' ? brand.darkLogoSrc : brand.logoSrc}
+                alt={brand.productName}
+                className="h-8 w-auto"
+              />
+              {workbenchEntryEnabled ? (
+                <div className="absolute left-full top-0 ml-1" data-pro-morph="badge">
+                  <ProBadge active={false} onToggle={enterWorkbench} />
+                </div>
+              ) : null}
+            </div>
+            <nav className="hidden items-center gap-1 text-sm md:flex" aria-label="Primary">
+              <button className="rounded-lg bg-primary/10 px-3 py-2 font-medium text-primary">
+                {t('classroom.recentClassrooms')}
               </button>
               <button
-                onClick={() => {
-                  setTheme('dark');
-                  setThemeOpen(false);
-                }}
-                className={cn(
-                  'w-full px-4 py-2 text-left text-sm hover:bg-accent transition-colors flex items-center gap-2',
-                  theme === 'dark' && 'bg-accent text-primary',
-                )}
+                onClick={() => textareaRef.current?.focus()}
+                className="rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
-                <Moon className="w-4 h-4" />
-                {t('settings.themeOptions.dark')}
+                {t('home.createEyebrow')}
               </button>
+            </nav>
+          </div>
+
+          <div ref={toolbarRef} className="flex items-center gap-1">
+            {/* Language Selector */}
+            <LanguageSwitcher onOpen={() => setThemeOpen(false)} />
+
+            <div className="w-[1px] h-4 bg-border" />
+
+            {/* Theme Selector */}
+            <div className="relative">
               <button
                 onClick={() => {
-                  setTheme('system');
-                  setThemeOpen(false);
+                  setThemeOpen(!themeOpen);
                 }}
-                className={cn(
-                  'w-full px-4 py-2 text-left text-sm hover:bg-accent transition-colors flex items-center gap-2',
-                  theme === 'system' && 'bg-accent text-primary',
-                )}
+                className="p-2 rounded-full text-muted-foreground hover:bg-card hover:text-foreground hover:shadow-sm transition-all"
               >
-                <Monitor className="w-4 h-4" />
-                {t('settings.themeOptions.system')}
+                {theme === 'light' && <Sun className="w-4 h-4" />}
+                {theme === 'dark' && <Moon className="w-4 h-4" />}
+                {theme === 'system' && <Monitor className="w-4 h-4" />}
+              </button>
+              {themeOpen && (
+                <div className="absolute top-full mt-2 right-0 bg-popover border border-border rounded-lg shadow-lg overflow-hidden z-50 min-w-[140px]">
+                  <button
+                    onClick={() => {
+                      setTheme('light');
+                      setThemeOpen(false);
+                    }}
+                    className={cn(
+                      'w-full px-4 py-2 text-left text-sm hover:bg-accent transition-colors flex items-center gap-2',
+                      theme === 'light' && 'bg-accent text-primary',
+                    )}
+                  >
+                    <Sun className="w-4 h-4" />
+                    {t('settings.themeOptions.light')}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setTheme('dark');
+                      setThemeOpen(false);
+                    }}
+                    className={cn(
+                      'w-full px-4 py-2 text-left text-sm hover:bg-accent transition-colors flex items-center gap-2',
+                      theme === 'dark' && 'bg-accent text-primary',
+                    )}
+                  >
+                    <Moon className="w-4 h-4" />
+                    {t('settings.themeOptions.dark')}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setTheme('system');
+                      setThemeOpen(false);
+                    }}
+                    className={cn(
+                      'w-full px-4 py-2 text-left text-sm hover:bg-accent transition-colors flex items-center gap-2',
+                      theme === 'system' && 'bg-accent text-primary',
+                    )}
+                  >
+                    <Monitor className="w-4 h-4" />
+                    {t('settings.themeOptions.system')}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="w-[1px] h-4 bg-border" />
+
+            {/* Settings Button */}
+            <div className="relative">
+              <button
+                onClick={() => setSettingsOpen(true)}
+                className="p-2 rounded-full text-muted-foreground hover:bg-card hover:text-foreground hover:shadow-sm transition-all group"
+              >
+                <Settings className="w-4 h-4 group-hover:rotate-90 transition-transform duration-500" />
               </button>
             </div>
-          )}
+          </div>
         </div>
-
-        <div className="w-[1px] h-4 bg-border" />
-
-        {/* Settings Button */}
-        <div className="relative">
-          <button
-            onClick={() => setSettingsOpen(true)}
-            className="p-2 rounded-full text-muted-foreground hover:bg-card hover:text-foreground hover:shadow-sm transition-all group"
-          >
-            <Settings className="w-4 h-4 group-hover:rotate-90 transition-transform duration-500" />
-          </button>
-        </div>
-      </div>
+      </header>
       <SettingsDialog
         open={settingsOpen}
         onOpenChange={(open) => {
@@ -810,76 +842,32 @@ function HomePage() {
         initialSection={settingsSection}
       />
 
-      {/* ═══ Background Decor ═══ */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse"
-          style={{ animationDuration: '4s' }}
-        />
-        <div
-          className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#14A99A]/10 rounded-full blur-3xl animate-pulse"
-          style={{ animationDuration: '6s' }}
-        />
+      {/* Quiet structural background: course workspace, not a marketing hero. */}
+      <div className="pointer-events-none absolute inset-x-0 top-16 h-[420px] overflow-hidden bg-[linear-gradient(180deg,color-mix(in_oklab,var(--primary)_7%,var(--background))_0%,var(--background)_100%)]">
+        <div className="absolute inset-0 opacity-[0.035] [background-image:linear-gradient(to_right,currentColor_1px,transparent_1px),linear-gradient(to_bottom,currentColor_1px,transparent_1px)] [background-size:32px_32px]" />
       </div>
 
-      {/* ═══ Course creation hero ═══ */}
+      {/* ═══ Course-space dashboard ═══ */}
       <motion.div
         initial={heroEnter({ opacity: 0, y: 20 })}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
-        className={cn(
-          'relative z-20 mt-[6vh] flex w-full max-w-[920px] flex-col items-center md:mt-[8vh]',
-        )}
+        className="relative z-20 mt-8 grid w-full max-w-6xl grid-cols-1 gap-5 px-4 md:mt-12 md:px-8 lg:grid-cols-12"
       >
-        {/* ── Logo ── */}
-        <div className="relative" data-pro-morph="lockup">
-          <motion.img
-            src={resolvedTheme === 'dark' ? brand.darkLogoSrc : brand.logoSrc}
-            alt={brand.productName}
-            initial={heroEnter({ opacity: 0, scale: 0.9 })}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{
-              delay: 0.1,
-              type: 'spring',
-              stiffness: 200,
-              damping: 20,
-            }}
-            className="mb-2 h-11 -ml-2 md:h-14 md:-ml-3"
-          />
-          {workbenchEntryEnabled ? (
-            <div
-              className="absolute left-full top-0 ml-1.5 mt-[10px] md:ml-2 md:mt-[14px]"
-              data-pro-morph="badge"
-            >
-              <ProBadge active={false} onToggle={enterWorkbench} />
-            </div>
-          ) : null}
-        </div>
-
-        {/* ── Slogan ── */}
-        <motion.p
-          initial={heroEnter({ opacity: 0 })}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.25 }}
-          className="mb-5 text-sm font-medium text-primary/80"
-        >
-          {t('home.slogan')}
-        </motion.p>
-
         <motion.div
           initial={heroEnter({ opacity: 0, y: 10 })}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="mb-7 max-w-[720px] text-center"
+          className="mb-2 lg:col-span-12"
         >
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/[0.06] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
+          <div className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.15em] text-primary">
             <Sparkles className="size-3.5" aria-hidden="true" />
             {t('home.createEyebrow')}
           </div>
-          <h1 className="text-balance text-[30px] font-semibold leading-[1.16] tracking-[-0.035em] text-foreground sm:text-[38px] md:text-[44px]">
+          <h1 className="max-w-[760px] text-balance text-[28px] font-semibold leading-[1.2] tracking-[-0.03em] text-foreground sm:text-[34px]">
             {t('home.createTitle')}
           </h1>
-          <p className="mx-auto mt-4 max-w-[640px] text-pretty text-sm leading-6 text-muted-foreground sm:text-[15px]">
+          <p className="mt-3 max-w-[720px] text-pretty text-sm leading-6 text-muted-foreground">
             {t('home.createDescription')}
           </p>
         </motion.div>
@@ -889,11 +877,11 @@ function HomePage() {
           initial={heroEnter({ opacity: 0, scale: 0.97 })}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.35 }}
-          className="w-full"
+          className="w-full lg:col-span-8"
         >
           <div
             data-pro-morph="composer"
-            className="w-full rounded-[24px] border border-primary/15 bg-card/90 backdrop-blur-xl shadow-[0_24px_80px_-36px_color-mix(in_oklab,var(--primary)_38%,transparent)] transition-[border-color,box-shadow] focus-within:border-primary/35 focus-within:shadow-[0_28px_90px_-34px_color-mix(in_oklab,var(--primary)_46%,transparent)]"
+            className="w-full rounded-2xl border border-border/80 bg-card shadow-[0_18px_50px_-34px_rgba(16,42,67,0.42)] transition-[border-color,box-shadow] focus-within:border-primary/35 focus-within:shadow-[0_22px_60px_-32px_color-mix(in_oklab,var(--primary)_38%,transparent)]"
           >
             {/* ── Greeting + Profile + Agents ── */}
             <div className="relative z-20 flex min-w-0 items-start justify-between">
@@ -905,6 +893,7 @@ function HomePage() {
 
             {/* Textarea */}
             <textarea
+              data-testid="course-requirement-input"
               ref={textareaRef}
               placeholder={t('upload.requirementPlaceholder')}
               className="min-h-[150px] max-h-[300px] w-full resize-none border-0 bg-transparent px-5 pb-3 pt-2 text-[14px] leading-relaxed placeholder:text-muted-foreground/45 focus:outline-none"
@@ -960,6 +949,7 @@ function HomePage() {
 
               {/* Send button */}
               <button
+                data-testid="course-generate-submit"
                 onClick={handleGenerate}
                 disabled={!canGenerate || preparingGenerate}
                 className={cn(
@@ -982,12 +972,73 @@ function HomePage() {
           </div>
         </motion.div>
 
+        <motion.aside
+          initial={heroEnter({ opacity: 0, x: 12 })}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.4 }}
+          className="relative min-h-[254px] overflow-hidden rounded-2xl border border-primary/15 bg-primary p-6 text-primary-foreground shadow-[0_22px_60px_-36px_color-mix(in_oklab,var(--primary)_70%,transparent)] lg:col-span-4 lg:row-span-3"
+        >
+          <div className="absolute -right-16 -top-20 size-52 rounded-full border-[34px] border-white/10" />
+          <div className="absolute -bottom-14 right-8 size-32 rounded-full bg-white/[0.06]" />
+          <div className="relative flex h-full flex-col">
+            <span className="flex size-10 items-center justify-center rounded-xl bg-white/12">
+              <Clock className="size-5" aria-hidden="true" />
+            </span>
+            <p className="mt-6 text-xs font-semibold uppercase tracking-[0.14em] text-primary-foreground/65">
+              {t('classroom.recentClassrooms')}
+            </p>
+            {latestClassroom ? (
+              <>
+                <h2 className="mt-2 line-clamp-2 text-xl font-semibold leading-snug">
+                  {latestClassroom.name}
+                </h2>
+                <p className="mt-2 text-sm text-primary-foreground/65">
+                  {formatDate(latestClassroom.updatedAt)}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => router.push(`/classroom/${latestClassroom.id}`)}
+                  className="mt-auto inline-flex h-10 w-fit items-center gap-2 rounded-xl bg-white px-4 text-sm font-semibold text-primary transition-transform hover:-translate-y-0.5"
+                >
+                  {locale === 'zh-CN' ? '继续课程' : 'Continue course'}
+                  <ChevronRight className="size-4" />
+                </button>
+              </>
+            ) : (
+              <>
+                <h2 className="mt-2 text-xl font-semibold leading-snug">
+                  {locale === 'zh-CN' ? '三步生成互动课程' : 'Create in three steps'}
+                </h2>
+                <ol className="mt-5 space-y-3 text-sm text-primary-foreground/75">
+                  {[
+                    locale === 'zh-CN' ? '描述课程主题与教学目标' : 'Describe the topic and goals',
+                    locale === 'zh-CN' ? '确认 AI 生成的课程方案' : 'Review the AI course plan',
+                    locale === 'zh-CN' ? '进入课堂开展互动学习' : 'Enter the interactive classroom',
+                  ].map((step, index) => (
+                    <li key={step} className="flex items-center gap-3">
+                      <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-white/15 text-xs font-semibold text-white">
+                        {index + 1}
+                      </span>
+                      <span>{step}</span>
+                    </li>
+                  ))}
+                </ol>
+                <p className="mt-auto text-xs leading-5 text-primary-foreground/55">
+                  {locale === 'zh-CN'
+                    ? '从左侧输入课程需求即可开始'
+                    : 'Start by entering your course request on the left'}
+                </p>
+              </>
+            )}
+          </div>
+        </motion.aside>
+
         {showVocationalTestUi && (
           <motion.div
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="mt-2 flex w-full justify-start px-1"
+            className="mt-2 flex w-full justify-start px-1 lg:col-span-8"
           >
             <Tooltip>
               <TooltipTrigger asChild>
@@ -1037,7 +1088,7 @@ function HomePage() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="mt-3 w-full p-3 bg-destructive/10 border border-destructive/20 rounded-lg"
+              className="mt-3 w-full rounded-lg border border-destructive/20 bg-destructive/10 p-3 lg:col-span-8"
             >
               <p className="text-sm text-destructive">{error}</p>
             </motion.div>
@@ -1055,7 +1106,7 @@ function HomePage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="relative z-10 mt-14 flex w-full max-w-6xl flex-col rounded-[28px] border border-border/60 bg-card/55 p-4 shadow-[0_30px_90px_-58px_rgba(16,42,67,0.55)] backdrop-blur-sm sm:p-6 md:mt-20 md:p-8"
+          className="relative z-10 mt-12 flex w-full max-w-6xl flex-col px-4 md:mt-16 md:px-8"
         >
           <div className="flex w-full flex-col gap-4 border-b border-border/50 pb-5 sm:flex-row sm:items-center sm:justify-between">
             <button

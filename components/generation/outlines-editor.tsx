@@ -242,15 +242,15 @@ export function OutlinesEditor({
         'dark:border-white/5 dark:bg-slate-950/70 dark:shadow-[0_30px_80px_-30px_rgba(0,0,0,0.6)]',
       )}
     >
-      {/* Soft gradient wash */}
-      <div className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
-      <div className="pointer-events-none absolute -top-32 left-1/2 h-64 w-[80%] -translate-x-1/2 rounded-full bg-blue-500/[0.04] blur-3xl dark:bg-blue-400/[0.08]" />
+      {/* Soft brand wash */}
+      <div className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-primary/45 to-transparent" />
+      <div className="pointer-events-none absolute -top-32 left-1/2 h-64 w-[80%] -translate-x-1/2 rounded-full bg-primary/[0.04] blur-3xl dark:bg-primary/[0.08]" />
 
       {/* Header */}
       <div className="relative flex items-start gap-3 px-6 pt-6 pb-4 md:px-10 md:pt-8 md:pb-6">
         <div className="min-w-0 flex-1 space-y-1.5">
           <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground/70">
-            <Sparkles className="size-3 text-blue-500" />
+            <Sparkles className="size-3 text-primary" />
             {t('generation.outlineEditorEyebrow')}
           </div>
           <h2 className="text-2xl font-semibold tracking-tight md:text-[28px]">
@@ -260,7 +260,7 @@ export function OutlinesEditor({
             {isStreaming && (
               <motion.span
                 aria-hidden
-                className="inline-flex size-1.5 rounded-full bg-blue-500"
+                className="inline-flex size-1.5 rounded-full bg-primary"
                 animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.1, 0.8] }}
                 transition={{ duration: 1.2, repeat: Infinity }}
               />

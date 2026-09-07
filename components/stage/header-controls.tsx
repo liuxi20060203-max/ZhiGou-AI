@@ -140,7 +140,7 @@ export function HeaderControls({
     <div className="flex items-center gap-4">
       <div
         className={cn(
-          'shrink-0 flex items-center gap-1 backdrop-blur-md shadow-sm rounded-full',
+          'flex shrink-0 items-center gap-1 rounded-xl shadow-sm backdrop-blur-md',
           compact
             ? 'bg-muted/70 border border-border/60 px-1.5 py-1'
             : 'bg-background/60 border border-border/50 px-2 py-1.5',
@@ -216,7 +216,7 @@ export function HeaderControls({
       {onToggleEditMode && (
         <label
           className={cn(
-            'shrink-0 inline-flex items-center gap-2.5 rounded-full border shadow-sm transition-colors duration-200',
+            'inline-flex shrink-0 items-center gap-2.5 rounded-xl border shadow-sm transition-colors duration-200',
             'bg-background/70 backdrop-blur-md',
             compact ? 'h-8 px-2.5' : 'h-9 px-3',
             proChecked ? 'border-primary/60 dark:border-primary/60' : 'border-border/60',

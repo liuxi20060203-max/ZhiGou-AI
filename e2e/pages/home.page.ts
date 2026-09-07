@@ -8,11 +8,12 @@ export class HomePage {
 
   constructor(page: Page) {
     this.page = page;
-    this.logo = page.locator('img[alt="知构 AI"]');
-    this.textarea = page.locator('textarea');
-    this.enterButton = page
-      .getByRole('button', { name: /generate course/i })
-      .or(page.getByRole('button', { name: '生成课程' }));
+    // These test IDs are the stable UI-redesign contract. The page structure,
+    // copy and accessible name may change, but these three user capabilities
+    // must survive every layout pass.
+    this.logo = page.getByTestId('home-brand-logo');
+    this.textarea = page.getByTestId('course-requirement-input');
+    this.enterButton = page.getByTestId('course-generate-submit');
   }
 
   async goto() {

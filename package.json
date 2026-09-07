@@ -25,6 +25,7 @@
     "test:package-tarballs": "node scripts/smoke-test-package-tarballs.mjs",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "test:e2e:ui-guard": "playwright test e2e/tests/home-to-generation.spec.ts e2e/tests/generation-flow.spec.ts e2e/tests/classroom-interaction.spec.ts e2e/tests/full-happy-path.spec.ts",
     "eval:pbl-v2-planner": "tsx eval/pbl-v2-planner/runner.ts",
     "eval:whiteboard": "tsx eval/whiteboard-layout/runner.ts",
     "eval:outline-language": "tsx eval/outline-language/runner.ts",

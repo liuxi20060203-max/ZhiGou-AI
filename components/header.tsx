@@ -7,6 +7,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import type { StageMode } from '@/lib/types/stage';
 import { classroomExitLabelKey, exitClassroom } from '@/lib/workbench/classroom-exit';
 import { HeaderControls } from './stage/header-controls';
+import { useBrand } from '@/lib/brand/brand-context';
+import { useTheme } from '@/lib/hooks/use-theme';
+import { useStageStore } from '@/lib/store';
 
 interface HeaderProps {
   readonly currentSceneTitle: string;
@@ -46,23 +49,36 @@ export function Header({
   const router = useRouter();
   const searchParams = useSearchParams();
   const exitLabel = t(classroomExitLabelKey(searchParams));
+  const brand = useBrand();
+  const { resolvedTheme } = useTheme();
+  const stageName = useStageStore((state) => state.stage?.name);
 
   return (
     <>
-      <header className="h-20 px-8 flex items-center justify-between z-10 bg-background/70 backdrop-blur-xl border-b border-border/60 gap-4">
-        <div className="flex items-center gap-3 min-w-0 flex-1">
+      <header className="z-10 flex h-20 items-center justify-between gap-4 border-b border-border/70 bg-background/90 px-5 backdrop-blur-xl md:px-7">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
           {hideBackControl
             ? null
             : (backControl ?? (
                 <button
                   onClick={() => exitClassroom(router, searchParams)}
-                  className="shrink-0 p-2 rounded-lg text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                  className="shrink-0 rounded-xl border border-border/70 bg-card p-2 text-muted-foreground shadow-sm transition-colors hover:border-primary/25 hover:bg-primary/10 hover:text-primary"
                   title={exitLabel}
                   aria-label={exitLabel}
                 >
-                  <ArrowLeft className="w-5 h-5" />
+                  <ArrowLeft className="size-5" />
                 </button>
               ))}
+          {!hideBackControl && (
+            <>
+              <img
+                src={resolvedTheme === 'dark' ? brand.darkLogoSrc : brand.logoSrc}
+                alt={brand.productName}
+                className="hidden h-7 w-auto sm:block"
+              />
+              <div className="hidden h-8 w-px bg-border/80 sm:block" />
+            </>
+          )}
           {/* Title block — hidden when `mode === 'edit'`. Header lives
               inside `PlaybackChromeRoot`, which is unmounted by `Stage`
               once mode flips to 'edit', so in steady state this branch
@@ -73,12 +89,12 @@ export function Header({
               briefly stack on top of the incoming EditChromeRoot's
               CommandBar title during the cross-fade. */}
           {mode !== 'edit' && (
-            <div className="flex flex-col min-w-0">
-              <span className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground mb-0.5">
-                {t('stage.currentScene')}
+            <div className="flex min-w-0 flex-col">
+              <span className="mb-0.5 truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                {stageName || t('stage.currentScene')}
               </span>
               <h1
-                className="text-xl font-bold text-foreground tracking-tight truncate"
+                className="truncate text-base font-semibold tracking-tight text-foreground md:text-lg"
                 suppressHydrationWarning
               >
                 {currentSceneTitle || t('common.loading')}

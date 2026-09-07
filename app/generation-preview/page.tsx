@@ -53,6 +53,8 @@ import type {
 } from '@/lib/types/generation';
 import { AgentRevealModal } from '@/components/agent/agent-reveal-modal';
 import { createLogger } from '@/lib/logger';
+import { useBrand } from '@/lib/brand/brand-context';
+import { useTheme } from '@/lib/hooks/use-theme';
 import {
   type GenerationSessionState,
   ALL_STEPS,
@@ -100,7 +102,9 @@ type SceneGenerationFailure = {
 
 function GenerationPreviewContent() {
   const router = useRouter();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  const brand = useBrand();
+  const { resolvedTheme } = useTheme();
   const hasStartedRef = useRef(false);
   const abortControllerRef = useRef<AbortController | null>(null);
   const outlineReviewTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -1191,9 +1195,9 @@ function GenerationPreviewContent() {
   // Still loading session from sessionStorage
   if (!sessionLoaded) {
     return (
-      <div className="flex min-h-[100dvh] w-full items-center justify-center bg-gradient-to-b from-background to-secondary/70 p-4">
-        <div className="text-center text-muted-foreground">
-          <div className="size-8 border-2 border-current border-t-transparent rounded-full animate-spin mx-auto" />
+      <div className="flex min-h-[100dvh] w-full items-center justify-center bg-background p-4">
+        <div className="text-center text-primary">
+          <div className="mx-auto size-8 animate-spin rounded-full border-2 border-current border-t-transparent" />
         </div>
       </div>
     );
@@ -1202,8 +1206,8 @@ function GenerationPreviewContent() {
   // No session found
   if (!session) {
     return (
-      <div className="flex min-h-[100dvh] w-full items-center justify-center bg-gradient-to-b from-background to-secondary/70 p-4">
-        <Card className="p-8 max-w-md w-full">
+      <div className="flex min-h-[100dvh] w-full items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md rounded-2xl border-border/70 p-8 shadow-lg">
           <div className="text-center space-y-4">
             <AlertCircle className="size-12 text-muted-foreground mx-auto" />
             <h2 className="text-xl font-semibold">{t('generation.sessionNotFound')}</h2>
@@ -1225,53 +1229,44 @@ function GenerationPreviewContent() {
   const activeStepText = getGenerationStepText(activeStep, session);
 
   if (isReviewingOutlines) {
-    const outlineStepIndex = Math.max(
-      0,
-      activeSteps.findIndex((step) => step.id === 'outline'),
-    );
     // Editor source-of-truth: prefer the persisted final list; fall back to the
     // live streaming buffer so the editor can render mid-stream after expansion.
     const editorOutlines = session.sceneOutlines ?? streamingOutlines ?? [];
 
     return (
-      <div className="relative flex min-h-[100dvh] w-full flex-col items-center overflow-hidden bg-gradient-to-b from-background to-secondary/70 p-4">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="absolute top-4 left-4 z-20"
-        >
-          <Button variant="ghost" size="sm" onClick={goBackToHome} disabled={isConfirmingOutlines}>
-            <ArrowLeft className="size-4 mr-2" />
-            {t('generation.backToHome')}
-          </Button>
-        </motion.div>
+      <div className="relative flex min-h-[100dvh] w-full flex-col items-center overflow-x-hidden bg-background">
+        <header className="sticky top-0 z-30 w-full border-b border-border/70 bg-background/90 backdrop-blur-xl">
+          <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 md:px-8">
+            <img
+              src={resolvedTheme === 'dark' ? brand.darkLogoSrc : brand.logoSrc}
+              alt={brand.productName}
+              className="h-8 w-auto"
+            />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={goBackToHome}
+              disabled={isConfirmingOutlines}
+            >
+              <ArrowLeft className="mr-2 size-4" />
+              {t('generation.backToHome')}
+            </Button>
+          </div>
+        </header>
 
-        <div className="z-10 w-full max-w-3xl pt-16 pb-8">
+        <div className="z-10 w-full max-w-4xl px-4 pb-10 pt-10 md:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
-            <div className="flex justify-center gap-2">
-              {activeSteps.map((step, idx) => (
-                <div
-                  key={step.id}
-                  className={cn(
-                    'h-1.5 rounded-full transition-all duration-500',
-                    idx < outlineStepIndex
-                      ? 'w-1.5 bg-primary/30'
-                      : idx === outlineStepIndex
-                        ? 'w-8 bg-primary'
-                        : 'w-1.5 bg-muted/50',
-                  )}
-                />
-              ))}
-            </div>
-
-            <div className="max-w-2xl space-y-2 text-center mx-auto">
-              <h2 className="text-2xl font-bold tracking-tight">
+            <div className="max-w-2xl space-y-2">
+              <div className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+                {locale === 'zh-CN' ? '课程方案 · 第二步' : 'Course plan · Step 2'}
+              </div>
+              <h1 className="text-3xl font-semibold tracking-tight">
                 {t('generation.reviewOutlineTitle')}
-              </h2>
+              </h1>
               <p className="text-muted-foreground text-sm md:text-base">
                 {isOutlineStreaming
                   ? t('generation.reviewOutlineStreamingDesc')
@@ -1303,224 +1298,275 @@ function GenerationPreviewContent() {
   }
 
   return (
-    <div className="relative flex min-h-[100dvh] w-full flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-background to-secondary/70 p-4 text-center">
-      {/* Background Decor */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div
-          className="absolute left-1/4 top-0 h-96 w-96 rounded-full bg-primary/10 blur-3xl animate-pulse"
-          style={{ animationDuration: '4s' }}
-        />
-        <div
-          className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-accent/10 blur-3xl animate-pulse"
-          style={{ animationDuration: '6s' }}
-        />
+    <div className="relative flex min-h-[100dvh] w-full flex-col items-center overflow-x-hidden bg-background">
+      <div className="pointer-events-none absolute inset-x-0 top-16 h-[440px] bg-[linear-gradient(180deg,color-mix(in_oklab,var(--primary)_7%,var(--background))_0%,var(--background)_100%)]">
+        <div className="absolute inset-0 opacity-[0.035] [background-image:linear-gradient(to_right,currentColor_1px,transparent_1px),linear-gradient(to_bottom,currentColor_1px,transparent_1px)] [background-size:32px_32px]" />
       </div>
 
-      {/* Back button */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="absolute top-4 left-4 z-20"
-      >
-        <Button variant="ghost" size="sm" onClick={goBackToHome}>
-          <ArrowLeft className="size-4 mr-2" />
-          {t('generation.backToHome')}
-        </Button>
-      </motion.div>
+      <header className="sticky top-0 z-30 w-full border-b border-border/70 bg-background/90 backdrop-blur-xl">
+        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 md:px-8">
+          <img
+            src={resolvedTheme === 'dark' ? brand.darkLogoSrc : brand.logoSrc}
+            alt={brand.productName}
+            className="h-8 w-auto"
+          />
+          <Button variant="ghost" size="sm" onClick={goBackToHome}>
+            <ArrowLeft className="mr-2 size-4" />
+            {t('generation.backToHome')}
+          </Button>
+        </div>
+      </header>
 
-      <div className="z-10 w-full max-w-lg space-y-8 flex flex-col items-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="w-full"
+      <main className="relative z-10 grid w-full max-w-6xl grid-cols-1 gap-6 px-4 pb-12 pt-10 md:px-8 lg:grid-cols-12">
+        <motion.aside
+          initial={{ opacity: 0, x: -16 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.45 }}
+          className="lg:col-span-4"
         >
-          <Card className="relative flex min-h-[400px] flex-col items-center justify-center overflow-hidden border-primary/15 bg-card/85 p-8 shadow-[0_30px_90px_-45px_color-mix(in_oklab,var(--primary)_45%,transparent)] backdrop-blur-xl md:p-12">
-            {/* Progress Dots */}
-            <div className="absolute top-6 left-0 right-0 flex justify-center gap-2">
-              {activeSteps.map((step, idx) => (
-                <div
-                  key={step.id}
-                  className={cn(
-                    'h-1.5 rounded-full transition-all duration-500',
-                    idx < currentStepIndex
-                      ? 'w-1.5 bg-primary/30'
-                      : idx === currentStepIndex
-                        ? 'w-8 bg-primary'
-                        : 'w-1.5 bg-muted/50',
-                  )}
-                />
-              ))}
+          <div className="lg:sticky lg:top-24">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+              {locale === 'zh-CN' ? '课程方案生成' : 'Course plan generation'}
+            </p>
+            <h1 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-foreground">
+              {session.courseTitle ||
+                (locale === 'zh-CN' ? '正在构建你的互动课程' : 'Building your interactive course')}
+            </h1>
+            <div className="mt-5 rounded-2xl border border-border/70 bg-card/80 p-4 shadow-sm">
+              <p className="text-xs font-medium text-muted-foreground">
+                {locale === 'zh-CN' ? '课程需求' : 'Course request'}
+              </p>
+              <p className="mt-2 line-clamp-4 text-sm leading-6 text-foreground/80">
+                {session.requirements.requirement}
+              </p>
             </div>
 
-            {/* Central Content */}
-            <div className="flex-1 flex flex-col items-center justify-center w-full space-y-8 mt-4">
-              {/* Icon / Visualizer Container */}
-              <div className="relative size-48 flex items-center justify-center">
-                <AnimatePresence mode="popLayout">
-                  {error ? (
-                    <motion.div
-                      key="error"
-                      initial={{ scale: 0.5, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      className="size-32 rounded-full bg-red-500/10 flex items-center justify-center border-2 border-red-500/20"
+            <ol className="mt-7 space-y-1">
+              {activeSteps.map((step, idx) => {
+                const StepIcon = step.icon;
+                const completed = idx < currentStepIndex;
+                const active = idx === currentStepIndex;
+                const stepText = getGenerationStepText(step, session);
+                return (
+                  <li
+                    key={step.id}
+                    className={cn(
+                      'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors',
+                      active && 'bg-primary/10 text-primary',
+                      !active && 'text-muted-foreground',
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        'flex size-8 shrink-0 items-center justify-center rounded-lg border',
+                        completed && 'border-primary/20 bg-primary text-primary-foreground',
+                        active && 'border-primary/25 bg-background text-primary',
+                        !active && !completed && 'border-border bg-background/70',
+                      )}
                     >
-                      <AlertCircle className="size-16 text-red-500" />
-                    </motion.div>
-                  ) : isComplete ? (
-                    <motion.div
-                      key="complete"
-                      initial={{ scale: 0.5, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      className="size-32 rounded-full bg-green-500/10 flex items-center justify-center border-2 border-green-500/20"
-                    >
-                      <CheckCircle2 className="size-16 text-green-500" />
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key={activeStep.id}
-                      initial={{ scale: 0.8, opacity: 0, filter: 'blur(10px)' }}
-                      animate={{ scale: 1, opacity: 1, filter: 'blur(0px)' }}
-                      exit={{ scale: 1.2, opacity: 0, filter: 'blur(10px)' }}
-                      transition={{ duration: 0.4 }}
-                      className="absolute inset-0 flex items-center justify-center"
-                    >
-                      <StepVisualizer
-                        stepId={activeStep.id}
-                        outlines={session.sceneOutlines ?? streamingOutlines}
-                        webSearchSources={webSearchSources}
-                        onExpandOutline={
-                          activeStep.id === 'outline' ? handleExpandStreamingOutline : undefined
-                        }
-                      />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                      {completed ? (
+                        <CheckCircle2 className="size-4" />
+                      ) : (
+                        <StepIcon className="size-4" />
+                      )}
+                    </span>
+                    <span className={cn(active && 'font-semibold')}>
+                      {t(stepText.title, stepText.titleValues)}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        </motion.aside>
+
+        <section className="flex min-w-0 flex-col items-center lg:col-span-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="w-full"
+          >
+            <Card className="relative flex min-h-[520px] flex-col items-center justify-center overflow-hidden border-border/70 bg-card p-8 text-center shadow-[0_24px_70px_-42px_rgba(16,42,67,0.45)] md:p-12">
+              <div className="absolute left-6 top-6 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
+                {locale === 'zh-CN' ? '方案构建进度' : 'Plan progress'} ·{' '}
+                {Math.min(currentStepIndex + 1, activeSteps.length)}/{activeSteps.length}
               </div>
 
-              {/* Text Content */}
-              <div className="space-y-3 max-w-sm mx-auto">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={error ? 'error' : isComplete ? 'done' : activeStep.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="space-y-2"
-                  >
-                    <h2 className="text-2xl font-bold tracking-tight">
-                      {error
-                        ? t('generation.generationFailed')
-                        : isComplete
-                          ? t('generation.generationComplete')
-                          : t(activeStepText.title, activeStepText.titleValues)}
-                    </h2>
-                    <p className="text-muted-foreground text-base">
-                      {error
-                        ? error
-                        : isComplete
-                          ? t('generation.classroomReady')
-                          : statusMessage || t(activeStepText.description)}
-                    </p>
-                  </motion.div>
-                </AnimatePresence>
+              {/* Central Content */}
+              <div className="flex-1 flex flex-col items-center justify-center w-full space-y-8 mt-4">
+                {/* Icon / Visualizer Container */}
+                <div className="relative size-48 flex items-center justify-center">
+                  <AnimatePresence mode="popLayout">
+                    {error ? (
+                      <motion.div
+                        key="error"
+                        initial={{ scale: 0.5, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="size-32 rounded-full bg-red-500/10 flex items-center justify-center border-2 border-red-500/20"
+                      >
+                        <AlertCircle className="size-16 text-red-500" />
+                      </motion.div>
+                    ) : isComplete ? (
+                      <motion.div
+                        key="complete"
+                        initial={{ scale: 0.5, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="size-32 rounded-full bg-green-500/10 flex items-center justify-center border-2 border-green-500/20"
+                      >
+                        <CheckCircle2 className="size-16 text-green-500" />
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key={activeStep.id}
+                        initial={{ scale: 0.8, opacity: 0, filter: 'blur(10px)' }}
+                        animate={{ scale: 1, opacity: 1, filter: 'blur(0px)' }}
+                        exit={{ scale: 1.2, opacity: 0, filter: 'blur(10px)' }}
+                        transition={{ duration: 0.4 }}
+                        className="absolute inset-0 flex items-center justify-center"
+                      >
+                        <StepVisualizer
+                          stepId={activeStep.id}
+                          outlines={session.sceneOutlines ?? streamingOutlines}
+                          webSearchSources={webSearchSources}
+                          onExpandOutline={
+                            activeStep.id === 'outline' ? handleExpandStreamingOutline : undefined
+                          }
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
 
-                {/* Truncation warning indicator */}
-                <AnimatePresence>
-                  {truncationWarnings.length > 0 && !error && !isComplete && (
+                {/* Text Content */}
+                <div className="space-y-3 max-w-sm mx-auto">
+                  <AnimatePresence mode="wait">
                     <motion.div
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0 }}
-                      transition={{
-                        type: 'spring',
-                        stiffness: 500,
-                        damping: 30,
-                      }}
-                      className="flex justify-center"
+                      key={error ? 'error' : isComplete ? 'done' : activeStep.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="space-y-2"
                     >
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <motion.button
-                            type="button"
-                            animate={{
-                              boxShadow: [
-                                '0 0 0 0 rgba(251, 191, 36, 0), 0 0 0 0 rgba(251, 191, 36, 0)',
-                                '0 0 16px 4px rgba(251, 191, 36, 0.12), 0 0 4px 1px rgba(251, 191, 36, 0.08)',
-                                '0 0 0 0 rgba(251, 191, 36, 0), 0 0 0 0 rgba(251, 191, 36, 0)',
-                              ],
-                            }}
-                            transition={{
-                              duration: 3,
-                              repeat: Infinity,
-                              ease: 'easeInOut',
-                            }}
-                            className="relative size-7 rounded-full flex items-center justify-center cursor-default
+                      <h2 className="text-2xl font-bold tracking-tight">
+                        {error
+                          ? t('generation.generationFailed')
+                          : isComplete
+                            ? t('generation.generationComplete')
+                            : t(activeStepText.title, activeStepText.titleValues)}
+                      </h2>
+                      <p className="text-muted-foreground text-base">
+                        {error
+                          ? error
+                          : isComplete
+                            ? t('generation.classroomReady')
+                            : statusMessage || t(activeStepText.description)}
+                      </p>
+                    </motion.div>
+                  </AnimatePresence>
+
+                  {/* Truncation warning indicator */}
+                  <AnimatePresence>
+                    {truncationWarnings.length > 0 && !error && !isComplete && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0 }}
+                        transition={{
+                          type: 'spring',
+                          stiffness: 500,
+                          damping: 30,
+                        }}
+                        className="flex justify-center"
+                      >
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <motion.button
+                              type="button"
+                              animate={{
+                                boxShadow: [
+                                  '0 0 0 0 rgba(251, 191, 36, 0), 0 0 0 0 rgba(251, 191, 36, 0)',
+                                  '0 0 16px 4px rgba(251, 191, 36, 0.12), 0 0 4px 1px rgba(251, 191, 36, 0.08)',
+                                  '0 0 0 0 rgba(251, 191, 36, 0), 0 0 0 0 rgba(251, 191, 36, 0)',
+                                ],
+                              }}
+                              transition={{
+                                duration: 3,
+                                repeat: Infinity,
+                                ease: 'easeInOut',
+                              }}
+                              className="relative size-7 rounded-full flex items-center justify-center cursor-default
                                        bg-gradient-to-br from-amber-400/15 to-orange-400/10
                                        border border-amber-400/25 hover:border-amber-400/40
                                        hover:from-amber-400/20 hover:to-orange-400/15
                                        transition-colors duration-300
                                        focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/30"
-                          >
-                            <AlertTriangle
-                              className="size-3.5 text-amber-500 dark:text-amber-400"
-                              strokeWidth={2.5}
-                            />
-                          </motion.button>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom" sideOffset={6}>
-                          <div className="space-y-1 py-0.5">
-                            {truncationWarnings.map((w, i) => (
-                              <p key={i} className="text-xs leading-relaxed">
-                                {w}
-                              </p>
-                            ))}
-                          </div>
-                        </TooltipContent>
-                      </Tooltip>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                            >
+                              <AlertTriangle
+                                className="size-3.5 text-amber-500 dark:text-amber-400"
+                                strokeWidth={2.5}
+                              />
+                            </motion.button>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" sideOffset={6}>
+                            <div className="space-y-1 py-0.5">
+                              {truncationWarnings.map((w, i) => (
+                                <p key={i} className="text-xs leading-relaxed">
+                                  {w}
+                                </p>
+                              ))}
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
-            </div>
-          </Card>
-        </motion.div>
+            </Card>
+          </motion.div>
 
-        {/* Footer Action */}
-        <div className="h-16 flex items-center justify-center w-full">
-          <AnimatePresence>
-            {error ? (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="w-full max-w-xs"
-              >
-                <Button size="lg" variant="outline" className="w-full h-12" onClick={goBackToHome}>
-                  {t('generation.goBackAndRetry')}
-                </Button>
-              </motion.div>
-            ) : isOutlineReady ? null : !isComplete ? (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex items-center gap-3 text-sm text-muted-foreground/50 font-medium uppercase tracking-widest"
-              >
-                <Sparkles className="size-3 animate-pulse" />
-                {t('generation.aiWorking')}
-                {generatedAgents.length > 0 && !showAgentReveal && (
-                  <button
-                    onClick={() => setShowAgentReveal(true)}
-                    className="ml-2 flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-medium normal-case tracking-normal text-accent transition-colors hover:bg-accent/20"
+          {/* Footer Action */}
+          <div className="flex h-16 w-full items-center justify-center">
+            <AnimatePresence>
+              {error ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="w-full max-w-xs"
+                >
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="w-full h-12"
+                    onClick={goBackToHome}
                   >
-                    <Bot className="size-3" />
-                    {t('generation.viewAgents')}
-                  </button>
-                )}
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
-        </div>
-      </div>
+                    {t('generation.goBackAndRetry')}
+                  </Button>
+                </motion.div>
+              ) : isOutlineReady ? null : !isComplete ? (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex items-center gap-3 text-sm text-muted-foreground/50 font-medium uppercase tracking-widest"
+                >
+                  <Sparkles className="size-3 animate-pulse" />
+                  {t('generation.aiWorking')}
+                  {generatedAgents.length > 0 && !showAgentReveal && (
+                    <button
+                      onClick={() => setShowAgentReveal(true)}
+                      className="ml-2 flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-medium normal-case tracking-normal text-accent transition-colors hover:bg-accent/20"
+                    >
+                      <Bot className="size-3" />
+                      {t('generation.viewAgents')}
+                    </button>
+                  )}
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
+          </div>
+        </section>
+      </main>
 
       {/* Agent Reveal Modal */}
       <AgentRevealModal
@@ -1540,7 +1586,7 @@ export default function GenerationPreviewPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-[100dvh] w-full items-center justify-center bg-gradient-to-b from-background to-secondary/70">
+        <div className="flex min-h-[100dvh] w-full items-center justify-center bg-background">
           <div className="animate-pulse space-y-4 text-center">
             <div className="h-8 w-48 bg-muted rounded mx-auto" />
             <div className="h-4 w-64 bg-muted rounded mx-auto" />

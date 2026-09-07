@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import {
   PanelLeftClose,
   PieChart,
@@ -18,8 +17,6 @@ import { SlideThumbnail } from '@/components/slide-renderer/SlideThumbnail';
 import { ThumbnailInteractive } from '@/components/slide-renderer/components/ThumbnailInteractive';
 import { useStageStore, useCanvasStore } from '@/lib/store';
 import { useI18n } from '@/lib/hooks/use-i18n';
-import { useBrand } from '@/lib/brand/brand-context';
-import { useTheme } from '@/lib/hooks/use-theme';
 import { useNearViewport } from '@/lib/hooks/use-near-viewport';
 import type { SceneType, SlideContent, InteractiveContent } from '@/lib/types/stage';
 import { PENDING_SCENE_ID } from '@/lib/store/stage';
@@ -32,7 +29,7 @@ interface SceneSidebarProps {
   readonly isCourseComplete?: boolean;
 }
 
-const DEFAULT_WIDTH = 220;
+const DEFAULT_WIDTH = 236;
 const MIN_WIDTH = 170;
 const MAX_WIDTH = 400;
 
@@ -43,11 +40,7 @@ export function SceneSidebar({
   onRetryOutline,
   isCourseComplete,
 }: SceneSidebarProps) {
-  const { t } = useI18n();
-  const brand = useBrand();
-  const { resolvedTheme } = useTheme();
-  const horizontalLogoSrc = resolvedTheme === 'dark' ? brand.darkLogoSrc : brand.logoSrc;
-  const router = useRouter();
+  const { t, locale } = useI18n();
   const { scenes, currentSceneId, setCurrentSceneId, generatingOutlines, generationStatus } =
     useStageStore();
   const failedOutlines = useStageStore.use.failedOutlines();
@@ -116,7 +109,7 @@ export function SceneSidebar({
         width: displayWidth,
         transition: isDraggingRef.current ? 'none' : 'width 0.3s ease',
       }}
-      className="bg-background/85 backdrop-blur-xl border-r border-border/60 shadow-[2px_0_24px_rgba(0,0,0,0.04)] flex flex-col shrink-0 z-20 relative overflow-visible"
+      className="relative z-20 flex shrink-0 flex-col overflow-visible border-r border-border/70 bg-secondary/30 shadow-[4px_0_28px_rgba(16,42,67,0.04)] backdrop-blur-xl"
     >
       {/* Drag handle */}
       {!collapsed && (
@@ -129,27 +122,34 @@ export function SceneSidebar({
       )}
 
       <div className={cn('flex flex-col w-full h-full overflow-hidden', collapsed && 'hidden')}>
-        {/* Logo Header */}
-        <div className="h-10 flex items-center justify-between shrink-0 relative mt-3 mb-1 px-3">
-          <button
-            onClick={() => router.push('/')}
-            className="flex items-center gap-2 cursor-pointer rounded-lg px-1.5 -mx-1.5 py-1 -my-1 hover:bg-primary/10 hover:text-primary active:scale-[0.97] transition-all duration-150"
-            title={t('generation.backToHome')}
-          >
-            <img src={horizontalLogoSrc} alt={brand.productName} className="h-6" />
-          </button>
+        {/* Course directory header */}
+        <div className="relative flex h-20 shrink-0 items-center justify-between border-b border-border/60 px-4">
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
+              {locale === 'zh-CN' ? '学习路径' : 'Learning path'}
+            </p>
+            <div className="mt-1 flex items-center gap-2">
+              <h2 className="truncate text-sm font-semibold text-foreground">
+                {locale === 'zh-CN' ? '课程目录' : 'Course outline'}
+              </h2>
+              <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-primary">
+                {scenes.length}
+              </span>
+            </div>
+          </div>
           <button
             onClick={() => onCollapseChange(true)}
-            className="w-7 h-7 shrink-0 rounded-lg flex items-center justify-center bg-muted/70 text-muted-foreground ring-1 ring-border/60 hover:bg-primary/10 hover:text-primary active:scale-90 transition-all duration-200"
+            className="flex size-8 shrink-0 items-center justify-center rounded-xl border border-border/70 bg-background/75 text-muted-foreground shadow-sm transition-all duration-200 hover:border-primary/25 hover:bg-primary/10 hover:text-primary active:scale-90"
+            aria-label={locale === 'zh-CN' ? '收起课程目录' : 'Collapse course outline'}
           >
-            <PanelLeftClose className="w-4 h-4" />
+            <PanelLeftClose className="size-4" />
           </button>
         </div>
 
         {/* Scenes List */}
         <div
           data-testid="scene-list"
-          className="flex-1 overflow-y-auto overflow-x-hidden p-2 space-y-2 scrollbar-hide pt-1"
+          className="scrollbar-hide flex-1 space-y-3 overflow-x-hidden overflow-y-auto p-3"
         >
           {scenes.map((scene, index) => {
             const isActive = currentSceneId === scene.id;
@@ -171,10 +171,10 @@ export function SceneSidebar({
                   }
                 }}
                 className={cn(
-                  'group relative rounded-lg transition-all duration-200 cursor-pointer flex flex-col gap-1 p-1.5',
+                  'group relative flex cursor-pointer flex-col gap-1.5 rounded-xl border p-2 transition-all duration-200',
                   isActive
-                    ? 'bg-primary/10 dark:bg-primary/20 ring-1 ring-primary/25 dark:ring-primary/35'
-                    : 'hover:bg-primary/[0.05] dark:hover:bg-primary/[0.08]',
+                    ? 'border-primary/30 bg-background shadow-sm ring-1 ring-primary/10 dark:bg-primary/15'
+                    : 'border-transparent hover:border-border/70 hover:bg-background/65',
                 )}
               >
                 {/* Scene Header */}
@@ -205,7 +205,7 @@ export function SceneSidebar({
                 </div>
 
                 {/* Thumbnail */}
-                <div className="relative aspect-video w-full rounded overflow-hidden bg-muted/70 ring-1 ring-border/60">
+                <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-muted/70 ring-1 ring-border/60">
                   <div className="absolute inset-0 flex items-center justify-center">
                     {isSlide && slideContent ? (
                       <LazySlideThumbnail
