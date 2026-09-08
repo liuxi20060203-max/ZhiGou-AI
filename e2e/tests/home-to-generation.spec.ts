@@ -64,6 +64,24 @@ test.describe('Home → Generation', () => {
     expect(page.url()).toContain('/generation-preview');
   });
 
+  test('dedicated create route reuses the course composer and submits requirement', async ({
+    page,
+  }) => {
+    const home = new HomePage(page);
+    await home.goto('/create');
+
+    await expect(home.logo).toBeVisible();
+    await expect(home.textarea).toBeVisible();
+    await expect(home.textarea).toBeFocused();
+    await expect(page.getByTestId('nav-create-course')).toHaveAttribute('aria-current', 'page');
+
+    await home.fillRequirement('创建一堂关于牛顿运动定律的互动课程');
+    await expect(home.enterButton).toBeEnabled();
+    await home.submit();
+
+    await page.waitForURL(/\/generation-preview/);
+  });
+
   test('keeps body spacing stable when the settings dialog opens', async ({ page }) => {
     const home = new HomePage(page);
     await home.goto();

@@ -24,6 +24,7 @@ import {
   Upload,
   Sparkles,
   Atom,
+  BookOpen,
   X,
   Presentation,
   Loader2,
@@ -127,7 +128,7 @@ const initialFormState: FormState = {
   vocationalTestMode: false,
 };
 
-function HomePage() {
+export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard' | 'create' }) {
   const { t, locale } = useI18n();
   const { theme, setTheme, resolvedTheme } = useTheme();
   const brand = useBrand();
@@ -256,6 +257,13 @@ function HomePage() {
   const searchButtonRef = useRef<HTMLButtonElement>(null);
   const toolbarRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const isCreateExperience = experience === 'create';
+
+  useEffect(() => {
+    if (!isCreateExperience) return;
+    const frame = requestAnimationFrame(() => textareaRef.current?.focus());
+    return () => cancelAnimationFrame(frame);
+  }, [isCreateExperience]);
   const thumbnailsRef = useRef<Record<string, Slide>>({});
 
   const replaceThumbnails = (slides: Record<string, Slide>) => {
@@ -731,12 +739,19 @@ function HomePage() {
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 md:px-8">
           <div className="flex min-w-0 items-center gap-7">
             <div className="relative shrink-0" data-pro-morph="lockup">
-              <img
-                data-testid="home-brand-logo"
-                src={resolvedTheme === 'dark' ? brand.darkLogoSrc : brand.logoSrc}
-                alt={brand.productName}
-                className="h-8 w-auto"
-              />
+              <button
+                type="button"
+                onClick={() => router.push('/')}
+                aria-label={locale === 'zh-CN' ? '返回我的课程' : 'Back to my courses'}
+                className="block rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/45"
+              >
+                <img
+                  data-testid="home-brand-logo"
+                  src={resolvedTheme === 'dark' ? brand.darkLogoSrc : brand.logoSrc}
+                  alt={brand.productName}
+                  className="h-8 w-auto"
+                />
+              </button>
               {workbenchEntryEnabled ? (
                 <div className="absolute left-full top-0 ml-1" data-pro-morph="badge">
                   <ProBadge active={false} onToggle={enterWorkbench} />
@@ -744,12 +759,34 @@ function HomePage() {
               ) : null}
             </div>
             <nav className="hidden items-center gap-1 text-sm md:flex" aria-label="Primary">
-              <button className="rounded-lg bg-primary/10 px-3 py-2 font-medium text-primary">
+              <button
+                type="button"
+                data-testid="nav-my-courses"
+                aria-current={!isCreateExperience ? 'page' : undefined}
+                onClick={() => router.push('/')}
+                className={cn(
+                  'rounded-lg px-3 py-2 transition-colors',
+                  !isCreateExperience
+                    ? 'bg-primary/10 font-medium text-primary'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                )}
+              >
                 {t('classroom.recentClassrooms')}
               </button>
               <button
-                onClick={() => textareaRef.current?.focus()}
-                className="rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                type="button"
+                data-testid="nav-create-course"
+                aria-current={isCreateExperience ? 'page' : undefined}
+                onClick={() => {
+                  if (isCreateExperience) textareaRef.current?.focus();
+                  else router.push('/create');
+                }}
+                className={cn(
+                  'rounded-lg px-3 py-2 transition-colors',
+                  isCreateExperience
+                    ? 'bg-primary/10 font-medium text-primary'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                )}
               >
                 {t('home.createEyebrow')}
               </button>
@@ -985,9 +1022,13 @@ function HomePage() {
               <Clock className="size-5" aria-hidden="true" />
             </span>
             <p className="mt-6 text-xs font-semibold uppercase tracking-[0.14em] text-primary-foreground/65">
-              {t('classroom.recentClassrooms')}
+              {isCreateExperience
+                ? locale === 'zh-CN'
+                  ? '创建指引'
+                  : 'Creation guide'
+                : t('classroom.recentClassrooms')}
             </p>
-            {latestClassroom ? (
+            {latestClassroom && !isCreateExperience ? (
               <>
                 <h2 className="mt-2 line-clamp-2 text-xl font-semibold leading-snug">
                   {latestClassroom.name}
@@ -1101,14 +1142,14 @@ function HomePage() {
           the New-folder / import / search actions, so a brand-new user with
           zero courses and zero folders can still create the first folder or
           import. One stable action surface across root, folder, and empty. */}
-      {hydrated && (
+      {hydrated && !isCreateExperience && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="relative z-10 mt-12 flex w-full max-w-6xl flex-col px-4 md:mt-16 md:px-8"
+          className="relative z-10 mt-12 w-[calc(100%-2rem)] max-w-[1088px] overflow-hidden rounded-[28px] border border-border/70 bg-card/80 p-4 shadow-[0_24px_70px_-48px_rgba(16,42,67,0.55)] backdrop-blur-sm md:mt-16 md:w-[calc(100%-4rem)] md:p-6"
         >
-          <div className="flex w-full flex-col gap-4 border-b border-border/50 pb-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <button
               type="button"
               onClick={() => {
@@ -1118,11 +1159,11 @@ function HomePage() {
               className="group/library min-w-0 text-left"
             >
               <span className="flex items-center gap-2.5">
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                  <Clock className="size-4.5" aria-hidden="true" />
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
+                  <BookOpen className="size-5" aria-hidden="true" />
                 </span>
                 <span className="min-w-0">
-                  <span className="flex items-center gap-2 text-lg font-semibold tracking-tight text-foreground">
+                  <span className="flex items-center gap-2 text-xl font-semibold tracking-tight text-foreground">
                     {t('classroom.recentClassrooms')}
                     {currentFolder && (
                       <>
@@ -1130,13 +1171,13 @@ function HomePage() {
                         <span className="max-w-[180px] truncate">{currentFolder.name}</span>
                       </>
                     )}
-                    <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium tabular-nums text-muted-foreground">
+                    <span className="rounded-lg bg-primary/10 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-primary">
                       {currentFolder ? currentFolderClassrooms.length : classrooms.length}
                     </span>
                     <motion.span
                       animate={{ rotate: recentOpen ? 180 : 0 }}
                       transition={{ duration: 0.25, ease: 'easeInOut' }}
-                      className="text-muted-foreground transition-colors group-hover/library:text-foreground"
+                      className="ml-1 text-muted-foreground transition-colors group-hover/library:text-primary"
                     >
                       <ChevronDown className="size-4" />
                     </motion.span>
@@ -1181,7 +1222,7 @@ function HomePage() {
                   >
                     <InputGroup
                       className={cn(
-                        'h-7 text-[12px] rounded-full bg-muted/40 border-transparent shadow-none',
+                        'h-9 text-[12px] rounded-xl bg-background border-border/60 shadow-none',
                         'transition-colors',
                         'hover:bg-muted/60',
                         'has-[[data-slot=input-group-control]:focus-visible]:bg-muted/60',
@@ -1211,7 +1252,7 @@ function HomePage() {
                         }}
                         placeholder={t('classroom.searchPlaceholder')}
                         aria-label={t('classroom.searchAriaLabel')}
-                        className="h-7 pl-3 placeholder:text-muted-foreground/50"
+                        className="h-9 pl-3 placeholder:text-muted-foreground/50"
                       />
                       {searchQuery && (
                         <InputGroupButton
@@ -1259,9 +1300,12 @@ function HomePage() {
                   }}
                   aria-label={t('classroom.newFolderTitle')}
                   title={t('classroom.newFolderTitle')}
-                  className="inline-flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm transition-opacity hover:opacity-90 cursor-pointer"
+                  className="inline-flex h-8 items-center justify-center gap-1.5 rounded-lg bg-primary px-2.5 text-primary-foreground shadow-sm transition-opacity hover:opacity-90 cursor-pointer"
                 >
                   <FolderPlus className="size-4" />
+                  <span className="hidden whitespace-nowrap md:inline">
+                    {t('classroom.newFolderTitle')}
+                  </span>
                 </button>
               )}
             </div>
@@ -1278,7 +1322,7 @@ function HomePage() {
                 className="w-full overflow-hidden"
               >
                 {folders.length === 0 && classrooms.length === 0 ? (
-                  <div className="flex flex-col items-center px-4 pb-5 pt-12 text-center">
+                  <div className="mt-6 flex flex-col items-center rounded-2xl border border-dashed border-primary/20 bg-primary/[0.035] px-4 py-12 text-center">
                     <span className="mb-4 flex size-14 items-center justify-center rounded-2xl border border-primary/15 bg-primary/[0.06] text-primary">
                       <Sparkles className="size-6" aria-hidden="true" />
                     </span>
@@ -1301,7 +1345,7 @@ function HomePage() {
                     {t('classroom.searchEmpty')}
                   </div>
                 ) : (
-                  <div className="pt-8">
+                  <div className="pt-7">
                     {/* Breadcrumb — shown only while searching (the folder path
                         already lives in the centered header above). */}
                     {isSearching && (
@@ -1340,7 +1384,7 @@ function HomePage() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -8 }}
                         transition={{ duration: 0.2 }}
-                        className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-8"
+                        className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
                       >
                         {/* Root + non-search: render folder tiles first. */}
                         {!isSearching &&
@@ -1798,8 +1842,8 @@ function ClassroomCard({
   };
 
   return (
-    <div
-      className="group cursor-pointer"
+    <article
+      className="group cursor-pointer rounded-2xl border border-border/70 bg-background/70 p-2.5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-primary/25 hover:shadow-[0_18px_38px_-26px_rgba(16,42,67,0.55)]"
       onClick={confirmingDelete ? undefined : onClick}
       draggable={!confirmingDelete && !editing}
       onDragStart={(e) => {
@@ -1812,10 +1856,10 @@ function ClassroomCard({
         window.dispatchEvent(new CustomEvent('course-drag-end'));
       }}
     >
-      {/* Thumbnail — large radius, no border, subtle bg */}
+      {/* Course cover */}
       <div
         ref={thumbRef}
-        className="relative w-full aspect-[16/9] rounded-2xl bg-slate-100 dark:bg-slate-800/80 overflow-hidden transition-transform duration-200 group-hover:scale-[1.02]"
+        className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-slate-100 ring-1 ring-black/5 dark:bg-slate-800/80 dark:ring-white/5"
       >
         {slide && thumbWidth > 0 ? (
           <SlideThumbnail
@@ -1826,8 +1870,8 @@ function ClassroomCard({
           />
         ) : !slide ? (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="size-12 rounded-2xl bg-gradient-to-br from-accent to-secondary flex items-center justify-center">
-              <span className="text-xl opacity-50">📄</span>
+            <div className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <BookOpen className="size-5" />
             </div>
           </div>
         ) : null}
@@ -1928,13 +1972,9 @@ function ClassroomCard({
         </AnimatePresence>
       </div>
 
-      {/* Info — outside the thumbnail */}
-      <div className="mt-2.5 px-1 flex items-center gap-2">
-        <span className="shrink-0 inline-flex items-center rounded-full bg-accent px-2 py-0.5 text-[11px] font-medium text-primary">
-          {classroom.sceneCount} {t('classroom.slides')} · {formatDate(classroom.updatedAt)}
-        </span>
+      <div className="flex min-h-[72px] flex-col px-1.5 pb-1 pt-3">
         {editing ? (
-          <div className="flex-1 min-w-0" onClick={(e) => e.stopPropagation()}>
+          <div className="min-w-0" onClick={(e) => e.stopPropagation()}>
             <input
               ref={nameInputRef}
               value={nameDraft}
@@ -1946,14 +1986,14 @@ function ClassroomCard({
               onBlur={commitRename}
               maxLength={100}
               placeholder={t('classroom.renamePlaceholder')}
-              className="w-full bg-transparent border-b border-primary/60 text-[15px] font-medium text-foreground/90 outline-none placeholder:text-muted-foreground/40"
+              className="w-full border-b border-primary/60 bg-transparent text-[15px] font-semibold text-foreground outline-none placeholder:text-muted-foreground/40"
             />
           </div>
         ) : (
           <Tooltip>
             <TooltipTrigger asChild>
               <p
-                className="font-medium text-[15px] truncate text-foreground/90 min-w-0 cursor-text"
+                className="min-w-0 truncate text-[15px] font-semibold text-foreground cursor-text"
                 onDoubleClick={startRename}
               >
                 {classroom.name}
@@ -1980,8 +2020,15 @@ function ClassroomCard({
             </TooltipContent>
           </Tooltip>
         )}
+        <div className="mt-auto flex items-center justify-between gap-3 pt-2 text-[11px] text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="size-1.5 rounded-full bg-accent" />
+            {classroom.sceneCount} {t('classroom.slides')}
+          </span>
+          <span>{formatDate(classroom.updatedAt)}</span>
+        </div>
       </div>
-    </div>
+    </article>
   );
 }
 

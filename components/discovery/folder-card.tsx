@@ -122,8 +122,8 @@ export function FolderCard({
   const hasCovers = covers.length > 0;
 
   return (
-    <div
-      className="group cursor-pointer"
+    <article
+      className="group cursor-pointer rounded-2xl border border-border/70 bg-background/70 p-2.5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-primary/25 hover:shadow-[0_18px_38px_-26px_rgba(16,42,67,0.55)]"
       onClick={editing ? undefined : onOpen}
       onDragEnter={(e) => {
         if (editing) return;
@@ -155,7 +155,7 @@ export function FolderCard({
       <div
         ref={thumbRef}
         className={cn(
-          'relative w-full aspect-[16/9] rounded-2xl bg-gradient-to-br from-primary/[0.08] to-accent/[0.08] dark:from-primary/20 dark:to-accent/15 overflow-hidden transition-transform duration-200 group-hover:scale-[1.02] ring-1',
+          'relative w-full aspect-[16/9] rounded-xl bg-gradient-to-br from-primary/[0.08] to-accent/[0.08] dark:from-primary/20 dark:to-accent/15 overflow-hidden ring-1',
           dropActive
             ? 'ring-2 ring-primary ring-offset-2 ring-offset-background scale-[1.03]'
             : 'ring-primary/20 dark:ring-primary/30',
@@ -324,12 +324,9 @@ export function FolderCard({
         </AnimatePresence>
       </div>
 
-      <div className="mt-2.5 px-1 flex items-center gap-2">
-        <span className="shrink-0 inline-flex items-center rounded-full bg-primary/10 dark:bg-primary/20 px-2 py-0.5 text-[11px] font-medium text-primary">
-          {t('classroom.folderBadge')}
-        </span>
+      <div className="flex min-h-[72px] flex-col px-1.5 pb-1 pt-3">
         {editing ? (
-          <div className="flex-1 min-w-0" onClick={(e) => e.stopPropagation()}>
+          <div className="min-w-0" onClick={(e) => e.stopPropagation()}>
             <input
               ref={inputRef}
               value={draft}
@@ -344,17 +341,26 @@ export function FolderCard({
               onBlur={commit}
               disabled={submitting}
               maxLength={80}
-              className="w-full bg-transparent border-b border-violet-400/60 text-[15px] font-medium text-foreground/90 outline-none disabled:opacity-50"
+              className="w-full border-b border-primary/60 bg-transparent text-[15px] font-semibold text-foreground outline-none disabled:opacity-50"
             />
             {error && <p className="mt-1 text-[11px] text-destructive">{error}</p>}
           </div>
         ) : (
-          <p className="font-medium text-[15px] truncate text-foreground/90 min-w-0">
+          <p className="min-w-0 truncate text-[15px] font-semibold text-foreground">
             {folder.name}
           </p>
         )}
+        <div className="mt-auto flex items-center justify-between gap-3 pt-2 text-[11px] text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5">
+            <Folder className="size-3.5 text-primary" />
+            {t('classroom.folderBadge')}
+          </span>
+          <span>
+            {courseCount} {t('classroom.folderCourseCountUnit')}
+          </span>
+        </div>
       </div>
-    </div>
+    </article>
   );
 }
 

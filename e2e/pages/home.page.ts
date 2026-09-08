@@ -16,8 +16,8 @@ export class HomePage {
     this.enterButton = page.getByTestId('course-generate-submit');
   }
 
-  async goto() {
-    await this.page.goto('/');
+  async goto(path = '/') {
+    await this.page.goto(path);
   }
 
   async fillRequirement(text: string) {
