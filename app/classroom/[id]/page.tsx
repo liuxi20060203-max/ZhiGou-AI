@@ -17,6 +17,10 @@ import { generateMediaForOutlines } from '@/lib/media/media-orchestrator';
 import { useAgentRegistry } from '@/lib/orchestration/registry/store';
 import { fetchStageMeta } from '@/lib/classroom/stage-meta-client';
 import { noteStageOwnership } from '@/lib/classroom/stage-ownership-signal';
+import { useI18n } from '@/lib/hooks/use-i18n';
+import { useBrand } from '@/lib/brand/brand-context';
+import { Button } from '@/components/ui/button';
+import { AlertCircle, Loader2, RotateCcw } from 'lucide-react';
 import {
   applyClassroomStageAndScenes,
   defaultClassroomLoadDeps,
@@ -24,6 +28,69 @@ import {
 } from '@/lib/classroom/load-classroom';
 
 const log = createLogger('Classroom');
+
+function ClassroomLoadingState() {
+  const { t } = useI18n();
+  const brand = useBrand();
+
+  return (
+    <div
+      className="relative flex flex-1 items-center justify-center overflow-hidden bg-background p-4"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+    >
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,color-mix(in_oklab,var(--primary)_11%,transparent),transparent_44%)]" />
+      <div className="relative flex w-full max-w-sm flex-col items-center rounded-[28px] border border-border/70 bg-card/90 px-8 py-10 text-center shadow-[0_28px_80px_-48px_rgba(16,42,67,0.65)] backdrop-blur-xl">
+        <img src={brand.logoSrc} alt={brand.productName} className="h-8 w-auto dark:hidden" />
+        <img
+          src={brand.darkLogoSrc}
+          alt={brand.productName}
+          className="hidden h-8 w-auto dark:block"
+        />
+        <span className="mt-8 flex size-16 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary">
+          <Loader2 className="size-7 animate-spin" aria-hidden="true" />
+        </span>
+        <p className="mt-5 text-base font-semibold text-foreground">
+          {t('common.loadingClassroom')}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function ClassroomErrorState({ error, onRetry }: { error: string; onRetry: () => void }) {
+  const { t, locale } = useI18n();
+  const brand = useBrand();
+
+  return (
+    <div
+      className="relative flex flex-1 items-center justify-center overflow-hidden bg-background p-4"
+      role="alert"
+    >
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,color-mix(in_oklab,var(--destructive)_8%,transparent),transparent_44%)]" />
+      <div className="relative flex w-full max-w-md flex-col items-center rounded-[28px] border border-border/70 bg-card/90 px-8 py-10 text-center shadow-[0_28px_80px_-48px_rgba(16,42,67,0.65)] backdrop-blur-xl">
+        <img src={brand.logoSrc} alt={brand.productName} className="h-8 w-auto dark:hidden" />
+        <img
+          src={brand.darkLogoSrc}
+          alt={brand.productName}
+          className="hidden h-8 w-auto dark:block"
+        />
+        <span className="mt-8 flex size-16 items-center justify-center rounded-2xl border border-destructive/20 bg-destructive/10 text-destructive">
+          <AlertCircle className="size-7" aria-hidden="true" />
+        </span>
+        <h1 className="mt-5 text-xl font-semibold text-foreground">
+          {locale === 'zh-CN' ? '课堂加载失败' : 'Unable to load classroom'}
+        </h1>
+        <p className="mt-2 max-w-sm text-sm leading-6 text-muted-foreground">{error}</p>
+        <Button onClick={onRetry} className="mt-7 w-full sm:w-auto sm:min-w-40">
+          <RotateCcw className="mr-2 size-4" aria-hidden="true" />
+          {t('common.retry')}
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 export default function ClassroomDetailPage() {
   const params = useParams();
@@ -225,27 +292,16 @@ export default function ClassroomDetailPage() {
       <MediaStageProvider value={classroomId}>
         <div className="h-screen flex flex-col overflow-hidden">
           {loading ? (
-            <div className="flex-1 flex items-center justify-center bg-background">
-              <div className="text-center text-muted-foreground">
-                <p>Loading classroom...</p>
-              </div>
-            </div>
+            <ClassroomLoadingState />
           ) : error ? (
-            <div className="flex-1 flex items-center justify-center bg-background">
-              <div className="text-center">
-                <p className="text-destructive mb-4">Error: {error}</p>
-                <button
-                  onClick={() => {
-                    setError(null);
-                    setLoading(true);
-                    loadClassroom();
-                  }}
-                  className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-                >
-                  Retry
-                </button>
-              </div>
-            </div>
+            <ClassroomErrorState
+              error={error}
+              onRetry={() => {
+                setError(null);
+                setLoading(true);
+                void loadClassroom();
+              }}
+            />
           ) : (
             <Stage onRetryOutline={retrySingleOutline} />
           )}

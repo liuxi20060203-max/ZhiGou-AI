@@ -16,7 +16,10 @@ export class ClassroomPage {
   }
 
   async waitForLoaded() {
-    await this.loadingText.waitFor({ state: 'hidden', timeout: 15_000 });
+    // Waiting only for loading text to be hidden can resolve before React mounts:
+    // a not-yet-rendered locator is already "hidden". A real scene is the stable
+    // signal that the classroom load pipeline and Stage surface are both ready.
+    await this.sidebarScenes.first().waitFor({ state: 'visible', timeout: 15_000 });
   }
 
   async clickScene(index: number) {
