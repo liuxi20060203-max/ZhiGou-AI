@@ -597,7 +597,7 @@ function SceneRow({
         {/* Body */}
         <div className="min-w-0 flex-1 space-y-1.5">
           {/* Title row */}
-          <div className="flex items-start justify-between gap-2">
+          <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-start sm:justify-between">
             {!disabled && !outline.title.trim() && (
               // Incomplete marker — a soft amber dot before a blank title. A
               // blank title blocks generation; the gate below counts how many.
@@ -612,13 +612,13 @@ function SceneRow({
               rows={1}
               spellCheck={false}
               className={cn(
-                'flex-1 resize-none border-none bg-transparent p-0 text-base font-semibold leading-7 tracking-tight',
+                'w-full resize-none border-none bg-transparent p-0 text-base font-semibold leading-7 tracking-tight sm:flex-1',
                 'placeholder:font-normal placeholder:text-muted-foreground/40',
                 'focus:outline-none focus:ring-0 md:text-lg',
                 disabled && 'cursor-default',
               )}
             />
-            <div className="flex shrink-0 items-center gap-1.5 pt-0.5">
+            <div className="flex shrink-0 items-center gap-1.5 self-start pt-0.5">
               {/* Cascading control: type-specific config (left) joined to the type selector (right) */}
               <div className="inline-flex items-center overflow-hidden rounded-full">
                 {!disabled && outline.type === 'quiz' && (

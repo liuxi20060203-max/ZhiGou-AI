@@ -55,8 +55,8 @@ export function Header({
 
   return (
     <>
-      <header className="z-10 flex h-20 items-center justify-between gap-4 border-b border-border/70 bg-background/90 px-5 backdrop-blur-xl md:px-7">
-        <div className="flex min-w-0 flex-1 items-center gap-3">
+      <header className="z-10 flex h-20 items-center justify-between gap-2 border-b border-border/70 bg-background/90 px-2 backdrop-blur-xl sm:gap-4 sm:px-5 md:px-7">
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
           {hideBackControl
             ? null
             : (backControl ?? (
@@ -90,11 +90,11 @@ export function Header({
               CommandBar title during the cross-fade. */}
           {mode !== 'edit' && (
             <div className="flex min-w-0 flex-col">
-              <span className="mb-0.5 truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+              <span className="mb-0.5 hidden truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground sm:block">
                 {stageName || t('stage.currentScene')}
               </span>
               <h1
-                className="truncate text-base font-semibold tracking-tight text-foreground md:text-lg"
+                className="truncate text-sm font-semibold tracking-tight text-foreground sm:text-base md:text-lg"
                 suppressHydrationWarning
               >
                 {currentSceneTitle || t('common.loading')}

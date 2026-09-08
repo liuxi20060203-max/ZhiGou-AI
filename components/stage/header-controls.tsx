@@ -137,13 +137,13 @@ export function HeaderControls({
   // the cluster pixel-stable; both hosts pad to `px-8`, so the right edge
   // anchors identically too.
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-1 sm:gap-4">
       <div
         className={cn(
           'flex shrink-0 items-center gap-1 rounded-xl shadow-sm backdrop-blur-md',
           compact
             ? 'bg-muted/70 border border-border/60 px-1.5 py-1'
-            : 'bg-background/60 border border-border/50 px-2 py-1.5',
+            : 'bg-background/60 border border-border/50 px-1 py-1 sm:px-2 sm:py-1.5',
         )}
       >
         {/* Language — Radix DropdownMenu so its menu portals to body

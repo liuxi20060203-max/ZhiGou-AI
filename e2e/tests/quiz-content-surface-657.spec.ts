@@ -232,7 +232,7 @@ test.describe('Quiz content surface (#657)', () => {
     // --- Leave Pro mode and take the quiz as a learner.
     await setProMode(false);
     await expect(page.getByTestId('quiz-surface')).toBeHidden();
-    await page.getByRole('button', { name: 'Start Quiz' }).click();
+    await page.getByRole('button', { name: 'Start Check' }).click();
 
     // The edited question text reaches playback — proves the edit round-trips.
     await expect(page.getByText('Capital of France (edited)?')).toBeVisible({ timeout: 10_000 });
