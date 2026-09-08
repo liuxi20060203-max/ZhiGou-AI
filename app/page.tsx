@@ -1142,6 +1142,42 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
           the New-folder / import / search actions, so a brand-new user with
           zero courses and zero folders can still create the first folder or
           import. One stable action surface across root, folder, and empty. */}
+      {!hydrated && !isCreateExperience && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+          aria-label={t('common.loading')}
+          className="relative z-10 mt-12 w-[calc(100%-2rem)] max-w-[1088px] overflow-hidden rounded-[28px] border border-border/70 bg-card/80 p-4 shadow-[0_24px_70px_-48px_rgba(16,42,67,0.55)] backdrop-blur-sm md:mt-16 md:w-[calc(100%-4rem)] md:p-6"
+        >
+          <div className="flex items-center gap-2.5">
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <BookOpen className="size-5 animate-pulse" aria-hidden="true" />
+            </span>
+            <span className="min-w-0 flex-1 space-y-2">
+              <span className="block h-5 w-32 animate-pulse rounded-md bg-muted" />
+              <span className="block h-3 w-52 max-w-full animate-pulse rounded bg-muted/70" />
+            </span>
+          </div>
+
+          <div className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[0, 1, 2].map((item) => (
+              <div
+                key={item}
+                className="overflow-hidden rounded-2xl border border-border/60 bg-background/60"
+              >
+                <div className="aspect-[16/9] animate-pulse bg-muted/70" />
+                <div className="space-y-3 p-4">
+                  <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
+                  <div className="h-3 w-2/5 animate-pulse rounded bg-muted/60" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
       {hydrated && !isCreateExperience && (
         <motion.div
           initial={{ opacity: 0 }}

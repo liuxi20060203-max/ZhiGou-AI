@@ -1195,10 +1195,46 @@ function GenerationPreviewContent() {
   // Still loading session from sessionStorage
   if (!sessionLoaded) {
     return (
-      <div className="flex min-h-[100dvh] w-full items-center justify-center bg-background p-4">
-        <div className="text-center text-primary">
-          <div className="mx-auto size-8 animate-spin rounded-full border-2 border-current border-t-transparent" />
-        </div>
+      <div
+        className="relative flex min-h-[100dvh] w-full items-center justify-center overflow-hidden bg-background p-4"
+        role="status"
+        aria-live="polite"
+        aria-busy="true"
+      >
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,color-mix(in_oklab,var(--primary)_12%,transparent),transparent_42%)]" />
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative flex w-full max-w-sm flex-col items-center rounded-[28px] border border-border/70 bg-card/85 px-8 py-10 text-center shadow-[0_28px_80px_-48px_rgba(16,42,67,0.65)] backdrop-blur-xl"
+        >
+          <img
+            src={resolvedTheme === 'dark' ? brand.darkLogoSrc : brand.logoSrc}
+            alt={brand.productName}
+            className="h-9 w-auto"
+          />
+          <div className="relative mt-8 flex size-16 items-center justify-center">
+            <div className="absolute inset-0 animate-ping rounded-2xl bg-primary/10" />
+            <div className="relative flex size-14 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary">
+              <Sparkles className="size-6 animate-pulse" aria-hidden="true" />
+            </div>
+          </div>
+          <p className="mt-6 text-base font-semibold text-foreground">{t('common.loading')}</p>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            {locale === 'zh-CN'
+              ? '正在恢复课程方案，请稍候'
+              : 'Restoring your course plan. This will only take a moment.'}
+          </p>
+          <div className="mt-7 flex items-center gap-2" aria-hidden="true">
+            {[0, 1, 2].map((item) => (
+              <motion.span
+                key={item}
+                animate={{ opacity: [0.25, 1, 0.25], scale: [0.85, 1, 0.85] }}
+                transition={{ duration: 1.2, repeat: Infinity, delay: item * 0.16 }}
+                className="size-1.5 rounded-full bg-primary"
+              />
+            ))}
+          </div>
+        </motion.div>
       </div>
     );
   }
@@ -1206,14 +1242,24 @@ function GenerationPreviewContent() {
   // No session found
   if (!session) {
     return (
-      <div className="flex min-h-[100dvh] w-full items-center justify-center bg-background p-4">
-        <Card className="w-full max-w-md rounded-2xl border-border/70 p-8 shadow-lg">
-          <div className="text-center space-y-4">
-            <AlertCircle className="size-12 text-muted-foreground mx-auto" />
-            <h2 className="text-xl font-semibold">{t('generation.sessionNotFound')}</h2>
-            <p className="text-sm text-muted-foreground">{t('generation.sessionNotFoundDesc')}</p>
-            <Button onClick={() => router.push('/')} className="w-full">
-              <ArrowLeft className="size-4 mr-2" />
+      <div className="relative flex min-h-[100dvh] w-full items-center justify-center overflow-hidden bg-background p-4">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,color-mix(in_oklab,var(--primary)_10%,transparent),transparent_42%)]" />
+        <Card className="relative w-full max-w-md rounded-[28px] border-border/70 bg-card/90 p-8 shadow-[0_28px_80px_-48px_rgba(16,42,67,0.65)] backdrop-blur-xl">
+          <div className="flex flex-col items-center text-center">
+            <img
+              src={resolvedTheme === 'dark' ? brand.darkLogoSrc : brand.logoSrc}
+              alt={brand.productName}
+              className="h-8 w-auto"
+            />
+            <span className="mt-8 flex size-16 items-center justify-center rounded-2xl border border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400">
+              <AlertCircle className="size-7" aria-hidden="true" />
+            </span>
+            <h2 className="mt-5 text-xl font-semibold">{t('generation.sessionNotFound')}</h2>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              {t('generation.sessionNotFoundDesc')}
+            </p>
+            <Button onClick={() => router.push('/')} className="mt-7 w-full">
+              <ArrowLeft className="mr-2 size-4" />
               {t('generation.backToHome')}
             </Button>
           </div>
