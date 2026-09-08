@@ -33,7 +33,7 @@ import { useAgentRegistry } from '@/lib/orchestration/registry/store';
 import { DEFAULT_TEACHER_AVATAR, DEFAULT_USER_AVATAR } from '@/components/roundtable/constants';
 import type { DiscussionAction } from '@/lib/types/action';
 import type { EngineMode, PlaybackView } from '@/lib/playback';
-import { getCoursePlaybackProgress } from '@/lib/playback/course-progress';
+import { getCoursePlaybackProgress } from '@/components/canvas/course-playback-progress';
 import type { Participant } from '@/lib/types/roundtable';
 
 export interface DiscussionRequest {
@@ -679,7 +679,7 @@ export function Roundtable({
     isProcessing;
   const toolbar = (
     <CanvasToolbar
-      className="shrink-0 h-8 px-3 border-b border-gray-100/40 dark:border-gray-700/30"
+      className="shrink-0 h-9 border-b border-primary/10 bg-card/55 px-4 backdrop-blur-xl dark:border-primary/15 dark:bg-card/35"
       currentSceneIndex={currentSceneIndex}
       scenesCount={scenesCount}
       engineState={
@@ -1150,11 +1150,12 @@ export function Roundtable({
 
   return (
     <div
+      data-testid="roundtable-learning-dock"
       className={cn(
-        'h-[192px] w-full flex flex-col relative z-10 transition-all duration-300',
+        'relative z-10 flex h-[192px] w-full flex-col overflow-hidden transition-all duration-300 sm:h-[200px]',
         isPresenting && !controlsVisible
           ? 'border-t border-transparent bg-transparent backdrop-blur-none'
-          : 'border-t border-border/60 bg-background/80 backdrop-blur-md',
+          : 'border-t border-primary/15 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--background)_92%,var(--primary)_8%),var(--background))] shadow-[0_-18px_48px_-34px_color-mix(in_oklab,var(--primary)_48%,transparent)] backdrop-blur-xl',
       )}
     >
       {/* ── Toolbar strip — merged from CanvasArea ── */}
@@ -1171,7 +1172,7 @@ export function Roundtable({
         {/* Left: Teacher identity */}
         <div
           className={cn(
-            'w-[90px] shrink-0 flex flex-col border-r border-border/60 bg-background/70 overflow-visible relative transition-opacity duration-300',
+            'relative flex w-[82px] shrink-0 flex-col overflow-visible border-r border-primary/10 bg-[linear-gradient(155deg,color-mix(in_oklab,var(--primary)_12%,var(--background)),var(--background)_72%)] transition-opacity duration-300 sm:w-[96px]',
             isPresenting && !controlsVisible && 'opacity-0 pointer-events-none',
           )}
         >
@@ -1296,7 +1297,7 @@ export function Roundtable({
         </div>
 
         {/* Center: Interaction stage */}
-        <div className="flex-1 relative mx-3 mb-2">
+        <div className="relative mx-2 mb-2 flex-1 sm:mx-4 sm:mb-3">
           {/* End flash banner (Issue 3) */}
           <AnimatePresence>
             {endFlashVisible && (
@@ -1331,8 +1332,16 @@ export function Roundtable({
                 if (isRecording || isProcessing) cancelRecording();
               }
             }}
-            className="relative w-full h-full rounded-[2.5rem] bg-card/75 backdrop-blur-xl border border-border/60 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.12)] flex flex-col justify-center px-6 overflow-hidden group transition-all duration-700 cursor-default"
+            className="group relative flex h-full w-full cursor-default flex-col justify-center overflow-hidden rounded-[1.75rem] border border-primary/15 bg-[linear-gradient(135deg,color-mix(in_oklab,var(--card)_96%,var(--primary)_4%),color-mix(in_oklab,var(--card)_97%,var(--accent)_3%))] px-4 shadow-[0_18px_45px_-28px_color-mix(in_oklab,var(--primary)_52%,transparent),inset_0_1px_0_rgba(255,255,255,0.65)] backdrop-blur-xl transition-all duration-700 sm:px-6 dark:border-primary/20 dark:shadow-[0_22px_52px_-30px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.05)]"
           >
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 overflow-hidden"
+            >
+              <div className="absolute -left-10 -top-16 size-36 rounded-full bg-primary/[0.08] blur-3xl dark:bg-primary/[0.12]" />
+              <div className="absolute -bottom-20 right-8 size-40 rounded-full bg-accent/[0.07] blur-3xl dark:bg-accent/[0.10]" />
+              <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-primary/45 to-transparent" />
+            </div>
             {elementReferencePill && (
               <div className="absolute left-1/2 top-2 z-30 -translate-x-1/2">{referencePill}</div>
             )}
@@ -1682,7 +1691,7 @@ export function Roundtable({
                                 (isInLiveFlow || isTopicPending) &&
                                   'hover:shadow-md cursor-pointer',
                               )
-                            : 'bg-background/75 border-border/70 text-foreground rounded-bl-sm shadow-sm hover:shadow-md cursor-pointer',
+                            : 'rounded-bl-sm border-primary/20 bg-[linear-gradient(135deg,color-mix(in_oklab,var(--background)_94%,var(--primary)_6%),var(--background))] text-foreground shadow-[0_12px_30px_-22px_color-mix(in_oklab,var(--primary)_60%,transparent)] hover:border-primary/35 hover:shadow-md cursor-pointer',
                       )}
                     >
                       {bubbleRole &&
@@ -1868,7 +1877,7 @@ export function Roundtable({
         {/* Right: Participants area */}
         <div
           className={cn(
-            'w-[140px] shrink-0 flex flex-col py-3 border-l border-border/60 bg-background/70 overflow-visible transition-opacity duration-300',
+            'flex w-[112px] shrink-0 flex-col overflow-visible border-l border-primary/10 bg-[linear-gradient(205deg,color-mix(in_oklab,var(--accent)_8%,var(--background)),var(--background)_76%)] py-3 transition-opacity duration-300 sm:w-[148px]',
             isPresenting && !controlsVisible && 'opacity-0 pointer-events-none',
           )}
         >

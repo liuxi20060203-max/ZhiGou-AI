@@ -1,4 +1,4 @@
-import type { EngineMode } from './types';
+import type { EngineMode } from '@/lib/playback';
 
 interface CourseProgressInput {
   readonly currentSceneIndex: number;

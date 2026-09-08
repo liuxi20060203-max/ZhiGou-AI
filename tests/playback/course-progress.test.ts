@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getCoursePlaybackProgress } from '@/lib/playback/course-progress';
+import { getCoursePlaybackProgress } from '@/components/canvas/course-playback-progress';
 
 describe('getCoursePlaybackProgress', () => {
   it('starts at zero before classroom playback begins', () => {
