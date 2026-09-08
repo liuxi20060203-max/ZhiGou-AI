@@ -39,9 +39,8 @@ import { createLogger } from '@/lib/logger';
 import { MediaStageProvider } from '@/lib/contexts/media-stage-context';
 import { generateMediaForOutlines } from '@/lib/media/media-orchestrator';
 import { useI18n } from '@/lib/hooks/use-i18n';
-import { FileQuestion, Loader2 } from 'lucide-react';
-import Link from 'next/link';
 import { useAgentRegistry } from '@/lib/orchestration/registry/store';
+import { ClassroomStatusState } from '@/components/classroom/classroom-status-state';
 import {
   applyClassroomStageAndScenes,
   defaultClassroomLoadDeps,
@@ -331,57 +330,28 @@ export function ClassroomSurface({
           }
         >
           {loading || (variant === 'pane' && !error && loadedClassroomId !== classroomId) ? (
-            <div className="flex-1 flex items-center justify-center bg-background">
-              <div className="flex flex-col items-center gap-3 text-muted-foreground">
-                <Loader2 className="h-8 w-8 animate-spin" />
-                <p>{t('common.loadingClassroom')}</p>
-              </div>
-            </div>
+            <ClassroomStatusState variant="loading" />
           ) : notFound ? (
             // Checked BEFORE `error`, and it renders no retry: the sources have
             // all answered, and running the same lookups again cannot change
             // the answer. One message for "deleted" and for "never existed" —
             // see the state's declaration.
-            <div
-              className="flex-1 flex items-center justify-center bg-background"
-              data-testid="classroom-not-found"
-            >
-              <div className="flex flex-col items-center gap-3 text-center max-w-md px-6">
-                <FileQuestion className="h-10 w-10 text-muted-foreground" />
-                <p className="text-lg font-medium">{t('classroom.notFound')}</p>
-                <p className="text-sm text-muted-foreground">{t('classroom.notFoundDesc')}</p>
-                <Link
-                  href="/"
-                  className="mt-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-                >
-                  {t('classroom.backToHome')}
-                </Link>
-              </div>
-            </div>
+            <ClassroomStatusState variant="not-found" />
           ) : error ? (
-            <div className="flex-1 flex items-center justify-center bg-background">
-              <div className="text-center">
-                <p className="text-destructive mb-4">
-                  {t('common.errorPrefix')}
-                  {error}
-                </p>
-                <button
-                  onClick={() => {
-                    setError(null);
-                    setLoading(true);
-                    void loadClassroom().then((outcome) => {
-                      if (variant === 'pane' && outcome === 'unavailable') {
-                        setLoading(false);
-                        setError(t('classroom.notFound'));
-                      }
-                    });
-                  }}
-                  className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-                >
-                  {t('common.retry')}
-                </button>
-              </div>
-            </div>
+            <ClassroomStatusState
+              variant="error"
+              message={error}
+              onRetry={() => {
+                setError(null);
+                setLoading(true);
+                void loadClassroom().then((outcome) => {
+                  if (variant === 'pane' && outcome === 'unavailable') {
+                    setLoading(false);
+                    setError(t('classroom.notFound'));
+                  }
+                });
+              }}
+            />
           ) : (
             <Stage classroomId={classroomId} onRetryOutline={retrySingleOutline} />
           )}

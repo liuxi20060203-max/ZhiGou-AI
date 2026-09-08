@@ -2,7 +2,7 @@
 
 import { useCallback, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Play } from 'lucide-react';
+import { AlertTriangle, Loader2, Play, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SceneRenderer } from '@/components/stage/scene-renderer';
 import { SceneProvider } from '@/lib/contexts/scene-context';
@@ -165,50 +165,38 @@ export function CanvasArea({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
-                className="absolute inset-0 z-[105] flex flex-col items-center justify-center bg-card"
+                className="absolute inset-0 z-[105] flex flex-col items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_50%_42%,color-mix(in_oklab,var(--primary)_10%,transparent),transparent_42%),var(--card)] p-5"
+                data-testid="scene-generation-state"
               >
                 {isGenerationFailed ? (
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center">
-                      <svg
-                        className="w-6 h-6 text-destructive"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={1.5}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
-                        />
-                      </svg>
+                  <div className="flex w-full max-w-xs flex-col items-center rounded-3xl border border-destructive/15 bg-card/85 px-7 py-8 text-center shadow-[0_24px_64px_-42px_color-mix(in_oklab,var(--destructive)_60%,transparent)] backdrop-blur-xl">
+                    <div className="flex size-14 items-center justify-center rounded-2xl border border-destructive/20 bg-destructive/10 text-destructive">
+                      <AlertTriangle className="size-6" aria-hidden="true" />
                     </div>
-                    <span className="text-sm text-destructive font-medium">
+                    <span className="mt-4 text-sm font-semibold text-foreground">
                       {t('stage.generationFailed')}
                     </span>
                     {onRetryGeneration && (
                       <button
                         onClick={onRetryGeneration}
-                        className="mt-1 px-4 py-1.5 text-xs font-medium rounded-full bg-destructive/10 text-destructive hover:bg-destructive/15 transition-colors active:scale-95"
+                        className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-destructive/20 bg-destructive/10 px-4 py-2 text-xs font-semibold text-destructive transition-all hover:bg-destructive/15 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/30"
                       >
+                        <RotateCcw className="size-3.5" aria-hidden="true" />
                         {t('generation.retryScene')}
                       </button>
                     )}
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center gap-4">
-                    {/* Spinner */}
-                    <div className="relative w-12 h-12">
-                      <div className="absolute inset-0 rounded-full border-2 border-border" />
-                      <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-primary animate-spin" />
+                  <div className="flex w-full max-w-xs flex-col items-center rounded-3xl border border-primary/15 bg-card/85 px-7 py-8 text-center shadow-[0_24px_64px_-42px_color-mix(in_oklab,var(--primary)_65%,transparent)] backdrop-blur-xl">
+                    <div className="relative flex size-14 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary">
+                      <span className="absolute inset-2 animate-ping rounded-xl border border-primary/20" />
+                      <Loader2 className="size-6 animate-spin" aria-hidden="true" />
                     </div>
-                    {/* Text */}
                     <motion.span
                       initial={{ opacity: 0, y: 4 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2, duration: 0.3 }}
-                      className="text-sm text-muted-foreground font-medium"
+                      className="mt-4 text-sm font-semibold text-foreground"
                     >
                       {t('stage.generatingNextPage')}
                     </motion.span>
