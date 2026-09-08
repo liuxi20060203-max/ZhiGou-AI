@@ -371,9 +371,10 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
     try {
       await deleteStageData(id);
       await loadClassrooms();
+      toast.success(locale === 'zh-CN' ? '课程已删除' : 'Course deleted');
     } catch (err) {
       log.error('Failed to delete classroom:', err);
-      toast.error('Failed to delete classroom');
+      toast.error(locale === 'zh-CN' ? '删除课程失败' : 'Failed to delete course');
     }
   };
 
@@ -381,6 +382,7 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
     try {
       await renameStage(id, newName);
       setClassrooms((prev) => prev.map((c) => (c.id === id ? { ...c, name: newName } : c)));
+      toast.success(locale === 'zh-CN' ? '课程名称已更新' : 'Course name updated');
     } catch (err) {
       log.error('Failed to rename classroom:', err);
       toast.error(t('classroom.renameFailed'));
@@ -408,6 +410,7 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
       try {
         await renameFolder(folder.id, newName);
         setFolders((prev) => prev.map((f) => (f.id === folder.id ? { ...f, name: trimmed } : f)));
+        toast.success(locale === 'zh-CN' ? '文件夹名称已更新' : 'Folder name updated');
         return null;
       } catch (err) {
         if (err instanceof FolderNameError) {
@@ -428,6 +431,15 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
     try {
       await deleteFolder(folder.id, mode);
       if (currentFolderId === folder.id) setCurrentFolderId(undefined);
+      toast.success(
+        locale === 'zh-CN'
+          ? mode === 'ungroup'
+            ? '文件夹已删除，课程已保留'
+            : '文件夹及其中课程已删除'
+          : mode === 'ungroup'
+            ? 'Folder deleted and courses kept'
+            : 'Folder and its courses deleted',
+      );
     } catch (err) {
       log.error('Failed to delete folder:', err);
       toast.error(t('classroom.folderDeleteFailed'));
@@ -444,6 +456,15 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
     setClassrooms((prev) => prev.map((c) => (c.id === stageId ? { ...c, folderId } : c)));
     try {
       await setStageFolder(stageId, folderId);
+      toast.success(
+        locale === 'zh-CN'
+          ? folderId
+            ? '课程已移入文件夹'
+            : '课程已移至我的课程'
+          : folderId
+            ? 'Course moved to folder'
+            : 'Course moved to My Courses',
+      );
     } catch (err) {
       log.error('Failed to move course:', err);
       toast.error(t('classroom.moveFailed'));
@@ -1954,6 +1975,8 @@ function ClassroomCard({
               <Button
                 size="icon"
                 variant="ghost"
+                aria-label={t('classroom.delete')}
+                title={t('classroom.delete')}
                 className="absolute top-2 right-2 size-7 opacity-0 group-hover:opacity-100 transition-opacity bg-black/30 hover:bg-destructive/80 text-white hover:text-white backdrop-blur-sm rounded-full"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -1965,6 +1988,8 @@ function ClassroomCard({
               <Button
                 size="icon"
                 variant="ghost"
+                aria-label={t('classroom.rename')}
+                title={t('classroom.rename')}
                 className="absolute top-2 right-11 size-7 opacity-0 group-hover:opacity-100 transition-opacity bg-black/30 hover:bg-black/50 text-white hover:text-white backdrop-blur-sm rounded-full"
                 onClick={startRename}
               >
