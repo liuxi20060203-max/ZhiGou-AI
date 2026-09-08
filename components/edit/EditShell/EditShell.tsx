@@ -299,7 +299,7 @@ function Frame({
 
   return (
     <StageGrid
-      className="bg-gradient-to-b from-zinc-100 to-zinc-200 dark:from-zinc-950 dark:to-zinc-900"
+      className="bg-[radial-gradient(circle_at_78%_12%,color-mix(in_oklab,var(--primary)_9%,transparent),transparent_34%),linear-gradient(180deg,color-mix(in_oklab,var(--background)_95%,var(--primary)_5%),var(--background))]"
       topSlot={
         hideCommandBar ? null : (
           // `data-maic-edit-chrome`: the workbench's hand-edit signal scope

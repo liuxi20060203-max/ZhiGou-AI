@@ -144,9 +144,8 @@ export function FloatingInsertToolbar({ items, x, y, collapsed, onToggleCollapse
           className={cn(
             'flex flex-col items-center gap-1 p-1',
             picking ? 'pointer-events-none' : 'pointer-events-auto',
-            'bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md',
-            'ring-1 ring-zinc-200/80 dark:ring-zinc-700/80',
-            'rounded-xl shadow-md',
+            'border border-primary/15 bg-card/88 backdrop-blur-xl dark:border-primary/20 dark:bg-card/82',
+            'rounded-xl shadow-[0_14px_34px_-22px_color-mix(in_oklab,var(--primary)_55%,transparent)]',
           )}
         >
           {/* Grip and fold share one low-profile row, so a folded strip IS the

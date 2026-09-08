@@ -29,11 +29,11 @@ export function InsertButton({ item, iconOnly = false, popoverSide = 'bottom' }:
       aria-label={iconOnly ? item.label : undefined}
       aria-pressed={typeof item.active === 'boolean' ? item.active : undefined}
       className={cn(
-        'group flex h-9 items-center rounded-xl transition-colors disabled:pointer-events-none disabled:opacity-40',
+        'group flex h-9 items-center rounded-xl transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 disabled:pointer-events-none disabled:opacity-35',
         iconOnly ? 'w-9 justify-center px-0' : 'gap-1.5 px-3',
         item.active
           ? 'bg-primary/15 text-primary dark:bg-primary/20'
-          : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100',
+          : 'text-zinc-600 hover:bg-primary/10 hover:text-primary dark:text-zinc-400 dark:hover:bg-primary/15 dark:hover:text-primary',
       )}
     >
       <span className="flex h-4 w-4 items-center justify-center [&>svg]:h-4 [&>svg]:w-4">

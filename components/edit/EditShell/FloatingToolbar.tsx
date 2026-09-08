@@ -22,7 +22,7 @@ export function FloatingToolbar({ actions }: FloatingToolbarProps) {
 
   return (
     <div className="pointer-events-none absolute left-1/2 top-5 z-20 -translate-x-1/2">
-      <div className="pointer-events-auto flex items-center gap-0.5 rounded-2xl bg-white/95 p-1 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.04)] ring-1 ring-zinc-200/60 backdrop-blur dark:bg-zinc-900/95 dark:shadow-[0_4px_24px_-8px_rgba(0,0,0,0.5)] dark:ring-zinc-800/60">
+      <div className="pointer-events-auto flex items-center gap-0.5 rounded-2xl border border-primary/15 bg-[linear-gradient(135deg,color-mix(in_oklab,var(--card)_96%,var(--primary)_4%),var(--card))] p-1 shadow-[0_16px_38px_-22px_color-mix(in_oklab,var(--primary)_55%,transparent),0_8px_18px_-14px_rgba(0,0,0,0.28)] backdrop-blur-xl dark:border-primary/20">
         {grouped.map((group, groupIndex) => (
           <Fragment key={groupIndex}>
             {groupIndex > 0 && <div className="mx-0.5 h-5 w-px bg-zinc-200 dark:bg-zinc-800" />}
@@ -45,8 +45,8 @@ function ActionButton({ action }: { readonly action: FloatingAction }) {
       onClick={action.popoverContent ? undefined : action.onInvoke}
       className={`flex h-8 items-center gap-1.5 rounded-xl px-2 transition-colors disabled:pointer-events-none disabled:opacity-40 ${
         isDanger
-          ? 'text-zinc-500 hover:bg-rose-50 hover:text-rose-600 dark:text-zinc-400 dark:hover:bg-rose-950/40 dark:hover:text-rose-400'
-          : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100'
+          ? 'text-zinc-500 hover:bg-rose-50 hover:text-rose-600 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400/35 dark:text-zinc-400 dark:hover:bg-rose-950/40 dark:hover:text-rose-400'
+          : 'text-zinc-600 hover:bg-primary/10 hover:text-primary active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 dark:text-zinc-400 dark:hover:bg-primary/15 dark:hover:text-primary'
       }`}
     >
       {action.icon}

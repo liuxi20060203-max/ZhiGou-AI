@@ -50,7 +50,7 @@ export function DockEditBar({
         aria-label={t('edit.dock.globalTools')}
         // Three tracks rather than a flex row with spacers: the pager must be
         // centred on the DOCK, not on whatever is left over after the flanks.
-        className="grid h-9 shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-2 border-b border-gray-100 px-6 dark:border-gray-800"
+        className="grid h-9 shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-2 border-b border-primary/10 bg-primary/[0.025] px-6 dark:border-primary/15 dark:bg-primary/[0.04]"
       >
         <div className="flex min-w-0 items-center gap-1">
           <button
@@ -59,7 +59,7 @@ export function DockEditBar({
             onClick={() => setRosterOpen(true)}
             title={t('edit.roster.title')}
             aria-label={t('edit.roster.title')}
-            className="inline-flex shrink-0 items-center gap-1 rounded-full border border-border bg-muted/40 px-2 py-0.5 text-[11px] text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground"
+            className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/20 bg-primary/[0.06] px-2 py-0.5 text-[11px] text-muted-foreground transition-all hover:border-primary/40 hover:bg-primary/10 hover:text-primary active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
           >
             <Users className="size-3" />
             {t('edit.roster.shortTitle')}

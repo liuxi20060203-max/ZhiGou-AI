@@ -87,7 +87,7 @@ export function CanvasPager({
   return (
     <div
       data-testid="edit-canvas-pager"
-      className="absolute bottom-3 left-1/2 z-30 flex -translate-x-1/2 items-center gap-0.5 rounded-full border border-zinc-200/70 bg-white/70 p-1 shadow-lg shadow-zinc-950/10 backdrop-blur-md dark:border-zinc-700/70 dark:bg-zinc-900/70 dark:shadow-black/30"
+      className="absolute bottom-3 left-1/2 z-30 flex -translate-x-1/2 items-center gap-0.5 rounded-full border border-primary/20 bg-card/80 p-1 shadow-[0_14px_34px_-20px_color-mix(in_oklab,var(--primary)_60%,transparent)] backdrop-blur-xl dark:border-primary/25 dark:bg-card/75"
     >
       {controls}
     </div>
@@ -113,10 +113,10 @@ function PagerButton({
           variant="ghost"
           aria-label={label}
           className={cn(
-            'size-7 shrink-0 disabled:opacity-35',
+            'size-7 shrink-0 transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-primary/35 disabled:pointer-events-none disabled:opacity-30',
             tone === 'dock'
-              ? 'rounded-md text-muted-foreground/60 hover:bg-muted hover:text-foreground'
-              : 'rounded-full text-zinc-600 hover:bg-white/80 hover:text-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-800/80 dark:hover:text-white',
+              ? 'rounded-md text-muted-foreground/60 hover:bg-primary/10 hover:text-primary'
+              : 'rounded-full text-zinc-600 hover:bg-primary/10 hover:text-primary dark:text-zinc-300 dark:hover:bg-primary/15 dark:hover:text-primary',
           )}
           {...props}
         >

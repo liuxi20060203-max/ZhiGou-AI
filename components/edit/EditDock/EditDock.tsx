@@ -99,7 +99,7 @@ export function EditDock({
         height:
           (collapsed ? TIMELINE_COLLAPSED_HEIGHT : TIMELINE_DEFAULT_HEIGHT) + DOCK_EDIT_BAR_HEIGHT,
       }}
-      className="relative flex flex-col border-t border-gray-100 bg-white/80 backdrop-blur-xl dark:border-gray-800 dark:bg-slate-900/80"
+      className="relative flex flex-col border-t border-primary/15 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--card)_96%,var(--primary)_4%),color-mix(in_oklab,var(--background)_98%,var(--accent)_2%))] shadow-[0_-18px_42px_-34px_color-mix(in_oklab,var(--primary)_58%,transparent)] backdrop-blur-xl dark:border-primary/20"
     >
       <DockEditBar sceneId={sceneId} canPickElements={canPickElements} pager={pager} />
 
