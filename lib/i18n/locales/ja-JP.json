@@ -731,6 +731,7 @@
     "previousLine": "Previous line",
     "nextLine": "Next line",
     "lineProgress": "Line {{current}} / {{total}}",
+    "courseProgress": "コース再生の進捗",
     "voiceInput": "音声入力",
     "voiceInputDisabled": "音声入力無効",
     "textInput": "テキスト入力",

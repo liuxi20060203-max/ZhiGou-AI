@@ -731,6 +731,7 @@
     "previousLine": "Previous line",
     "nextLine": "Next line",
     "lineProgress": "Line {{current}} / {{total}}",
+    "courseProgress": "تقدم تشغيل الدورة",
     "voiceInput": "إدخال صوتي",
     "voiceInputDisabled": "الإدخال الصوتي معطّل",
     "textInput": "إدخال نصي",

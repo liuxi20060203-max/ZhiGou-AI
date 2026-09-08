@@ -731,6 +731,7 @@
     "previousLine": "Vorherige Zeile",
     "nextLine": "Nächste Zeile",
     "lineProgress": "Zeile {{current}} / {{total}}",
+    "courseProgress": "Kurswiedergabefortschritt",
     "voiceInput": "Spracheingabe",
     "voiceInputDisabled": "Spracheingabe deaktiviert",
     "textInput": "Texteingabe",

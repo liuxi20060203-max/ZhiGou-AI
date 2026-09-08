@@ -731,6 +731,7 @@
     "previousLine": "Previous line",
     "nextLine": "Next line",
     "lineProgress": "Line {{current}} / {{total}}",
+    "courseProgress": "Ход воспроизведения курса",
     "voiceInput": "Голосовой ввод",
     "voiceInputDisabled": "Голосовой ввод отключён",
     "textInput": "Текстовый ввод",

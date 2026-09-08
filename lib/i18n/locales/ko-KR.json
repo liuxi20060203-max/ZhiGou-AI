@@ -731,6 +731,7 @@
     "previousLine": "Previous line",
     "nextLine": "Next line",
     "lineProgress": "Line {{current}} / {{total}}",
+    "courseProgress": "강의 재생 진행률",
     "voiceInput": "음성 입력",
     "voiceInputDisabled": "음성 입력 비활성화됨",
     "textInput": "텍스트 입력",

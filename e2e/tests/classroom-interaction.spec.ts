@@ -155,11 +155,16 @@ test.describe('Classroom Interaction', () => {
     // First scene title visible
     await expect(classroom.getSceneTitle(0)).toContainText('基本概念');
 
+    const playbackProgress = page.getByTestId('course-playback-progress');
+    await expect(playbackProgress).toBeVisible();
+    await expect(playbackProgress).toHaveAttribute('aria-valuenow', '0');
+
     // Click second scene
     await classroom.clickScene(1);
 
     // Verify second scene is now active — heading in the top bar shows the current scene name
     await expect(page.getByRole('heading', { name: '光反应' })).toBeVisible();
+    await expect(playbackProgress).toHaveAttribute('aria-valuenow', '33');
   });
 
   test('caps and restores the non-presentation roundtable draft height', async ({ page }) => {

@@ -33,6 +33,7 @@ import { useAgentRegistry } from '@/lib/orchestration/registry/store';
 import { DEFAULT_TEACHER_AVATAR, DEFAULT_USER_AVATAR } from '@/components/roundtable/constants';
 import type { DiscussionAction } from '@/lib/types/action';
 import type { EngineMode, PlaybackView } from '@/lib/playback';
+import { getCoursePlaybackProgress } from '@/lib/playback/course-progress';
 import type { Participant } from '@/lib/types/roundtable';
 
 export interface DiscussionRequest {
@@ -185,6 +186,8 @@ export function Roundtable({
   isDiscussionPaused,
   onDiscussionPause,
   onDiscussionResume,
+  totalActions = 0,
+  currentActionIndex = 0,
   currentSceneIndex = 0,
   scenesCount = 1,
   whiteboardOpen = false,
@@ -613,6 +616,15 @@ export function Roundtable({
   const showStopButton =
     engineMode === 'live' || sessionType === 'qa' || sessionType === 'discussion';
 
+  const coursePlaybackProgress = getCoursePlaybackProgress({
+    currentSceneIndex,
+    scenesCount,
+    currentActionIndex,
+    totalActions,
+    engineMode,
+    playbackCompleted: !!playbackCompleted,
+  });
+
   const handleCycleSpeed = useCallback(() => {
     const currentIndex = PLAYBACK_SPEEDS.indexOf(playbackSpeed as (typeof PLAYBACK_SPEEDS)[number]);
     const nextIndex = (currentIndex + 1) % PLAYBACK_SPEEDS.length;
@@ -703,6 +715,7 @@ export function Roundtable({
       onToggleAutoPlay={() => setAutoPlayLecture(!autoPlayLecture)}
       playbackSpeed={playbackSpeed}
       onCycleSpeed={handleCycleSpeed}
+      playbackProgress={coursePlaybackProgress}
       showElementReference={showElementReference}
       canPickSlideElement={canPickSlideElement}
       elementPickActive={elementPickActive}

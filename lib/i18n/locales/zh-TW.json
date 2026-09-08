@@ -716,6 +716,7 @@
     "previousLine": "Previous line",
     "nextLine": "Next line",
     "lineProgress": "Line {{current}} / {{total}}",
+    "courseProgress": "課程播放進度",
     "voiceInput": "語音輸入",
     "voiceInputDisabled": "語音輸入已停用",
     "textInput": "文字輸入",

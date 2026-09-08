@@ -731,6 +731,7 @@
     "previousLine": "Previous line",
     "nextLine": "Next line",
     "lineProgress": "Line {{current}} / {{total}}",
+    "courseProgress": "课程播放进度",
     "voiceInput": "语音输入",
     "voiceInputDisabled": "语音输入已禁用",
     "textInput": "文字输入",

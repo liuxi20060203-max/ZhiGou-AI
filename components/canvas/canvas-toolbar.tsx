@@ -55,6 +55,7 @@ export interface CanvasToolbarProps {
   readonly onToggleAutoPlay?: () => void;
   readonly playbackSpeed?: number;
   readonly onCycleSpeed?: () => void;
+  readonly playbackProgress?: number;
   readonly showElementReference?: boolean;
   readonly canPickSlideElement?: boolean;
   readonly elementPickActive?: boolean;
@@ -120,6 +121,7 @@ export function CanvasToolbar({
   onToggleAutoPlay,
   playbackSpeed = 1,
   onCycleSpeed,
+  playbackProgress,
   showElementReference,
   canPickSlideElement,
   elementPickActive,
@@ -157,7 +159,23 @@ export function CanvasToolbar({
   const presentationLabel = isPresenting ? t('stage.exitFullscreen') : t('stage.fullscreen');
 
   return (
-    <div className={cn('flex items-center gap-2', className)}>
+    <div className={cn('relative flex items-center gap-2', className)}>
+      {playbackProgress !== undefined && (
+        <div
+          aria-label={t('roundtable.courseProgress')}
+          aria-valuemax={100}
+          aria-valuemin={0}
+          aria-valuenow={Math.round(playbackProgress)}
+          className="absolute inset-x-0 top-0 h-1 overflow-hidden bg-slate-300/90 dark:bg-slate-700/90"
+          data-testid="course-playback-progress"
+          role="progressbar"
+        >
+          <div
+            className="h-full rounded-r-full bg-primary shadow-[0_0_8px_color-mix(in_oklab,var(--primary)_55%,transparent)] transition-[width] duration-500 ease-out"
+            style={{ width: `${playbackProgress}%` }}
+          />
+        </div>
+      )}
       {/* ── Left: sidebar toggle + page indicator ── */}
       <div className="flex items-center gap-1 shrink-0 pl-1">
         {onToggleSidebar && (

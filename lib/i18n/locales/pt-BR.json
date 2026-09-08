@@ -731,6 +731,7 @@
     "previousLine": "Previous line",
     "nextLine": "Next line",
     "lineProgress": "Line {{current}} / {{total}}",
+    "courseProgress": "Progresso de reprodução do curso",
     "voiceInput": "Entrada por voz",
     "voiceInputDisabled": "Entrada por voz desativada",
     "textInput": "Entrada por texto",

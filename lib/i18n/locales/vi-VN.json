@@ -731,6 +731,7 @@
     "previousLine": "Dòng trước",
     "nextLine": "Dòng sau",
     "lineProgress": "Dòng {{current}} / {{total}}",
+    "courseProgress": "Tiến trình phát khóa học",
     "voiceInput": "Nhập bằng giọng nói",
     "voiceInputDisabled": "Đã tắt nhập bằng giọng nói",
     "textInput": "Nhập bằng chữ",

@@ -731,6 +731,7 @@
     "previousLine": "Réplique précédente",
     "nextLine": "Réplique suivante",
     "lineProgress": "Réplique {{current}} / {{total}}",
+    "courseProgress": "Progression de la lecture du cours",
     "voiceInput": "Saisie vocale",
     "voiceInputDisabled": "Saisie vocale désactivée",
     "textInput": "Saisie au clavier",
