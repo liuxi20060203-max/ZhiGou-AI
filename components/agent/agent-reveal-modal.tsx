@@ -106,7 +106,7 @@ export function AgentRevealModal({ agents, open, onClose, onAllRevealed }: Agent
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-zinc-100/90 backdrop-blur-sm dark:bg-black/70 dark:backdrop-blur-md"
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background/92 backdrop-blur-md"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -115,7 +115,7 @@ export function AgentRevealModal({ agents, open, onClose, onAllRevealed }: Agent
           {/* Close button */}
           {allRevealed && (
             <motion.button
-              className="absolute right-4 top-4 flex size-9 items-center justify-center rounded-full bg-black/5 text-zinc-500 backdrop-blur-sm transition-colors hover:bg-black/10 hover:text-zinc-700 dark:bg-white/10 dark:text-white/70 dark:hover:bg-white/20 dark:hover:text-white"
+              className="absolute right-4 top-4 flex size-9 items-center justify-center rounded-full border border-border bg-card/80 text-muted-foreground shadow-sm backdrop-blur-sm transition-colors hover:border-primary/30 hover:bg-accent hover:text-primary"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2, duration: 0.2 }}
@@ -127,7 +127,7 @@ export function AgentRevealModal({ agents, open, onClose, onAllRevealed }: Agent
 
           {/* Title */}
           <motion.h2
-            className="mb-8 text-2xl font-bold text-zinc-800 drop-shadow-sm dark:text-white dark:drop-shadow-lg md:text-3xl"
+            className="mb-8 text-2xl font-bold text-foreground drop-shadow-sm md:text-3xl"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.4 }}
@@ -172,7 +172,7 @@ export function AgentRevealModal({ agents, open, onClose, onAllRevealed }: Agent
                         }}
                       >
                         {/* Inner card body */}
-                        <div className="relative flex size-full flex-col overflow-clip rounded-[14px] bg-white dark:bg-zinc-900">
+                        <div className="relative flex size-full flex-col overflow-clip rounded-[14px] bg-card">
                           {/* Top gradient band with texture */}
                           <div className="relative shrink-0 overflow-hidden" style={{ height: 56 }}>
                             {/* Color gradient fill */}
@@ -227,7 +227,7 @@ export function AgentRevealModal({ agents, open, onClose, onAllRevealed }: Agent
                               className="flex size-[50px] items-center justify-center rounded-full border-[2.5px] shadow-lg shadow-black/40"
                               style={{
                                 borderColor: agent.color,
-                                backgroundColor: '#f8f8fc',
+                                backgroundColor: 'var(--muted)',
                               }}
                             >
                               {isUrl(agent.avatar) ? (
@@ -286,7 +286,7 @@ export function AgentRevealModal({ agents, open, onClose, onAllRevealed }: Agent
 
                           {/* Persona text — fills remaining space */}
                           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3.5 pt-1.5 pb-3">
-                            <p className="text-left text-[10.5px] leading-[1.65] text-zinc-600 dark:text-zinc-400">
+                            <p className="text-left text-[10.5px] leading-[1.65] text-muted-foreground">
                               {agent.persona}
                             </p>
                           </div>
@@ -314,14 +314,15 @@ export function AgentRevealModal({ agents, open, onClose, onAllRevealed }: Agent
                       <div
                         className="absolute inset-0 rounded-2xl p-[2px]"
                         style={{
-                          background: 'linear-gradient(160deg, #6366f1, #a855f7, #6366f1)',
+                          background:
+                            'linear-gradient(160deg, var(--primary), #14a99a, var(--primary))',
                         }}
                       >
                         <div
                           className="relative flex size-full flex-col items-center justify-center rounded-[14px]"
                           style={{
                             background:
-                              'linear-gradient(145deg, #1e1b4b 0%, #312e81 40%, #1e1b4b 100%)',
+                              'linear-gradient(145deg, #071b23 0%, #102e39 45%, #071b23 100%)',
                           }}
                         >
                           {/* Decorative inner border */}
@@ -377,8 +378,8 @@ export function AgentRevealModal({ agents, open, onClose, onAllRevealed }: Agent
                   className={cn(
                     'size-2 rounded-full transition-colors duration-300',
                     index < revealedCount
-                      ? 'bg-zinc-700 dark:bg-white'
-                      : 'bg-zinc-300 dark:bg-white/30',
+                      ? 'bg-primary shadow-[0_0_10px_color-mix(in_srgb,var(--primary)_50%,transparent)]'
+                      : 'bg-border',
                   )}
                 />
               ))}
@@ -386,7 +387,7 @@ export function AgentRevealModal({ agents, open, onClose, onAllRevealed }: Agent
 
             {allRevealed && (
               <motion.button
-                className="rounded-full bg-zinc-800 px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-white/15 dark:hover:bg-white/25"
+                className="rounded-full bg-primary px-6 py-2 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-[transform,opacity] hover:-translate-y-0.5 hover:opacity-90"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 0.3 }}
