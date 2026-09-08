@@ -185,7 +185,7 @@ function CueTooltip({ tip }: { tip: TooltipState }) {
 
 // Native HTML5 drag snapshots the element's square bounding box, so a round
 // icon chip drags with white corners ("white border"). Suppress the ghost with a 1×1
-// transparent image — the violet drop indicator carries the feedback instead.
+// transparent image — the primary-colour drop indicator carries the feedback instead.
 let blankDragImg: HTMLImageElement | null = null;
 function setBlankDragImage(e: React.DragEvent) {
   if (typeof document === 'undefined') return;
@@ -591,7 +591,7 @@ function SpeechClip({
   return (
     <div
       className={cn(
-        'group/clip relative flex h-full w-[228px] shrink-0 flex-col overflow-hidden rounded-xl border border-border/85 bg-white/75 shadow-sm transition-colors focus-within:border-violet-400 hover:border-violet-300/70 dark:bg-slate-800/50 dark:hover:border-violet-500/40',
+        'group/clip relative flex h-full w-[228px] shrink-0 flex-col overflow-hidden rounded-xl border border-border/85 bg-white/75 shadow-sm transition-colors focus-within:border-primary/65 hover:border-primary/45 dark:bg-slate-800/50 dark:hover:border-primary/50',
         needsText && INCOMPLETE_CLIP,
       )}
     >
@@ -851,7 +851,7 @@ function CueMarker({
       className={cn(
         'group/cue relative flex h-full w-[108px] shrink-0 flex-col overflow-hidden rounded-xl border border-gray-200/80 bg-white/65 shadow-sm transition-colors dark:border-gray-700/60 dark:bg-slate-800/40',
         bound
-          ? 'cursor-pointer hover:border-violet-300/70 dark:hover:border-violet-500/40'
+          ? 'cursor-pointer hover:border-primary/45 dark:hover:border-primary/50'
           : 'cursor-grab active:cursor-grabbing',
         needsTarget && cn('border-dashed', m.dash),
       )}

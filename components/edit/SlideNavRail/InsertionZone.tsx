@@ -19,13 +19,13 @@ interface InsertionZoneProps {
  * `space-y-2` density (no layout shift, ever). On hover the `+` badge
  * pops out to the right side of the gap with a small overshoot, sitting
  * on its own z-layer with a solid background + soft drop shadow so it
- * clearly floats above any adjacent violet ring.
+ * clearly floats above any adjacent primary-colour ring.
  */
 export function InsertionZone({ label, slideLabel, quizLabel, onInsert }: InsertionZoneProps) {
   // `z-20` lifts the whole zone above adjacent `Reorder.Item` siblings.
   // Without this, the next-in-DOM-order ThumbItem (which has a `transform`
   // via motion's Reorder, creating its own stacking context) paints on
-  // top, and its violet ring clips through the `+` badge regardless of
+  // top, and its primary ring clips through the `+` badge regardless of
   // any z-index applied inside the InsertionZone itself.
   return (
     <Popover>
@@ -47,10 +47,10 @@ export function InsertionZone({ label, slideLabel, quizLabel, onInsert }: Insert
                 'pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 z-30',
                 'inline-flex h-5 w-5 items-center justify-center rounded-full',
                 // Solid background + ring + shadow gives it real visual
-                // elevation against the neighbouring violet ring zones.
-                'bg-white text-violet-600 ring-1 ring-violet-200',
-                'dark:bg-zinc-900 dark:text-violet-300 dark:ring-violet-400/40',
-                'shadow-md shadow-violet-500/15 dark:shadow-violet-500/20',
+                // elevation against the neighbouring primary ring zones.
+                'bg-white text-primary ring-1 ring-primary/25',
+                'dark:bg-zinc-900 dark:text-primary dark:ring-primary/40',
+                'shadow-md shadow-primary/15 dark:shadow-primary/20',
                 // Popup motion: start tiny + transparent, end full size with a
                 // small overshoot. The custom cubic-bezier is a classic
                 // "back-ease-out" giving it a quick, springy reveal.
@@ -104,13 +104,13 @@ function SceneTypeChoice({
         data-testid={`scene-type-${type}`}
         className={cn(
           'flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-sm',
-          'text-zinc-700 outline-none transition-colors hover:bg-violet-50 hover:text-violet-700',
-          'focus-visible:bg-violet-50 focus-visible:text-violet-700',
-          'dark:text-zinc-200 dark:hover:bg-violet-500/10 dark:hover:text-violet-300',
-          'dark:focus-visible:bg-violet-500/10 dark:focus-visible:text-violet-300',
+          'text-zinc-700 outline-none transition-colors hover:bg-primary/[0.08] hover:text-primary',
+          'focus-visible:bg-primary/[0.08] focus-visible:text-primary',
+          'dark:text-zinc-200 dark:hover:bg-primary/10 dark:hover:text-primary',
+          'dark:focus-visible:bg-primary/10 dark:focus-visible:text-primary',
         )}
       >
-        <Icon className="h-4 w-4 text-violet-500" strokeWidth={1.8} aria-hidden="true" />
+        <Icon className="h-4 w-4 text-primary" strokeWidth={1.8} aria-hidden="true" />
         <span>{label}</span>
       </button>
     </PopoverClose>

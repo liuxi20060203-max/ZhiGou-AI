@@ -11,13 +11,13 @@ const TYPES: { type: QuizQuestionType; labelKey: string; Icon: LucideIcon; tint:
     type: 'single',
     labelKey: 'edit.quiz.type.single',
     Icon: CircleDot,
-    tint: 'bg-violet-100 text-violet-600 dark:bg-violet-500/15 dark:text-violet-300',
+    tint: 'bg-primary/15 text-primary dark:bg-primary/20',
   },
   {
     type: 'multiple',
     labelKey: 'edit.quiz.type.multiple',
     Icon: ListChecks,
-    tint: 'bg-indigo-100 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-300',
+    tint: 'bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300',
   },
   {
     type: 'short_answer',

@@ -22,7 +22,7 @@
  *
  * The canvas itself stays as the author wrote it. Pick mode used to outline EVERY
  * selectable element with a faint ring and wash, on the theory that an author
- * cannot tell what is clickable — the cost was a slide covered in violet boxes,
+ * cannot tell what is clickable — the cost was a slide covered in accent boxes,
  * which is a worse answer to "what am I about to pick" than the pointer's own
  * hover ring. So: one ring on the element under the pointer, the numbered pins on
  * the ones already staged (`ElementRefPinLayer`), and nothing else.
@@ -454,7 +454,7 @@ export function ElementPickLayer() {
         {/* hovered element — the one ring on the canvas */}
         {hover && hover.box.width > 0 && (
           <div
-            className="pointer-events-none absolute rounded-md bg-violet-500/[0.06] ring-2 ring-violet-500"
+            className="pointer-events-none absolute rounded-md bg-primary/[0.07] ring-2 ring-primary"
             style={{
               left: hover.box.left - 2,
               top: hover.box.top - 2,
@@ -465,9 +465,8 @@ export function ElementPickLayer() {
         )}
 
         {/* instruction banner */}
-        <div className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded-full border border-violet-300/60 bg-popover/95 px-3.5 py-1.5 text-[12px] font-medium text-foreground shadow-lg shadow-black/10 backdrop-blur">
-          <span className="text-violet-600 dark:text-violet-400">{banner.lead}</span> ·{' '}
-          {banner.hint}
+        <div className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded-full border border-primary/35 bg-popover/95 px-3.5 py-1.5 text-[12px] font-medium text-foreground shadow-lg shadow-black/10 backdrop-blur">
+          <span className="text-primary">{banner.lead}</span> · {banner.hint}
         </div>
 
         {/* draggable + collapsible element panel, inside the canvas */}
@@ -525,7 +524,7 @@ export function ElementPickLayer() {
                       disabled={isRefMode && atCap && ordinal === 0}
                       className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[12px] transition-colors hover:bg-muted disabled:opacity-40 disabled:hover:bg-transparent ${
                         marked
-                          ? 'bg-violet-50 ring-1 ring-violet-200 dark:bg-violet-500/10 dark:ring-violet-500/30'
+                          ? 'bg-primary/[0.08] ring-1 ring-primary/25 dark:bg-primary/10 dark:ring-primary/35'
                           : ''
                       }`}
                     >
@@ -533,11 +532,11 @@ export function ElementPickLayer() {
                         {elementRefLabel(el, t)}
                       </span>
                       {ordinal > 0 ? (
-                        <span className="grid size-4 shrink-0 place-items-center rounded-full bg-violet-500 text-[9px] font-semibold tabular-nums text-white">
+                        <span className="grid size-4 shrink-0 place-items-center rounded-full bg-primary text-[9px] font-semibold tabular-nums text-primary-foreground">
                           {ordinal}
                         </span>
                       ) : marked ? (
-                        <Check className="size-3 shrink-0 text-violet-500" />
+                        <Check className="size-3 shrink-0 text-primary" />
                       ) : (
                         <span className="shrink-0 font-mono text-[9px] text-muted-foreground/45">
                           {el.id.slice(0, 6)}

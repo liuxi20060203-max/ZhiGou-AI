@@ -61,7 +61,7 @@ import { useCanvasStore } from '@/lib/store/canvas';
  *    resting palette: while picking, a click anywhere on the canvas has to mean
  *    "this element", not "insert one".
  * 4. `paletteOverPicker` (130) — where the insert strip goes WHILE picking, and
- *    only then, so the picker's violet ring and wash stop painting across the
+ *    only then, so the picker's primary ring and wash stop painting across the
  *    strip and washing it out to a disabled-looking grey. The strip is inert up
  *    here (see `FloatingInsertToolbar` for why, and for what stays clickable):
  *    it takes no pointer events, so clicks in its area fall through to the picker
