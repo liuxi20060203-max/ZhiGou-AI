@@ -200,6 +200,27 @@ test.describe('Home recent video thumbnails', () => {
     await expect(classroomVideo).toHaveCount(1);
     await expect(classroomVideo).toBeVisible({ timeout: 10_000 });
     await expect(classroomVideo).toHaveAttribute('src', /^blob:/);
+    await expect(page.getByTestId('video-progress-control')).toBeVisible();
+    const progressSlider = page
+      .getByTestId('video-progress-control')
+      .locator('input[type="range"]');
+    await expect(progressSlider).toHaveCount(1);
+
+    await classroomVideo.evaluate((video) => {
+      Object.defineProperty(video, 'duration', { configurable: true, value: 120 });
+      Object.defineProperty(video, 'currentTime', {
+        configurable: true,
+        value: 30,
+        writable: true,
+      });
+      video.dispatchEvent(new Event('loadedmetadata'));
+      video.dispatchEvent(new Event('timeupdate'));
+    });
+
+    await expect(progressSlider).toBeEnabled();
+    await expect(progressSlider).toHaveValue('30');
+    await progressSlider.fill('60');
+    await expect(classroomVideo).toHaveJSProperty('currentTime', 60);
   });
 
   test('falls back from legacy gen_vid_1 refs to the single stored video media file', async ({

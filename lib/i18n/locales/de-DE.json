@@ -1013,7 +1013,8 @@
     "deleteFolderConfirmRemove": "Dadurch werden der Ordner und seine Kurse einschließlich des Chatverlaufs gelöscht.",
     "notFound": "Kurs nicht gefunden",
     "notFoundDesc": "Dieser Kurs existiert nicht oder wurde gelöscht.",
-    "backToHome": "Zurück zur Startseite"
+    "backToHome": "Zurück zur Startseite",
+    "videoProgress": "Videowiedergabefortschritt"
   },
   "upload": {
     "pdfSizeLimit": "Unterstützt PDF-Dateien bis zu 50 MB",

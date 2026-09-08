@@ -1013,7 +1013,8 @@
     "deleteFolderAndCourses_other": "حذف المجلد و {{count}} دورة",
     "notFound": "لم يتم العثور على الدورة",
     "notFoundDesc": "هذه الدورة غير موجودة أو تم حذفها.",
-    "backToHome": "العودة إلى الصفحة الرئيسية"
+    "backToHome": "العودة إلى الصفحة الرئيسية",
+    "videoProgress": "تقدم تشغيل الفيديو"
   },
   "upload": {
     "pdfSizeLimit": "يدعم ملفات PDF حتى 50 ميغابايت",

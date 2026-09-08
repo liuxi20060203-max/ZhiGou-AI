@@ -15,6 +15,7 @@ import { useSettingsStore } from '@/lib/store/settings';
 import { useSceneData } from '@/lib/contexts/scene-context';
 import type { SlideContent } from '@/lib/types/stage';
 import { useResolvedVideoMedia } from './useResolvedVideoMedia';
+import { VideoProgressBar } from './VideoProgressBar';
 
 const log = createLogger('BaseVideoElement');
 
@@ -162,17 +163,20 @@ export function BaseVideoElement({ elementInfo }: BaseVideoElementProps) {
             ) : null}
           </div>
         ) : isReady && resolvedSrc ? (
-          <video
-            ref={videoRef}
-            className="w-full h-full"
-            style={{ objectFit: 'contain' }}
-            src={resolvedSrc}
-            poster={resolvedPoster ?? undefined}
-            preload="metadata"
-            controls
-            playsInline
-            onEnded={handleEnded}
-          />
+          <>
+            <video
+              ref={videoRef}
+              className="w-full h-full"
+              style={{ objectFit: 'contain' }}
+              src={resolvedSrc}
+              poster={resolvedPoster ?? undefined}
+              preload="metadata"
+              controls
+              playsInline
+              onEnded={handleEnded}
+            />
+            <VideoProgressBar videoRef={videoRef} ariaLabel={t('classroom.videoProgress')} />
+          </>
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-black/10 rounded">
             <svg

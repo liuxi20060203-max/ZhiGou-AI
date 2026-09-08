@@ -998,7 +998,8 @@
     "deleteFolderAndCourses_other": "刪除資料夾和 {{count}} 門課程",
     "notFound": "找不到這門課程",
     "notFoundDesc": "課程不存在，或已被刪除。",
-    "backToHome": "返回首頁"
+    "backToHome": "返回首頁",
+    "videoProgress": "影片播放進度"
   },
   "upload": {
     "pdfSizeLimit": "支援最大50MB的PDF檔案",

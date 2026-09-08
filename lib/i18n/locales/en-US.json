@@ -1013,7 +1013,8 @@
     "deleteFolderConfirmRemove": "This removes the folder and its courses, including chat history.",
     "notFound": "Course not found",
     "notFoundDesc": "This course does not exist, or it has been deleted.",
-    "backToHome": "Back to home"
+    "backToHome": "Back to home",
+    "videoProgress": "Video playback progress"
   },
   "upload": {
     "pdfSizeLimit": "Supports PDF files up to 50MB",

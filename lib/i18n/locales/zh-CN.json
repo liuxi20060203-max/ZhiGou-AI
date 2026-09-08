@@ -1013,7 +1013,8 @@
     "deleteFolderAndCourses_other": "删除文件夹和 {{count}} 门课程",
     "notFound": "找不到这门课程",
     "notFoundDesc": "课程不存在，或已被删除。",
-    "backToHome": "返回首页"
+    "backToHome": "返回首页",
+    "videoProgress": "视频播放进度"
   },
   "upload": {
     "pdfSizeLimit": "支持最大50MB的PDF文件",

@@ -1013,7 +1013,8 @@
     "deleteFolderAndCourses_other": "フォルダと {{count}} 件のコースを削除",
     "notFound": "コースが見つかりません",
     "notFoundDesc": "このコースは存在しないか、すでに削除されています。",
-    "backToHome": "ホームに戻る"
+    "backToHome": "ホームに戻る",
+    "videoProgress": "動画の再生進捗"
   },
   "upload": {
     "pdfSizeLimit": "50MBまでのPDFファイルに対応しています",

@@ -14,6 +14,7 @@ import { useI18n } from '@/lib/hooks/use-i18n';
 import { createLogger } from '@/lib/logger';
 import { mediaResolutionCanRetry, type MediaResolution } from '@/lib/media/resolve-media-ref';
 import { SCREEN_ELEMENT_ID_PREFIX } from '../element-dom';
+import { VideoProgressBar } from '../components/element/VideoElement/VideoProgressBar';
 
 const log = createLogger('RendererScreenCanvas');
 
@@ -145,6 +146,7 @@ function PlaybackVideoContent({
           playsInline
           onEnded={handleEnded}
         />
+        <VideoProgressBar videoRef={videoRef} ariaLabel={t('classroom.videoProgress')} />
         {canRetry ? (
           <button
             onClick={(event) => {

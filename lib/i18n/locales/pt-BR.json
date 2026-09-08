@@ -1013,7 +1013,8 @@
     "deleteFolderConfirmRemove": "Isto remove a pasta e seus cursos, incluindo o histórico de chat.",
     "notFound": "Curso não encontrado",
     "notFoundDesc": "Este curso não existe ou foi excluído.",
-    "backToHome": "Voltar ao início"
+    "backToHome": "Voltar ao início",
+    "videoProgress": "Progresso da reprodução do vídeo"
   },
   "upload": {
     "pdfSizeLimit": "Suporta arquivos PDF de até 50 MB",

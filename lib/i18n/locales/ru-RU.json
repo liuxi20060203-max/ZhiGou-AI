@@ -1013,7 +1013,8 @@
     "deleteFolderConfirmRemove": "Папка и её курсы (включая историю чата) будут удалены.",
     "notFound": "Курс не найден",
     "notFoundDesc": "Этот курс не существует или был удалён.",
-    "backToHome": "На главную"
+    "backToHome": "На главную",
+    "videoProgress": "Ход воспроизведения видео"
   },
   "upload": {
     "pdfSizeLimit": "Поддержка PDF до 50 МБ",
