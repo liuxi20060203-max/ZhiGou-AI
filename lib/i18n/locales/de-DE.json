@@ -536,7 +536,7 @@
       "panRight": "Nach rechts verschieben",
       "collapseAxis": "Auf Achse einklappen",
       "expandTrack": "Spur ausklappen",
-      "emptyHint": "Ziehe Aktionen auf die Achse, um zu beginnen, oder lass den MAIC Agent einen Sprechertext erstellen.",
+      "emptyHint": "Ziehe Aktionen auf die Achse, um zu beginnen, oder lass ZhiGou AI einen Sprechertext erstellen.",
       "speechPlaceholder": "Sprechertext eingeben…",
       "reorder": "Zum Neuanordnen ziehen",
       "moveLeft": "Nach links",

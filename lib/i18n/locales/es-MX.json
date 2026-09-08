@@ -536,7 +536,7 @@
       "panRight": "Desplazar a la derecha",
       "collapseAxis": "Contraer al eje",
       "expandTrack": "Expandir pista",
-      "emptyHint": "Arrastra acciones al eje para empezar, o deja que MAIC Agent genere la narración.",
+      "emptyHint": "Arrastra acciones al eje para empezar, o deja que ZhiGou AI genere la narración.",
       "speechPlaceholder": "Escribe esta línea de narración…",
       "reorder": "Arrastra para reordenar",
       "moveLeft": "Mover a la izquierda",

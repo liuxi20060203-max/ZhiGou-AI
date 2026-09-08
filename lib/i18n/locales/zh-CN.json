@@ -536,7 +536,7 @@
       "panRight": "右移视口",
       "collapseAxis": "收起为轴线",
       "expandTrack": "展开轨道",
-      "emptyHint": "把上方的动作拖到轴上开始编排，或让 MAIC Agent 生成讲解。",
+      "emptyHint": "把上方的动作拖到轴上开始编排，或让知构 AI 自动生成讲解。",
       "speechPlaceholder": "输入这一句讲解…",
       "reorder": "拖动重排",
       "moveLeft": "左移",

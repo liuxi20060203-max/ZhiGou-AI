@@ -463,7 +463,7 @@
       "panRight": "오른쪽으로 이동",
       "collapseAxis": "축으로 접기",
       "expandTrack": "트랙 펼치기",
-      "emptyHint": "위의 동작을 축으로 끌어 시작하거나, MAIC Agent가 내레이션을 생성하도록 하세요.",
+      "emptyHint": "위의 동작을 축으로 끌어 시작하거나, ZhiGou AI가 내레이션을 생성하도록 하세요.",
       "speechPlaceholder": "이 내레이션을 입력하세요…",
       "reorder": "끌어서 순서 변경",
       "moveLeft": "왼쪽으로",

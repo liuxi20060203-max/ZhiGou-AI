@@ -536,7 +536,7 @@
       "panRight": "Défiler vers la droite",
       "collapseAxis": "Réduire à l’axe",
       "expandTrack": "Déplier la piste",
-      "emptyHint": "Faites glisser des actions sur l’axe pour commencer, ou laissez l’agent MAIC générer la narration.",
+      "emptyHint": "Faites glisser des actions sur l’axe pour commencer, ou laissez ZhiGou AI générer la narration.",
       "speechPlaceholder": "Saisissez cette réplique de narration…",
       "reorder": "Faire glisser pour réordonner",
       "moveLeft": "Déplacer vers la gauche",
