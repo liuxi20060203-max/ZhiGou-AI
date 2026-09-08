@@ -125,7 +125,7 @@ function ThumbItemComponent({
           'outline-none transition-colors duration-150',
           active
             ? 'bg-primary/[0.09] ring-1 ring-primary/35 dark:bg-primary/[0.12] dark:ring-primary/45'
-            : 'hover:bg-zinc-50/80 dark:hover:bg-zinc-800/50',
+            : 'hover:bg-primary/[0.06] focus-visible:bg-primary/[0.06] focus-visible:ring-1 focus-visible:ring-primary/30',
         )}
       >
         {/* Page-level "incomplete content" dot — surfaces a scene with any
@@ -147,7 +147,7 @@ function ThumbItemComponent({
                 'flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[10px] font-black leading-none tabular-nums',
                 active
                   ? 'bg-primary text-primary-foreground shadow-sm shadow-primary/30'
-                  : 'bg-zinc-100 text-zinc-500 dark:bg-zinc-700 dark:text-zinc-400',
+                  : 'bg-muted text-muted-foreground',
               )}
             >
               {index + 1}
@@ -189,7 +189,7 @@ function ThumbItemComponent({
                   'truncate text-xs font-bold transition-colors',
                   active
                     ? 'text-primary'
-                    : 'text-zinc-600 group-hover/thumb:text-zinc-900 dark:text-zinc-300 dark:group-hover/thumb:text-zinc-100',
+                    : 'text-muted-foreground group-hover/thumb:text-foreground',
                 )}
                 title={scene.title}
               >
@@ -213,8 +213,7 @@ function ThumbItemComponent({
                   className={cn(
                     'shrink-0 rounded p-0.5 text-zinc-400 transition-opacity',
                     'opacity-0 group-hover/thumb:opacity-100 data-[state=open]:opacity-100',
-                    'hover:bg-zinc-200/80 hover:text-zinc-700',
-                    'dark:hover:bg-zinc-700 dark:hover:text-zinc-200',
+                    'hover:bg-primary/10 hover:text-primary',
                   )}
                 >
                   <MoreHorizontal className="h-3.5 w-3.5" />
@@ -244,7 +243,7 @@ function ThumbItemComponent({
         <div
           className={cn(
             'relative aspect-video w-full overflow-hidden rounded',
-            'bg-zinc-100 ring-1 ring-black/5 dark:bg-zinc-800 dark:ring-white/5',
+            'bg-muted/65 ring-1 ring-primary/10 dark:ring-primary/15',
           )}
         >
           <div className="absolute inset-0 flex items-center justify-center">

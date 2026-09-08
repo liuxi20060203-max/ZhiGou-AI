@@ -310,8 +310,8 @@ export function SlideNavRail() {
       ref={railRef}
       data-testid="slide-nav-rail"
       data-collapsed={collapsed}
-      // Mirrors playback SceneSidebar: white/translucent surface, soft
-      // right border, backdrop blur. `overflow-hidden` clips tiles to
+      // Uses the same product-token surface as the editor stage, with a soft
+      // primary seam and backdrop blur. `overflow-hidden` clips tiles to
       // the rail's current width — without it, mid-drag widths leak
       // children rightward (the inner scroll body has overflow-x-hidden
       // but it sits inside this aside and only clips its own
@@ -323,9 +323,9 @@ export function SlideNavRail() {
       // arrive too late.
       className={cn(
         'relative flex h-full shrink-0 flex-col overflow-hidden',
-        'border-r border-gray-100 dark:border-gray-800',
-        'bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl',
-        'shadow-[2px_0_24px_rgba(0,0,0,0.02)]',
+        'border-r border-primary/15 backdrop-blur-xl dark:border-primary/20',
+        'bg-[radial-gradient(circle_at_20%_0%,color-mix(in_oklab,var(--primary)_12%,transparent),transparent_30%),linear-gradient(180deg,color-mix(in_oklab,var(--background)_93%,var(--primary)_7%),color-mix(in_oklab,var(--background)_98%,var(--accent)_2%))]',
+        'shadow-[8px_0_34px_-30px_color-mix(in_oklab,var(--primary)_65%,transparent)]',
       )}
       style={{
         width: collapsed ? RAIL_HANDLE_PX : persistedWidth,
@@ -346,7 +346,7 @@ export function SlideNavRail() {
           onPointerCancel={handleResizeEnd}
           className="group absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize touch-none transition-colors hover:bg-primary/25 active:bg-primary/45"
         >
-          <div className="absolute right-0.5 top-1/2 h-8 w-0.5 -translate-y-1/2 rounded-full bg-gray-300 transition-colors group-hover:bg-primary dark:bg-gray-600" />
+          <div className="absolute right-0.5 top-1/2 h-8 w-0.5 -translate-y-1/2 rounded-full bg-primary/20 transition-colors group-hover:bg-primary/70" />
         </div>
       )}
       {/* Collapse / expand control. Two forms of one toggle (stable testid):
@@ -364,10 +364,9 @@ export function SlideNavRail() {
           data-testid="slide-nav-rail-collapse"
           className={cn(
             'absolute inset-0 z-10 flex items-center justify-center',
-            'text-zinc-400/70 dark:text-zinc-500/70',
-            'hover:bg-gray-100/80 hover:text-zinc-600 dark:hover:bg-gray-800/80 dark:hover:text-zinc-300',
-            'focus-visible:outline-none focus-visible:bg-gray-100/80 focus-visible:text-zinc-600 focus-visible:ring-1 focus-visible:ring-primary/50 dark:focus-visible:bg-gray-800/80 dark:focus-visible:text-zinc-300',
-            'active:bg-gray-200/90 active:text-zinc-700 dark:active:bg-gray-700/90 dark:active:text-zinc-200',
+            'text-muted-foreground/65 hover:bg-primary/10 hover:text-primary',
+            'focus-visible:bg-primary/10 focus-visible:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/50',
+            'active:bg-primary/15 active:text-primary',
             'transition-colors duration-150',
           )}
         >
@@ -382,10 +381,9 @@ export function SlideNavRail() {
           data-testid="slide-nav-rail-collapse"
           className={cn(
             'absolute right-0 top-1/2 z-10 flex h-8 w-6 -translate-y-1/2 items-center justify-center rounded-l-md',
-            'text-zinc-400/70 dark:text-zinc-500/70',
-            'hover:bg-gray-100/80 hover:text-zinc-600 dark:hover:bg-gray-800/80 dark:hover:text-zinc-300',
-            'focus-visible:outline-none focus-visible:bg-gray-100/80 focus-visible:text-zinc-600 focus-visible:ring-1 focus-visible:ring-primary/50 dark:focus-visible:bg-gray-800/80 dark:focus-visible:text-zinc-300',
-            'active:bg-gray-200/90 active:text-zinc-700 dark:active:bg-gray-700/90 dark:active:text-zinc-200',
+            'text-muted-foreground/65 hover:bg-primary/10 hover:text-primary',
+            'focus-visible:bg-primary/10 focus-visible:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/50',
+            'active:bg-primary/15 active:text-primary',
             'transition-colors duration-150',
           )}
         >
@@ -407,7 +405,7 @@ export function SlideNavRail() {
               type="button"
               onClick={() => router.push('/')}
               title={t('generation.backToHome')}
-              className="flex items-center gap-2 cursor-pointer rounded-lg px-1.5 -mx-1.5 py-1 -my-1 hover:bg-gray-100/80 dark:hover:bg-gray-800/60 active:scale-[0.97] transition-all duration-150"
+              className="-mx-1.5 -my-1 flex cursor-pointer items-center gap-2 rounded-lg px-1.5 py-1 transition-all duration-150 hover:bg-primary/10 active:scale-[0.97]"
             >
               {/* Desktop client: the Electron title bar already shows the brand icon + name, so the edit rail doesn't repeat it;
                   returning home is handled by the edit bar's CommandBar back arrow. */}
