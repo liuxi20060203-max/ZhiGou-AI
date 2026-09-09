@@ -922,6 +922,21 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
             <Sparkles className="size-3.5" aria-hidden="true" />
             {t('home.createEyebrow')}
           </div>
+          {isCreateExperience && (
+            <div
+              className="mb-4 flex items-center gap-2 text-[11px] font-medium text-muted-foreground"
+              aria-label={locale === 'zh-CN' ? '创建课程步骤 1 / 3' : 'Course creation step 1 of 3'}
+            >
+              <span className="rounded-full bg-primary px-2 py-1 text-primary-foreground">1</span>
+              <span className="font-semibold text-primary">
+                {locale === 'zh-CN' ? '课程内容' : 'Course content'}
+              </span>
+              <span className="h-px w-8 bg-border" />
+              <span>2 {locale === 'zh-CN' ? '课程计划' : 'Course plan'}</span>
+              <span className="h-px w-8 bg-border" />
+              <span>3 {locale === 'zh-CN' ? '互动课堂' : 'Classroom'}</span>
+            </div>
+          )}
           <h1 className="max-w-[760px] text-balance text-[28px] font-semibold leading-[1.2] tracking-[-0.03em] text-foreground sm:text-[34px]">
             {t('home.createTitle')}
           </h1>
@@ -1018,7 +1033,13 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
                 )}
               >
                 <span className="text-xs font-medium">
-                  {preparingGenerate ? t('stage.generating') : t('toolbar.enterClassroom')}
+                  {preparingGenerate
+                    ? t('stage.generating')
+                    : isCreateExperience
+                      ? locale === 'zh-CN'
+                        ? '生成课程计划'
+                        : 'Generate course plan'
+                      : t('toolbar.enterClassroom')}
                 </span>
                 {preparingGenerate ? (
                   <Loader2 className="size-3.5 animate-spin" />
