@@ -1370,7 +1370,7 @@ function GenerationPreviewContent() {
           transition={{ duration: 0.45 }}
           className="lg:col-span-4"
         >
-          <div className="lg:sticky lg:top-24">
+          <div className="rounded-[28px] border border-border/70 bg-card/75 p-5 shadow-[0_22px_60px_-48px_color-mix(in_srgb,var(--primary)_48%,transparent)] backdrop-blur-sm lg:sticky lg:top-24">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
               {locale === 'zh-CN' ? '课程方案生成' : 'Course plan generation'}
             </p>
@@ -1378,7 +1378,7 @@ function GenerationPreviewContent() {
               {session.courseTitle ||
                 (locale === 'zh-CN' ? '正在构建你的互动课程' : 'Building your interactive course')}
             </h1>
-            <div className="mt-5 rounded-2xl border border-border/70 bg-card/80 p-4 shadow-sm">
+            <div className="mt-5 rounded-2xl border border-primary/10 bg-background/65 p-4">
               <p className="text-xs font-medium text-muted-foreground">
                 {locale === 'zh-CN' ? '课程需求' : 'Course request'}
               </p>
@@ -1387,42 +1387,53 @@ function GenerationPreviewContent() {
               </p>
             </div>
 
-            <ol className="mt-7 space-y-1">
-              {activeSteps.map((step, idx) => {
-                const StepIcon = step.icon;
-                const completed = idx < currentStepIndex;
-                const active = idx === currentStepIndex;
-                const stepText = getGenerationStepText(step, session);
-                return (
-                  <li
-                    key={step.id}
-                    className={cn(
-                      'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors',
-                      active && 'bg-primary/10 text-primary',
-                      !active && 'text-muted-foreground',
-                    )}
-                  >
-                    <span
+            <div className="mt-7 border-t border-border/60 pt-5">
+              <div className="mb-3 flex items-center justify-between">
+                <span className="text-xs font-semibold text-foreground">
+                  {locale === 'zh-CN' ? '构建路径' : 'Build path'}
+                </span>
+                <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold tabular-nums text-primary">
+                  {Math.min(currentStepIndex + 1, activeSteps.length)}/{activeSteps.length}
+                </span>
+              </div>
+              <ol className="space-y-1.5">
+                {activeSteps.map((step, idx) => {
+                  const StepIcon = step.icon;
+                  const completed = idx < currentStepIndex;
+                  const active = idx === currentStepIndex;
+                  const stepText = getGenerationStepText(step, session);
+                  return (
+                    <li
+                      key={step.id}
                       className={cn(
-                        'flex size-8 shrink-0 items-center justify-center rounded-lg border',
-                        completed && 'border-primary/20 bg-primary text-primary-foreground',
-                        active && 'border-primary/25 bg-background text-primary',
-                        !active && !completed && 'border-border bg-background/70',
+                        'flex items-center gap-3 rounded-xl border px-3 py-2.5 text-sm transition-all',
+                        active && 'border-primary/20 bg-primary/10 text-primary shadow-sm',
+                        completed && 'border-transparent bg-accent/45 text-foreground',
+                        !active && !completed && 'border-transparent text-muted-foreground',
                       )}
                     >
-                      {completed ? (
-                        <CheckCircle2 className="size-4" />
-                      ) : (
-                        <StepIcon className="size-4" />
-                      )}
-                    </span>
-                    <span className={cn(active && 'font-semibold')}>
-                      {t(stepText.title, stepText.titleValues)}
-                    </span>
-                  </li>
-                );
-              })}
-            </ol>
+                      <span
+                        className={cn(
+                          'flex size-8 shrink-0 items-center justify-center rounded-lg border',
+                          completed && 'border-primary/15 bg-primary text-primary-foreground',
+                          active && 'border-primary/25 bg-card text-primary shadow-sm',
+                          !active && !completed && 'border-border bg-background/70',
+                        )}
+                      >
+                        {completed ? (
+                          <CheckCircle2 className="size-4" />
+                        ) : (
+                          <StepIcon className="size-4" />
+                        )}
+                      </span>
+                      <span className={cn(active && 'font-semibold')}>
+                        {t(stepText.title, stepText.titleValues)}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
           </div>
         </motion.aside>
 
@@ -1433,8 +1444,8 @@ function GenerationPreviewContent() {
             transition={{ duration: 0.5 }}
             className="w-full"
           >
-            <Card className="relative flex min-h-[520px] flex-col items-center justify-center overflow-hidden border-border/70 bg-card p-8 text-center shadow-[0_24px_70px_-42px_rgba(16,42,67,0.45)] md:p-12">
-              <div className="absolute left-6 top-6 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
+            <Card className="relative flex min-h-[520px] flex-col items-center justify-center overflow-hidden rounded-[28px] border-primary/15 bg-[linear-gradient(145deg,color-mix(in_srgb,var(--card)_96%,var(--primary)_4%),var(--card))] p-8 text-center shadow-[0_28px_76px_-46px_color-mix(in_srgb,var(--primary)_46%,transparent)] md:p-12">
+              <div className="absolute left-6 top-6 rounded-full border border-primary/15 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
                 {locale === 'zh-CN' ? '方案构建进度' : 'Plan progress'} ·{' '}
                 {Math.min(currentStepIndex + 1, activeSteps.length)}/{activeSteps.length}
               </div>
