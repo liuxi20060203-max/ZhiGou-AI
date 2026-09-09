@@ -123,7 +123,7 @@ export function FolderCard({
 
   return (
     <article
-      className="group cursor-pointer rounded-2xl border border-border/70 bg-background/70 p-2.5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-primary/25 hover:shadow-[0_18px_38px_-26px_rgba(16,42,67,0.55)]"
+      className="group cursor-pointer rounded-[22px] border border-border/70 bg-card/85 p-3 shadow-[0_12px_30px_-24px_rgba(16,42,67,0.42)] transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/30 hover:shadow-[0_24px_46px_-28px_color-mix(in_srgb,var(--primary)_35%,transparent)]"
       onClick={editing ? undefined : onOpen}
       onDragEnter={(e) => {
         if (editing) return;
@@ -155,7 +155,7 @@ export function FolderCard({
       <div
         ref={thumbRef}
         className={cn(
-          'relative w-full aspect-[16/9] rounded-xl bg-gradient-to-br from-primary/[0.08] to-accent/[0.08] dark:from-primary/20 dark:to-accent/15 overflow-hidden ring-1',
+          'relative w-full aspect-[16/9] rounded-[15px] bg-gradient-to-br from-primary/[0.08] to-accent/[0.08] dark:from-primary/20 dark:to-accent/15 overflow-hidden ring-1',
           dropActive
             ? 'ring-2 ring-primary ring-offset-2 ring-offset-background scale-[1.03]'
             : 'ring-primary/20 dark:ring-primary/30',
@@ -324,7 +324,7 @@ export function FolderCard({
         </AnimatePresence>
       </div>
 
-      <div className="flex min-h-[72px] flex-col px-1.5 pb-1 pt-3">
+      <div className="flex min-h-[76px] flex-col px-1 pb-0.5 pt-3.5">
         {editing ? (
           <div className="min-w-0" onClick={(e) => e.stopPropagation()}>
             <input
@@ -350,7 +350,7 @@ export function FolderCard({
             {folder.name}
           </p>
         )}
-        <div className="mt-auto flex items-center justify-between gap-3 pt-2 text-[11px] text-muted-foreground">
+        <div className="mt-auto flex items-center justify-between gap-3 border-t border-border/50 pt-2.5 text-[11px] text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
             <Folder className="size-3.5 text-primary" />
             {t('classroom.folderBadge')}

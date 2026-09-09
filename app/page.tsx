@@ -1900,7 +1900,7 @@ function ClassroomCard({
 
   return (
     <article
-      className="group cursor-pointer rounded-2xl border border-border/70 bg-background/70 p-2.5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-primary/25 hover:shadow-[0_18px_38px_-26px_rgba(16,42,67,0.55)]"
+      className="group cursor-pointer rounded-[22px] border border-border/70 bg-card/85 p-3 shadow-[0_12px_30px_-24px_rgba(16,42,67,0.42)] transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/30 hover:shadow-[0_24px_46px_-28px_color-mix(in_srgb,var(--primary)_35%,transparent)]"
       onClick={confirmingDelete ? undefined : onClick}
       draggable={!confirmingDelete && !editing}
       onDragStart={(e) => {
@@ -1916,7 +1916,7 @@ function ClassroomCard({
       {/* Course cover */}
       <div
         ref={thumbRef}
-        className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-slate-100 ring-1 ring-black/5 dark:bg-slate-800/80 dark:ring-white/5"
+        className="relative aspect-[16/9] w-full overflow-hidden rounded-[15px] bg-slate-100 ring-1 ring-black/5 dark:bg-slate-800/80 dark:ring-white/5"
       >
         {slide && thumbWidth > 0 ? (
           <SlideThumbnail
@@ -1962,6 +1962,11 @@ function ClassroomCard({
             </TooltipContent>
           </Tooltip>
         )}
+
+        <span className="pointer-events-none absolute bottom-2 right-2 z-10 inline-flex translate-y-1 items-center gap-1 rounded-full border border-white/15 bg-black/45 px-2.5 py-1 text-[10px] font-semibold text-white opacity-0 shadow-sm backdrop-blur-sm transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100">
+          {t('toolbar.enterClassroom')}
+          <ChevronRight className="size-3" />
+        </span>
 
         {/* Delete — top-right, only on hover */}
         <AnimatePresence>
@@ -2033,7 +2038,7 @@ function ClassroomCard({
         </AnimatePresence>
       </div>
 
-      <div className="flex min-h-[72px] flex-col px-1.5 pb-1 pt-3">
+      <div className="flex min-h-[76px] flex-col px-1 pb-0.5 pt-3.5">
         {editing ? (
           <div className="min-w-0" onClick={(e) => e.stopPropagation()}>
             <input
@@ -2081,9 +2086,9 @@ function ClassroomCard({
             </TooltipContent>
           </Tooltip>
         )}
-        <div className="mt-auto flex items-center justify-between gap-3 pt-2 text-[11px] text-muted-foreground">
+        <div className="mt-auto flex items-center justify-between gap-3 border-t border-border/50 pt-2.5 text-[11px] text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
-            <span className="size-1.5 rounded-full bg-accent" />
+            <BookOpen className="size-3 text-primary" />
             {classroom.sceneCount} {t('classroom.slides')}
           </span>
           <span>{formatDate(classroom.updatedAt)}</span>
