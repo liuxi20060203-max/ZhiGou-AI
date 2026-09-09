@@ -1007,7 +1007,7 @@ export function Roundtable({
                         className="shrink-0 overflow-hidden"
                       >
                         <div className="relative w-10 h-10 rounded-full flex items-center justify-center">
-                          <div className="absolute inset-0 rounded-full border-2 border-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.3)] transition-all duration-300" />
+                          <div className="absolute inset-0 rounded-full border-2 border-primary shadow-[0_0_6px_color-mix(in_oklab,var(--primary)_30%,transparent)] transition-all duration-300" />
                           <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden relative z-10 text-lg">
                             <AvatarDisplay
                               src={
@@ -1687,7 +1687,7 @@ export function Roundtable({
                           ? 'bg-primary/95 backdrop-blur-sm border-primary/40 text-primary-foreground rounded-br-sm shadow-md shadow-primary/20'
                           : bubbleRole === 'agent'
                             ? cn(
-                                'bg-blue-50/95 dark:bg-blue-950/60 backdrop-blur-sm border-blue-200/60 dark:border-blue-800/60 text-gray-700 dark:text-gray-200 rounded-br-sm shadow-sm',
+                                'bg-primary/10 dark:bg-primary/15 backdrop-blur-sm border-primary/20 dark:border-primary/25 text-gray-700 dark:text-gray-200 rounded-br-sm shadow-sm',
                                 (isInLiveFlow || isTopicPending) &&
                                   'hover:shadow-md cursor-pointer',
                               )
@@ -1716,7 +1716,7 @@ export function Roundtable({
                                   bubbleRole === 'user'
                                     ? 'border-primary dark:border-primary/80'
                                     : bubbleRole === 'agent'
-                                      ? 'border-blue-300 dark:border-blue-600'
+                                      ? 'border-primary/40 dark:border-primary/50'
                                       : 'border-primary/30 dark:border-primary/40',
                                 )}
                               >
@@ -1761,7 +1761,7 @@ export function Roundtable({
                               }}
                               className={cn(
                                 'w-1.5 h-1.5 rounded-full',
-                                isAgentLoading ? 'bg-blue-400 dark:bg-blue-500' : 'bg-primary/70',
+                                isAgentLoading ? 'bg-primary/80 dark:bg-primary' : 'bg-primary/70',
                               )}
                             />
                             <motion.div
@@ -1773,7 +1773,7 @@ export function Roundtable({
                               }}
                               className={cn(
                                 'w-1.5 h-1.5 rounded-full',
-                                isAgentLoading ? 'bg-blue-400 dark:bg-blue-500' : 'bg-primary/70',
+                                isAgentLoading ? 'bg-primary/80 dark:bg-primary' : 'bg-primary/70',
                               )}
                             />
                             <motion.div
@@ -1785,7 +1785,7 @@ export function Roundtable({
                               }}
                               className={cn(
                                 'w-1.5 h-1.5 rounded-full',
-                                isAgentLoading ? 'bg-blue-400 dark:bg-blue-500' : 'bg-primary/70',
+                                isAgentLoading ? 'bg-primary/80 dark:bg-primary' : 'bg-primary/70',
                               )}
                             />
                           </div>

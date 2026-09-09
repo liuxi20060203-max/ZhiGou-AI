@@ -59,10 +59,10 @@ const TYPE_THEME: Record<
   }
 > = {
   slide: {
-    chip: 'bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-300',
-    chipHover: 'hover:bg-blue-100/80 dark:hover:bg-blue-500/15',
-    accent: 'bg-blue-500',
-    dot: 'bg-blue-400',
+    chip: 'bg-primary/10 text-primary dark:bg-primary/15 dark:text-primary',
+    chipHover: 'hover:bg-primary/15 dark:hover:bg-primary/20',
+    accent: 'bg-primary',
+    dot: 'bg-primary/80',
   },
   quiz: {
     chip: 'bg-primary/10 text-primary dark:bg-primary/15 dark:text-primary',

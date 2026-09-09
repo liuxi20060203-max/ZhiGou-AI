@@ -139,7 +139,7 @@ function CollapsedBubblePill({
           bubble.role === 'user'
             ? 'bg-primary/10 dark:bg-primary/20 border-primary/25 dark:border-primary/40'
             : bubble.role === 'agent'
-              ? 'bg-blue-50/80 dark:bg-blue-950/70 border-blue-200/70 dark:border-blue-800/60'
+              ? 'bg-primary/10 dark:bg-primary/15 border-primary/20 dark:border-primary/25'
               : 'bg-white/80 dark:bg-gray-900/85 border-gray-200/70 dark:border-gray-700/70',
         )}
       >
@@ -149,7 +149,7 @@ function CollapsedBubblePill({
             bubble.role === 'user'
               ? 'border-primary/60'
               : bubble.role === 'agent'
-                ? 'border-blue-300 dark:border-blue-600'
+                ? 'border-primary/40 dark:border-primary/50'
                 : 'border-primary/30',
           )}
         >
@@ -172,7 +172,7 @@ function CollapsedBubblePill({
             bubble.role === 'user'
               ? 'bg-primary/10 dark:bg-primary/20 border-primary/25 dark:border-primary/40 hover:bg-primary/15'
               : bubble.role === 'agent'
-                ? 'bg-blue-50/80 dark:bg-blue-950/70 border-blue-200/70 dark:border-blue-800/60 hover:bg-blue-100 dark:hover:bg-blue-900/70'
+                ? 'bg-primary/10 dark:bg-primary/15 border-primary/20 dark:border-primary/25 hover:bg-primary/15 dark:hover:bg-primary/20'
                 : 'bg-white/80 dark:bg-gray-900/85 border-gray-200/70 dark:border-gray-700/70 hover:bg-gray-100 dark:hover:bg-gray-800/70',
           )}
         >
@@ -214,7 +214,7 @@ export function PresentationBubbleCard({
         bubble.role === 'user'
           ? 'bg-primary/10 dark:bg-primary/20 border-primary/25 dark:border-primary/40'
           : bubble.role === 'agent'
-            ? 'bg-blue-50/60 dark:bg-blue-950/55 border-blue-200/70 dark:border-blue-800/60'
+            ? 'bg-primary/10 dark:bg-primary/15 border-primary/20 dark:border-primary/25'
             : 'bg-white/62 dark:bg-gray-900/82 border-gray-200/70 dark:border-gray-700/70',
       )}
     >
@@ -225,7 +225,7 @@ export function PresentationBubbleCard({
             bubble.role === 'user'
               ? 'border-primary/60'
               : bubble.role === 'agent'
-                ? 'border-blue-300 dark:border-blue-600'
+                ? 'border-primary/40 dark:border-primary/50'
                 : 'border-primary/30',
           )}
         >
@@ -238,7 +238,7 @@ export function PresentationBubbleCard({
               bubble.role === 'user'
                 ? 'text-primary'
                 : bubble.role === 'agent'
-                  ? 'text-blue-500 dark:text-blue-300'
+                  ? 'text-primary dark:text-primary'
                   : 'text-primary/80',
             )}
           >
@@ -286,7 +286,7 @@ export function PresentationBubbleCard({
                   bubble.role === 'user'
                     ? 'bg-primary/70'
                     : bubble.role === 'agent'
-                      ? 'bg-blue-400 dark:bg-blue-500'
+                      ? 'bg-primary/80 dark:bg-primary'
                       : 'bg-primary/70',
                 )}
               />
