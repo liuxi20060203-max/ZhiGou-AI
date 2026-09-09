@@ -79,13 +79,10 @@ function PlaybackVideoContent({
 
   if (showSkeleton) {
     return (
-      <div className="flex h-full w-full items-center justify-center rounded bg-gradient-to-br from-indigo-50 via-violet-50/60 to-blue-50 dark:from-indigo-950/40 dark:via-violet-950/30 dark:to-blue-950/20">
+      <div className="flex h-full w-full items-center justify-center rounded bg-gradient-to-br from-primary/10 via-accent/50 to-sky-50 dark:from-primary/20 dark:via-accent/20 dark:to-background">
         <div className="relative h-14 w-14">
-          <div className="absolute inset-0 animate-pulse rounded-full border-2 border-indigo-300/40 dark:border-indigo-500/30" />
-          <Film
-            className="absolute inset-0 m-auto h-5 w-5 text-indigo-400/80 dark:text-indigo-500/70"
-            strokeWidth={1.5}
-          />
+          <div className="absolute inset-0 animate-pulse rounded-full border-2 border-primary/35" />
+          <Film className="absolute inset-0 m-auto h-5 w-5 text-primary/80" strokeWidth={1.5} />
         </div>
       </div>
     );
