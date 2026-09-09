@@ -53,6 +53,7 @@ export function CanvasArea({
   showStopDiscussion,
   onStopDiscussion,
   onContinueDiscussion,
+  playbackProgress,
   hideToolbar,
   isPendingScene,
   isCourseComplete,
@@ -101,19 +102,21 @@ export function CanvasArea({
       {/* Slide area — takes remaining space */}
       <div
         className={cn(
-          'flex-1 min-h-0 relative overflow-hidden flex items-center justify-center p-2 transition-colors duration-500',
-          currentScene?.type === 'interactive' ? 'bg-accent/20' : 'bg-background/80',
+          'relative flex min-h-0 flex-1 items-center justify-center overflow-hidden p-3 transition-colors duration-500 md:p-4',
+          currentScene?.type === 'interactive'
+            ? 'bg-accent/20'
+            : 'bg-[radial-gradient(circle_at_50%_40%,color-mix(in_oklab,var(--primary)_5%,transparent),transparent_58%),var(--background)]',
         )}
       >
         <StageViewport
           workbench={inWorkbenchPanel}
           interactive={currentScene?.type === 'interactive'}
           className={cn(
-            'bg-card shadow-2xl rounded-lg overflow-hidden relative transition-all duration-700',
+            'relative overflow-hidden rounded-2xl border border-border/70 bg-card shadow-[0_22px_60px_-28px_color-mix(in_srgb,var(--primary)_30%,transparent)] transition-all duration-700',
             showControls && !isLiveSession && currentScene?.type === 'slide' && 'cursor-pointer',
             currentScene?.type === 'interactive'
-              ? 'shadow-blue-200/50 dark:shadow-blue-900/50 ring-1 ring-blue-900/5 dark:ring-blue-500/10'
-              : 'shadow-gray-200/50 dark:shadow-gray-800/50 ring-1 ring-gray-950/5 dark:ring-white/5',
+              ? 'shadow-primary/15 ring-1 ring-primary/15'
+              : 'shadow-black/10 ring-1 ring-foreground/5 dark:shadow-black/30 dark:ring-white/10',
           )}
           onClick={handleSlideClick}
         >
@@ -266,6 +269,7 @@ export function CanvasArea({
           )}
           currentSceneIndex={currentSceneIndex}
           scenesCount={scenesCount}
+          playbackProgress={playbackProgress}
           engineState={engineState}
           isLiveSession={isLiveSession}
           isSoftClosing={isSoftClosing}

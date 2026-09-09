@@ -1497,6 +1497,14 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
               currentScene={currentScene}
               currentSceneIndex={currentSceneIndex}
               scenesCount={totalScenesCount}
+              playbackProgress={
+                totalActions > 0
+                  ? Math.min(
+                      100,
+                      Math.max(0, ((currentPlaybackActionIndex ?? 0) / totalActions) * 100),
+                    )
+                  : 0
+              }
               mode={mode}
               engineState={canvasEngineState}
               isLiveSession={
