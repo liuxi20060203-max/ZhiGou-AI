@@ -277,7 +277,7 @@ export function OutlinesEditor({
             className={cn(
               'mt-1 inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium',
               'text-muted-foreground transition-colors hover:bg-muted hover:text-foreground',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/30',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30',
               'disabled:cursor-not-allowed disabled:opacity-50',
             )}
           >
@@ -401,7 +401,7 @@ export function OutlinesEditor({
           <Button
             onClick={onConfirm}
             disabled={isLoading || isStreaming || outlines.length === 0 || blockingCount > 0}
-            className="rounded-full px-6 shadow-lg shadow-blue-500/20"
+            className="rounded-full px-6 shadow-lg shadow-primary/20"
           >
             {isLoading ? (
               <>
@@ -530,7 +530,7 @@ function SceneRow({
         'hover:bg-slate-50/60 dark:hover:bg-slate-800/30',
         'focus-within:bg-slate-50/80 dark:focus-within:bg-slate-800/40',
         isDragging && 'opacity-40',
-        isDragTarget && 'bg-blue-500/[0.04] ring-1 ring-blue-400/40',
+        isDragTarget && 'bg-primary/[0.05] ring-1 ring-primary/35',
       )}
     >
       <div className="flex items-start gap-2.5">
@@ -569,7 +569,7 @@ function SceneRow({
               'hover:bg-muted hover:text-foreground/80',
               'group-hover/scene:text-muted-foreground/70',
               'active:cursor-grabbing',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/30',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30',
               disabled && 'pointer-events-none opacity-30',
             )}
           >
@@ -731,7 +731,7 @@ function EmptyState({
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-          className="text-blue-500/70"
+          className="text-primary/70"
         >
           <Loader2 className="size-6" />
         </motion.div>
@@ -879,7 +879,7 @@ function StreamingPlaceholder({ nextIndex }: { nextIndex: number }) {
       {/* Left rail: spacer for grip column + spinner where the number badge would be */}
       <div className="flex shrink-0 items-center gap-0.5 pt-1">
         <span className="size-7" aria-hidden />
-        <span className="flex size-7 items-center justify-center rounded-full bg-blue-500/10 text-blue-500">
+        <span className="flex size-7 items-center justify-center rounded-full bg-primary/10 text-primary">
           <Loader2 className="size-3.5 animate-spin" />
         </span>
       </div>
@@ -944,19 +944,19 @@ function InsertDivider({
           aria-hidden
           className={cn(
             'absolute top-1/2 h-px -translate-y-1/2 transition-colors',
-            // Edge: short, neutral line; between: longer, blue line
+            // Edge: short, neutral line; between: longer, brand-accent line
             isEdge
-              ? 'inset-x-16 bg-muted-foreground/40 group-hover/insert:bg-blue-500/60'
-              : 'inset-x-8 bg-blue-400/30 group-hover/insert:bg-blue-500/60',
+              ? 'inset-x-16 bg-muted-foreground/40 group-hover/insert:bg-primary/60'
+              : 'inset-x-8 bg-primary/30 group-hover/insert:bg-primary/60',
           )}
         />
         <span
           className={cn(
             'relative flex items-center justify-center rounded-full text-white transition-all',
-            // Edge: smaller, neutral, no shadow until hover; between: full blue badge
+            // Edge: smaller, neutral, no shadow until hover; between: full brand badge
             isEdge
-              ? 'size-4 bg-muted-foreground/60 group-hover/insert:size-5 group-hover/insert:bg-blue-500 group-hover/insert:shadow-md group-hover/insert:shadow-blue-500/30'
-              : 'size-5 bg-blue-500 shadow-md shadow-blue-500/30 group-hover/insert:scale-110',
+              ? 'size-4 bg-muted-foreground/60 group-hover/insert:size-5 group-hover/insert:bg-primary group-hover/insert:shadow-md group-hover/insert:shadow-primary/30'
+              : 'size-5 bg-primary shadow-md shadow-primary/30 group-hover/insert:scale-110',
           )}
         >
           <Plus className={cn('transition-all', isEdge ? 'size-2.5' : 'size-3')} />
@@ -1001,7 +1001,7 @@ function KeyPointInput({
           'inline-block rounded-full bg-transparent px-2.5 py-1 text-xs',
           'text-foreground placeholder:text-muted-foreground/50',
           'border border-dashed border-transparent transition-colors',
-          'hover:border-muted-foreground/20 focus:border-blue-400/50 focus:bg-blue-500/[0.03]',
+          'hover:border-muted-foreground/20 focus:border-primary/50 focus:bg-primary/[0.03]',
           'focus:outline-none focus:ring-0',
         )}
       />
