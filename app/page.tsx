@@ -826,21 +826,21 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
                 onClick={() => {
                   setThemeOpen(!themeOpen);
                 }}
-                className="p-2 rounded-full text-muted-foreground hover:bg-card hover:text-foreground hover:shadow-sm transition-all"
+                className="rounded-xl p-2 text-muted-foreground transition-all hover:bg-accent hover:text-primary hover:shadow-sm"
               >
                 {theme === 'light' && <Sun className="w-4 h-4" />}
                 {theme === 'dark' && <Moon className="w-4 h-4" />}
                 {theme === 'system' && <Monitor className="w-4 h-4" />}
               </button>
               {themeOpen && (
-                <div className="absolute top-full mt-2 right-0 bg-popover border border-border rounded-lg shadow-lg overflow-hidden z-50 min-w-[140px]">
+                <div className="absolute top-full right-0 z-50 mt-2 min-w-[148px] overflow-hidden rounded-xl border border-primary/15 bg-popover/95 p-1.5 text-popover-foreground shadow-[0_18px_48px_-24px_color-mix(in_srgb,var(--primary)_38%,transparent)] backdrop-blur-xl">
                   <button
                     onClick={() => {
                       setTheme('light');
                       setThemeOpen(false);
                     }}
                     className={cn(
-                      'w-full px-4 py-2 text-left text-sm hover:bg-accent transition-colors flex items-center gap-2',
+                      'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-accent hover:text-primary',
                       theme === 'light' && 'bg-accent text-primary',
                     )}
                   >
@@ -853,7 +853,7 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
                       setThemeOpen(false);
                     }}
                     className={cn(
-                      'w-full px-4 py-2 text-left text-sm hover:bg-accent transition-colors flex items-center gap-2',
+                      'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-accent hover:text-primary',
                       theme === 'dark' && 'bg-accent text-primary',
                     )}
                   >
@@ -866,7 +866,7 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
                       setThemeOpen(false);
                     }}
                     className={cn(
-                      'w-full px-4 py-2 text-left text-sm hover:bg-accent transition-colors flex items-center gap-2',
+                      'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-accent hover:text-primary',
                       theme === 'system' && 'bg-accent text-primary',
                     )}
                   >
@@ -883,7 +883,7 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
             <div className="relative">
               <button
                 onClick={() => setSettingsOpen(true)}
-                className="p-2 rounded-full text-muted-foreground hover:bg-card hover:text-foreground hover:shadow-sm transition-all group"
+                className="group rounded-xl p-2 text-muted-foreground transition-all hover:bg-accent hover:text-primary hover:shadow-sm"
               >
                 <Settings className="w-4 h-4 group-hover:rotate-90 transition-transform duration-500" />
               </button>
