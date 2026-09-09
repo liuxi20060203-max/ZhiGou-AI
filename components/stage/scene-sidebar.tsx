@@ -283,10 +283,10 @@ export function SceneSidebar({
                       </div>
                     ) : scene.type === 'pbl' ? (
                       /* PBL: kanban board with 3 columns */
-                      <div className="w-full h-full bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/20 p-1.5 flex flex-col">
+                      <div className="w-full h-full bg-gradient-to-br from-cyan-50 to-teal-50 dark:from-cyan-950/30 dark:to-teal-950/20 p-1.5 flex flex-col">
                         <div className="flex items-center gap-1 mb-1.5">
-                          <div className="w-1.5 h-1.5 rounded bg-blue-300 dark:bg-blue-600" />
-                          <div className="h-1 w-8 bg-blue-200/60 dark:bg-blue-700/30 rounded-full" />
+                          <div className="w-1.5 h-1.5 rounded bg-primary/70 dark:bg-primary" />
+                          <div className="h-1 w-8 bg-primary/20 dark:bg-primary/30 rounded-full" />
                         </div>
                         <div className="flex-1 flex gap-1 overflow-hidden">
                           {[0, 1, 2].map((col) => (
@@ -298,7 +298,7 @@ export function SceneSidebar({
                                 className={cn(
                                   'h-0.5 w-3 rounded-full mb-0.5',
                                   col === 0
-                                    ? 'bg-blue-300/70'
+                                    ? 'bg-primary/60'
                                     : col === 1
                                       ? 'bg-amber-300/70'
                                       : 'bg-green-300/70',
@@ -309,7 +309,7 @@ export function SceneSidebar({
                               }).map((_, i) => (
                                 <div
                                   key={i}
-                                  className="h-2 w-full bg-blue-100/60 dark:bg-blue-800/20 rounded border border-blue-200/30 dark:border-blue-700/20"
+                                  className="h-2 w-full bg-primary/[0.08] dark:bg-primary/[0.12] rounded border border-primary/15 dark:border-primary/20"
                                 />
                               ))}
                             </div>
