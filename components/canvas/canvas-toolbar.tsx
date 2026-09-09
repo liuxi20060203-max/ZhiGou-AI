@@ -166,7 +166,7 @@ export function CanvasToolbar({
           aria-valuemax={100}
           aria-valuemin={0}
           aria-valuenow={Math.round(playbackProgress)}
-          className="absolute inset-x-0 top-0 h-1 overflow-hidden bg-slate-300/90 dark:bg-slate-700/90"
+          className="absolute inset-x-0 top-0 h-1.5 overflow-hidden bg-muted-foreground/20 dark:bg-muted-foreground/30"
           data-testid="course-playback-progress"
           role="progressbar"
         >

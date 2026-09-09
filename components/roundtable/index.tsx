@@ -679,7 +679,7 @@ export function Roundtable({
     isProcessing;
   const toolbar = (
     <CanvasToolbar
-      className="shrink-0 h-9 border-b border-primary/10 bg-card/55 px-4 backdrop-blur-xl dark:border-primary/15 dark:bg-card/35"
+      className="shrink-0 h-9 border-b border-primary/15 bg-card/75 px-4 backdrop-blur-xl dark:border-primary/20 dark:bg-card/45"
       currentSceneIndex={currentSceneIndex}
       scenesCount={scenesCount}
       engineState={
