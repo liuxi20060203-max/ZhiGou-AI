@@ -101,6 +101,14 @@ export function SceneSidebar({
     return icons[type] || BookOpen;
   };
 
+  const getSceneTypeLabel = (type: SceneType) => {
+    const labels =
+      locale === 'zh-CN'
+        ? { slide: '课程讲解', quiz: '理解检测', interactive: '互动探索', pbl: '项目实践' }
+        : { slide: 'Lesson', quiz: 'Check', interactive: 'Interactive', pbl: 'Project' };
+    return labels[type] || labels.slide;
+  };
+
   const displayWidth = collapsed ? 0 : sidebarWidth;
 
   return (
@@ -203,9 +211,14 @@ export function SceneSidebar({
                     </span>
                   </div>
                 </div>
+                <div className="flex items-center gap-1.5 px-2 text-[10px] text-muted-foreground/70">
+                  <Icon className="size-3 text-primary/70" aria-hidden="true" />
+                  <span>{getSceneTypeLabel(scene.type)}</span>
+                  {isActive && <span className="ml-auto font-medium text-primary">当前环节</span>}
+                </div>
 
                 {/* Thumbnail */}
-                <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-muted/70 ring-1 ring-border/60">
+                <div className="relative hidden aspect-[16/7] w-full overflow-hidden rounded-lg bg-muted/70 ring-1 ring-border/60 xl:block">
                   <div className="absolute inset-0 flex items-center justify-center">
                     {isSlide && slideContent ? (
                       <LazySlideThumbnail
