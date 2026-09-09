@@ -55,7 +55,7 @@ export function Header({
 
   return (
     <>
-      <header className="z-10 flex h-20 items-center justify-between gap-2 border-b border-border/70 bg-background/90 px-2 backdrop-blur-xl sm:gap-4 sm:px-5 md:px-7">
+      <header className="z-10 flex h-16 items-center justify-between gap-2 border-b border-border/70 bg-background/90 px-2 backdrop-blur-xl sm:gap-4 sm:px-5 md:px-7">
         <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
           {hideBackControl
             ? null
@@ -74,9 +74,9 @@ export function Header({
               <img
                 src={resolvedTheme === 'dark' ? brand.darkLogoSrc : brand.logoSrc}
                 alt={brand.productName}
-                className="hidden h-7 w-auto sm:block"
+                className="hidden h-6 w-auto sm:block"
               />
-              <div className="hidden h-8 w-px bg-border/80 sm:block" />
+              <div className="hidden h-6 w-px bg-border/80 sm:block" />
             </>
           )}
           {/* Title block — hidden when `mode === 'edit'`. Header lives
