@@ -100,6 +100,109 @@ type SceneGenerationFailure = {
   statusCode?: number;
 };
 
+function CoursePlanStepBar({ locale }: { locale: string }) {
+  const steps =
+    locale === 'zh-CN'
+      ? ['课程内容', '课程计划', '互动课堂']
+      : ['Course content', 'Course plan', 'Interactive classroom'];
+
+  return (
+    <nav
+      aria-label={locale === 'zh-CN' ? '课程创建进度' : 'Course creation progress'}
+      className="flex items-center gap-2 rounded-2xl border border-border/70 bg-card/65 px-3 py-2.5 text-xs backdrop-blur-sm sm:gap-3 sm:px-4"
+    >
+      {steps.map((step, index) => (
+        <div key={step} className="flex min-w-0 flex-1 items-center gap-2">
+          <span
+            className={cn(
+              'flex size-6 shrink-0 items-center justify-center rounded-full border text-[11px] font-semibold',
+              index === 1
+                ? 'border-primary bg-primary text-primary-foreground shadow-sm shadow-primary/25'
+                : 'border-border bg-background/70 text-muted-foreground',
+            )}
+          >
+            {index + 1}
+          </span>
+          <span
+            className={cn(
+              'truncate',
+              index === 1 ? 'font-semibold text-primary' : 'text-muted-foreground',
+            )}
+          >
+            {step}
+          </span>
+          {index < steps.length - 1 && <span className="hidden h-px flex-1 bg-border sm:block" />}
+        </div>
+      ))}
+    </nav>
+  );
+}
+
+function CoursePlanOverview({
+  locale,
+  title,
+  outlines,
+  materialCount,
+}: {
+  locale: string;
+  title?: string;
+  outlines: SceneOutline[];
+  materialCount: number;
+}) {
+  const labels =
+    locale === 'zh-CN'
+      ? { overview: '课程概览', scenes: '教学环节', materials: '参考资料', empty: '待生成' }
+      : {
+          overview: 'Course overview',
+          scenes: 'Teaching sections',
+          materials: 'Materials',
+          empty: 'Pending',
+        };
+  const typeCounts = outlines.reduce<Record<string, number>>((counts, outline) => {
+    counts[outline.type] = (counts[outline.type] ?? 0) + 1;
+    return counts;
+  }, {});
+  const typeLabels: Record<string, string> =
+    locale === 'zh-CN'
+      ? { slide: '课程讲解', quiz: '理解检测', interactive: '互动探索', pbl: '项目实践' }
+      : { slide: 'Lesson', quiz: 'Check', interactive: 'Interactive', pbl: 'Project' };
+
+  return (
+    <section className="rounded-2xl border border-border/70 bg-card/55 px-4 py-3.5 backdrop-blur-sm">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <div className="min-w-0 flex-1">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-primary">
+            {labels.overview}
+          </p>
+          <p className="mt-1 truncate text-sm font-semibold text-foreground">
+            {title || labels.empty}
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          <span className="rounded-full bg-primary/10 px-2 py-1 font-medium text-primary">
+            {outlines.length} {labels.scenes}
+          </span>
+          <span className="rounded-full bg-muted/70 px-2 py-1">
+            {materialCount} {labels.materials}
+          </span>
+        </div>
+      </div>
+      {outlines.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-1.5 border-t border-border/50 pt-3">
+          {Object.entries(typeCounts).map(([type, count]) => (
+            <span
+              key={type}
+              className="rounded-md border border-border/60 bg-background/60 px-2 py-1 text-[11px] text-muted-foreground"
+            >
+              {typeLabels[type] ?? type}: {count}
+            </span>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
 function GenerationPreviewContent() {
   const router = useRouter();
   const { t, locale } = useI18n();
@@ -1319,6 +1422,15 @@ function GenerationPreviewContent() {
                   : t('generation.reviewOutlineDesc')}
               </p>
             </div>
+
+            <CoursePlanStepBar locale={locale} />
+
+            <CoursePlanOverview
+              locale={locale}
+              title={session.courseTitle}
+              outlines={editorOutlines}
+              materialCount={session.documentSources?.length ?? 0}
+            />
 
             {error && (
               <div className="mx-auto max-w-2xl rounded-xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive">
