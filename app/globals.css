@@ -457,21 +457,21 @@ body[data-maic-editor='true'] .editable-element-text li,
 [data-pbl-workspace='true'] .pbl-v2-task-review-shell {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgb(199 210 254 / 0.55);
+  border: 1px solid rgb(103 232 249 / 0.42);
   background:
-    radial-gradient(circle at 12% 0%, rgb(167 139 250 / 0.26), transparent 34%),
+    radial-gradient(circle at 12% 0%, rgb(45 212 191 / 0.22), transparent 34%),
     radial-gradient(circle at 92% 12%, rgb(103 232 249 / 0.2), transparent 28%),
     linear-gradient(
       145deg,
-      rgb(245 243 255 / 0.7),
-      rgb(239 246 255 / 0.5) 54%,
+      rgb(240 253 250 / 0.7),
+      rgb(240 249 255 / 0.5) 54%,
       rgb(236 254 255 / 0.56)
     );
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.65),
     0 20px 54px rgb(3 10 26 / 0.3),
-    0 0 0 1px rgb(139 92 246 / 0.12),
-    0 0 42px rgb(99 102 241 / 0.14);
+    0 0 0 1px rgb(14 116 144 / 0.12),
+    0 0 42px rgb(8 145 178 / 0.14);
   backdrop-filter: blur(20px) saturate(1.08);
 }
 
@@ -482,7 +482,7 @@ body[data-maic-editor='true'] .editable-element-text li,
   pointer-events: none;
   background:
     linear-gradient(135deg, rgb(255 255 255 / 0.5), transparent 34%),
-    linear-gradient(90deg, rgb(167 139 250 / 0.72), rgb(103 232 249 / 0.42), transparent) top / 100%
+    linear-gradient(90deg, rgb(45 212 191 / 0.72), rgb(103 232 249 / 0.42), transparent) top / 100%
       1px no-repeat;
 }
 
@@ -492,19 +492,19 @@ body[data-maic-editor='true'] .editable-element-text li,
 }
 
 [data-pbl-workspace='true'] .pbl-v2-task-review-card {
-  border: 1px solid rgb(199 210 254 / 0.52);
+  border: 1px solid rgb(103 232 249 / 0.4);
   background:
     linear-gradient(
       145deg,
       rgb(255 255 255 / 0.48),
-      rgb(238 242 255 / 0.34),
+      rgb(240 253 250 / 0.34),
       rgb(236 254 255 / 0.3)
     ),
     rgb(255 255 255 / 0.2);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.58),
     0 16px 38px rgb(4 20 28 / 0.14),
-    0 0 30px rgb(129 140 248 / 0.12);
+    0 0 30px rgb(8 145 178 / 0.12);
   backdrop-filter: blur(12px) saturate(1.05);
 }
 
