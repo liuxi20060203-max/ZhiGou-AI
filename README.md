@@ -1,14 +1,17 @@
-<!-- <p align="center">
-  <img src="assets/logo-horizontal.png" alt="OpenMAIC" width="420"/>
-</p> -->
-
 <p align="center">
-  <img src="assets/banner.png" alt="OpenMAIC Banner" width="680"/>
+  <img src="public/brand/logo-horizontal.svg" alt="ZhiGou AI" width="360"/>
 </p>
 
+<h1 align="center">ZhiGou AI · 知构 AI</h1>
+
 <p align="center">
-  Get an immersive, multi-agent learning experience in just one click
+  Build intelligent courses and immersive interactive classrooms with AI
 </p>
+
+> ZhiGou AI is a university innovation project developed on top of the open-source
+> [OpenMAIC](https://github.com/THU-MAIC/OpenMAIC) project. The product experience,
+> visual identity, and course workflow have been redesigned for this project while
+> retaining the original project's license and attribution.
 
 <p align="center">
   <a href="https://lcn6dqn3m0yr.feishu.cn/wiki/CkQSwHFdzibQFvkGzwPcmUOfnXg"><img src="https://img.shields.io/badge/%F0%9F%93%98%20User%20Guide-v1.0.0%20%C2%B7%20English-4F8EF7?style=for-the-badge" alt="v1.0.0 User Guide (English)"/></a>

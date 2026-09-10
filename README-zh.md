@@ -1,14 +1,16 @@
-<!-- <p align="center">
-  <img src="assets/logo-horizontal.png" alt="OpenMAIC" width="420"/>
-</p> -->
-
 <p align="center">
-  <img src="assets/banner.png" alt="OpenMAIC Banner" width="680"/>
+  <img src="public/brand/logo-horizontal.svg" alt="知构 AI" width="360"/>
 </p>
 
+<h1 align="center">知构 AI · ZhiGou AI</h1>
+
 <p align="center">
-  一键生成沉浸式多智能体互动课堂。
+  用 AI 构建智能课程与沉浸式互动课堂
 </p>
+
+> 知构 AI 是面向大学生创新项目打造的智能课程与互动课堂平台，基于开源项目
+> [OpenMAIC](https://github.com/THU-MAIC/OpenMAIC) 进行二次开发。本项目重新设计了
+> 品牌视觉、产品体验与课程工作流，并保留原项目许可证与开源归属说明。
 
 <p align="center">
   <a href="https://my.feishu.cn/wiki/UIfKw9Knti0LcKkTxDNcqlUrnzh"><img src="https://img.shields.io/badge/%F0%9F%93%99%20%E4%BD%93%E9%AA%8C%E6%8C%87%E5%8D%97-v1.0.0%20%C2%B7%20%E4%B8%AD%E6%96%87-FF6B35?style=for-the-badge" alt="v1.0.0 体验指南（中文）"/></a>
