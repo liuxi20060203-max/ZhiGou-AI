@@ -1,0 +1,16 @@
+ZhiGou AI
+Copyright (c) 2026 ZhiGou AI project contributors
+
+ZhiGou AI is a secondary development based on OpenMAIC:
+https://github.com/THU-MAIC/OpenMAIC
+
+OpenMAIC is Copyright (c) 2026 THU-MAIC and is distributed under the
+MIT License. The original copyright and permission notice are retained in
+the root LICENSE file. Workspace packages and third-party components retain
+their own copyright notices and licenses where applicable.
+
+ZhiGou AI includes project-specific changes to branding, visual design,
+course-creation presentation, classroom interaction surfaces, responsive
+layout, and related documentation and tests.
+
+This notice does not imply endorsement by or affiliation with THU-MAIC.

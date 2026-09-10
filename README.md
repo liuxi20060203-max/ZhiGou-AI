@@ -1033,6 +1033,7 @@ If you find OpenMAIC useful in your research, please consider citing:
 ## 📄 License
 
 This project is licensed under the [MIT License](LICENSE).
+See [NOTICE](NOTICE) for the OpenMAIC attribution and a summary of ZhiGou AI modifications.
 
 ### Third-Party Components
 

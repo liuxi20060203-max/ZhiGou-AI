@@ -1,195 +1,81 @@
-# Contributing to OpenMAIC
+# Contributing to ZhiGou AI
 
-Thank you for your interest in contributing to OpenMAIC! This guide will help you get started and ensure a smooth collaboration.
+感谢你关注知构 AI。当前仓库主要用于大学生创新项目的开发、展示与迭代，欢迎通过 Issue 和 Pull Request 提交问题或改进。
 
-## How to Contribute
+## 开始开发
 
-| Contribution type | What to do |
-| --- | --- |
-| **Bug fix** | Open a PR directly (link the issue if one exists) |
-| **Extending existing features** (e.g. adding a new model provider, new TTS engine) | Open a PR directly |
-| **New feature or architecture change** | Start a [GitHub Discussion](https://github.com/THU-MAIC/OpenMAIC/discussions) or ask in [Discord](https://discord.gg/p8Pf2r3SaG) **before** opening a PR |
-| **Design / UI change** | Discuss in a GitHub Discussion or Discord first — include mockups or screenshots |
-| **Refactor-only PR** | Not accepted unless a maintainer explicitly requests it |
-| **Documentation** | Open a PR directly |
-| **Question** | Ask in [Discord](https://discord.gg/p8Pf2r3SaG) |
+运行环境：
 
-## Claiming Issues
-
-To avoid duplicate effort, please **comment on an issue** to claim it before you start working. A maintainer will assign you.
-
-- If **no PR or meaningful update** (WIP commit, progress comment) appears within **1 day**, the issue may be reassigned to someone else.
-- If you see an issue already assigned, reach out to the assignee first to coordinate — you may be able to collaborate or split the work.
-- If you can no longer work on a claimed issue, please leave a comment so others can pick it up.
-
-## Prerequisites
-
-- [Node.js](https://nodejs.org/) >= 22.19.0
-- [pnpm](https://pnpm.io/) (latest)
-- A copy of `.env.local` — see [`.env.example`](.env.example) for reference
-
-## Getting Started
+- Node.js 22.19.0 或更高版本；
+- pnpm；
+- 根据 [`.env.example`](.env.example) 配置本地 `.env.local`。
 
 ```bash
-# Clone the repository
-git clone https://github.com/THU-MAIC/OpenMAIC.git
-cd OpenMAIC
-
-# Install dependencies
+git clone https://github.com/liuxi20060203-max/ZhiGou-AI.git
+cd ZhiGou-AI
 pnpm install
-
-# Set up environment variables
-cp .env.example .env.local
-# Edit .env.local with your API keys
-
-# Start the development server
 pnpm dev
 ```
 
-## Development Workflow
+请勿提交 `.env.local`、API Key、访问令牌、数据库凭据或包含个人信息的测试数据。
 
-1. **Fork** the repository and create a branch from `main`:
-   ```bash
-   git checkout -b feat/your-feature main
-   ```
-2. **Branch naming convention:**
-   - `feat/` — new features or enhancements
-   - `fix/` — bug fixes
-   - `docs/` — documentation changes
-3. Make your changes and **test locally**.
-4. Run **all CI checks** before committing (see below).
-5. Open a **Pull Request** against `main`.
+## 开发流程
 
-### Environment Variable Changes
+1. 从最新的 `main` 创建独立分支；
+2. 一个分支只处理一个明确问题；
+3. UI 修改附带前后对比截图；
+4. 提交前完成相关自动化测试和人工核心流程检查；
+5. 通过 Pull Request 合并到 `main`。
 
-When adding or renaming an operator-facing environment variable, update
-[`.env.example`](.env.example) in the same PR. Document whether it is optional,
-its safe default or example value, and whether it is read at build time or
-runtime. Variables used only by tests, CI, or internal development scripts do
-not need to be added to the template, but their owning file or documentation
-must make that limited scope clear.
+推荐使用以下分支前缀：
 
-## Before You Submit a PR
+- `feat/`：功能或体验增强；
+- `fix/`：问题修复；
+- `docs/`：文档修改；
+- `chore/`：工程维护。
 
-Run the following checks locally — CI will run them too, but catching issues early saves everyone time:
+提交信息采用 Conventional Commits，例如：
+
+```text
+feat(classroom): improve playback progress
+fix(ui): align dark theme colors
+docs: update project guide
+```
+
+## 修改边界
+
+进行界面和品牌开发前，请先阅读 [`ZHIGOU_UI_PROTECTION_BOUNDARY.md`](ZHIGOU_UI_PROTECTION_BOUNDARY.md)。
+
+- UI、布局、品牌资源和用户可见文案可以按设计方案调整；
+- 修改课程生成、课堂运行、存储、导入导出或 `@openmaic/*` 包前，必须先评估调用方和兼容性；
+- 不得为了视觉改造复制或重写已有的生成、播放和持久化逻辑；
+- 必须保留 OpenMAIC 和其他第三方组件的许可证及版权声明。
+
+## 提交前检查
+
+根据改动范围运行以下检查：
 
 ```bash
-# 1. Format code
-pnpm format
-
-# 2. Lint (with auto-fix)
-pnpm lint --fix
-
-# 3. TypeScript type checking
-npx tsc --noEmit
+pnpm check
+pnpm lint
+pnpm test
+pnpm build
 ```
 
-If formatting or lint auto-fixes produce changes, include them in your commit.
+涉及首页、课程生成或课堂交互时，还应运行对应 Playwright 测试：
 
-### Local Testing
-
-Before marking a PR as **Ready for Review**, you **must**:
-
-1. **Verify your goal** — confirm that the PR achieves what it set out to do (bug is fixed, feature works as expected, etc.)
-2. **Regression test** — manually check that existing functionality is not broken by your changes (e.g. navigate key flows, verify related features still work)
-3. **Run CI checks locally** (see above)
-
-If you have not completed local verification, keep your PR in **Draft** status. Only move it to Ready for Review once you are confident it works and does not regress other features.
-
-### PR Guidelines
-
-- **Every PR must link to an issue** — use `Closes #123` or `Fixes #456` in the PR description. If no issue exists yet, create one first. PRs without a linked issue will not be reviewed.
-- **Keep PRs focused** — one concern per PR; do not mix unrelated changes
-- **Describe what and why** — fill out the [PR template](.github/pull_request_template.md)
-- **Include screenshots** — for UI changes, show before/after
-- **Ensure CI passes** before requesting review
-- **All UI text must be internationalized (i18n)** — do not hardcode user-facing strings
-
-## Commit Message Convention
-
-We follow [Conventional Commits](https://www.conventionalcommits.org/):
-
-```
-<type>(<scope>): <short description>
-
-[optional body]
-
-[optional footer]
+```bash
+pnpm test:e2e:ui-guard
 ```
 
-**Types:** `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `ci`, `perf`, `style`
+如果项目已有与本次修改无关的警告，请在 Pull Request 中如实记录，不要顺手扩大修改范围。
 
-Examples:
+## 问题反馈
 
-```
-feat(tts): add Azure TTS provider
-fix(whiteboard): prevent canvas from resetting on window resize
-docs: add CONTRIBUTING.md
-```
+- 普通缺陷和功能建议：在本仓库创建 Issue；
+- 安全漏洞：按照 [`SECURITY.md`](SECURITY.md) 私下报告，不要公开漏洞细节；
+- 如果问题可以在未修改的 OpenMAIC 上复现，可同时参考[上游项目](https://github.com/THU-MAIC/OpenMAIC)，但请避免重复或公开提交敏感信息。
 
-## Changing a Published Package
+## 许可证
 
-Four packages under `packages/@openmaic/` are published to npm: `dsl`, `storage`, `renderer`, and `importer`. Anything that ships inside one of those tarballs is under version control in the literal sense — the version number on npm has to keep meaning "this exact source".
-
-**If your PR changes a publishable file in one of those packages, bump that package's `version` in its `package.json` in the same PR.** CI enforces this, and without the bump you will see:
-
-```
-<package>: publishable package inputs changed but version did not increase
-```
-
-What counts as publishable: everything under the package directory except files that never reach the tarball, such as `docs/`, `test/`, and `vitest.config.ts`. Editing only those needs no bump. The exact set lives in `scripts/check-package-version-bumps.mjs`.
-
-Choosing the number is a [semver](https://semver.org/) judgement, and it is yours to make rather than something CI can infer:
-
-- **patch** — a fix that changes no documented behaviour
-- **minor** — new behaviour that existing consumers can ignore
-- **major** — anything an existing consumer must react to
-
-For packages below `1.0.0`, a **minor** bump signals a breaking change and a **patch** bump signals a compatible change, following common 0.x semver practice; the **major** rule applies from `1.0.0`.
-
-Be deliberate with `@openmaic/dsl`. It is the contract the other packages and downstream deployments validate against, so a change that narrows what an existing document may contain is a breaking change even when the diff looks small.
-
-You never publish anything yourself. Once your PR is merged, a version that is not yet on the registry is released automatically, and a `@openmaic/<name>@<version>` tag is written afterwards to record it. That tag is a marker, not a trigger: pushing one does not release anything.
-
-## AI-Assisted PRs 🤖
-
-PRs built with AI tools (Codex, Claude, Cursor, etc.) are welcome! We just ask for transparency and self-review:
-
-- **Mark it** — note in the PR title or description that the PR is AI-assisted
-- **AI-review your own code first** — before requesting maintainer review, run an AI code review (e.g. Claude, Codex, Copilot) on your changes and address the findings. This is **required** for AI-assisted PRs to avoid dumping large amounts of unreviewed generated code on maintainers.
-- **You are responsible for what you submit** — understand the code, not just the prompt.
-
-AI-assisted PRs are held to the same quality standard as any other PR. Community members are also encouraged to leave constructive feedback on any PR — peer review helps everyone improve.
-
-## Project Structure
-
-```
-OpenMAIC/
-├── app/              # Next.js app router pages and API routes
-├── components/       # React components
-├── lib/              # Shared utilities and core logic (i18n in lib/i18n/locales/)
-├── packages/         # Internal packages (mathml2omml, pptxgenjs)
-├── public/           # Static assets
-└── .github/          # Issue templates, PR template, CI workflows
-```
-
-## Reporting Bugs
-
-Use the [Bug Report](https://github.com/THU-MAIC/OpenMAIC/issues/new?template=bug_report.yml) issue template. Include:
-
-- Steps to reproduce
-- Expected vs. actual behavior
-- Browser / OS / Node version
-- Screenshots or error logs if applicable
-
-## Requesting Features
-
-Use the [Feature Request](https://github.com/THU-MAIC/OpenMAIC/issues/new?template=feature_request.yml) issue template. For larger features, please open a [Discussion](https://github.com/THU-MAIC/OpenMAIC/discussions) first.
-
-## Security Vulnerabilities
-
-Please report security vulnerabilities through [GitHub Security Advisories](https://github.com/THU-MAIC/OpenMAIC/security/advisories/new). **Do not** open a public issue for security vulnerabilities.
-
-## License
-
-By contributing to OpenMAIC, you agree that your contributions will be licensed under the [MIT License](LICENSE).
+提交贡献即表示你同意该贡献按本仓库的 [MIT License](LICENSE) 发布，并保留 [`NOTICE`](NOTICE) 中列出的上游归属。

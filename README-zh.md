@@ -847,6 +847,7 @@ OpenMAIC/
 ## 📄 许可证
 
 本项目基于 [MIT License](LICENSE) 开源。
+OpenMAIC 上游归属与知构 AI 修改说明见 [NOTICE](NOTICE)。
 
 ### 第三方组件
 

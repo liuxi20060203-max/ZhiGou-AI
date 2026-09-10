@@ -1,33 +1,31 @@
-# Security Policy for OpenMAIC
+# Security Policy for ZhiGou AI
 
-Thank you for helping us keep OpenMAIC secure! We take the security of our platform, multi-agent engine, and users very seriously. 
+知构 AI 涉及模型服务密钥、课程材料、媒体资源和本地或服务端存储。请负责任地报告安全问题，避免公开可能被利用的细节。
 
-## Supported Versions
+## 支持范围
 
-We currently provide security updates for the latest major release and the active `main` branch. Please ensure you are running the most recent version of OpenMAIC before submitting a report.
+当前仅维护 `main` 分支的最新版本。历史提交、个人部署环境以及未经合并的分支不承诺提供安全更新。
 
-| Version | Supported          |
-| ------- | ------------------ |
-| main    | :white_check_mark: |
-| Latest Release | :white_check_mark: |
-| Older Versions | :x:                |
+## 报告安全漏洞
 
-## Reporting a Vulnerability
+请不要通过公开 Issue、Discussion 或 Pull Request 披露未修复漏洞。
 
-If you discover a security vulnerability in OpenMAIC, **please do not create a public GitHub issue.** Publicly disclosing a vulnerability can put other users and self-hosted instances at risk.
+优先使用本仓库的 [GitHub Private Vulnerability Reporting](https://github.com/liuxi20060203-max/ZhiGou-AI/security/advisories/new) 提交报告。如果该入口暂不可用，请先联系仓库维护者建立私密沟通渠道，在渠道确认前不要发送漏洞利用代码、密钥或用户数据。
 
-Instead, please report it privately using one of the following methods:
-**GitHub Private Vulnerability Reporting:** Go to the [Security tab](https://github.com/THU-MAIC/OpenMAIC/security) of the repository, click on "Advisories", and select "Report a vulnerability".
+报告中建议包含：
 
+- 漏洞影响和受影响功能；
+- 可复现的最小步骤；
+- 运行环境和相关版本；
+- 已脱敏的日志、截图或示例；
+- 可选的修复建议。
 
-**What to include in your report:**
-* A description of the vulnerability and its potential impact.
-* Detailed steps to reproduce the issue.
-* Any relevant logs, screenshots, or code snippets.
-* (Optional) Suggested mitigation or a patch.
+请不要提交真实 API Key、访问令牌、数据库密码、未脱敏课程材料或个人信息。
 
-We will acknowledge receipt of your vulnerability report within 48 hours and strive to send you regular updates about our progress.
+## 上游问题
 
-## Disclosure Process
+如果漏洞在未经修改的 [OpenMAIC](https://github.com/THU-MAIC/OpenMAIC) 中同样存在，请遵循上游项目的安全报告流程。不要在两个仓库中公开重复披露尚未修复的问题。
 
-When a vulnerability is confirmed and patched, we will publish a GitHub Security Advisory detailing the issue, the impacted versions, and the fix. We will also credit the security researcher who reported the issue (unless they prefer to remain anonymous).
+## 处理原则
+
+维护者会先确认报告是否属于知构 AI 的影响范围，再评估修复和披露方式。当前项目不承诺固定响应时限；在补丁发布或双方确认可以公开之前，请保持漏洞信息私密。
