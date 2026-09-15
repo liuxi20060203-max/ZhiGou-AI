@@ -8,7 +8,6 @@ import {
   Check,
   ChevronDown,
   ChevronRight,
-  Clock,
   Copy,
   Folder,
   FolderPlus,
@@ -97,6 +96,21 @@ import {
   workspaceResumeHref,
 } from '@/lib/workbench/workspace-session-memory';
 import { useBrand } from '@/lib/brand/brand-context';
+import { TaskCreateFields } from '@/components/learning/task-create-fields';
+import { buildConceptLearningRequirement } from '@/lib/learning/requirement-adapter';
+import {
+  LEARNING_TASK_DRAFT_SESSION_KEY,
+  getLearningTask,
+  upsertLearningTask,
+  updateLearningTask,
+} from '@/lib/learning/task-storage';
+import {
+  createConceptLearningTask,
+  validateConceptLearningTaskInput,
+} from '@/lib/learning/task-template';
+import type { ConceptLearningTaskInput } from '@/lib/learning/types';
+import { RecentTaskList } from '@/components/learning/recent-task-list';
+import { CreationFlowCard } from '@/components/generation/creation-flow-card';
 
 const log = createLogger('Home');
 
@@ -128,11 +142,18 @@ const initialFormState: FormState = {
   vocationalTestMode: false,
 };
 
-export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard' | 'create' }) {
+export function HomePage({
+  experience = 'dashboard',
+}: {
+  experience?: 'dashboard' | 'create' | 'learning';
+}) {
   const { t, locale } = useI18n();
   const { theme, setTheme, resolvedTheme } = useTheme();
   const brand = useBrand();
   const router = useRouter();
+  const isDashboardExperience = experience === 'dashboard';
+  const isCreateExperience = experience === 'create';
+  const isLearningExperience = experience === 'learning';
   // Do not replay the classic hero's entrance after the route handoff already
   // carried the lockup and composer into place.
   const [swapped] = useState(arrivedByProSwap);
@@ -167,6 +188,16 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
     if (workbenchEntryEnabled) router.prefetch('/workspace');
   }, [router, workbenchEntryEnabled]);
   const [form, setForm] = useState<FormState>(initialFormState);
+  const [learningInput, setLearningInput] = useState<ConceptLearningTaskInput>({
+    courseName: '',
+    knowledgePoint: '',
+    learningGoal: '',
+    priorKnowledge: '',
+  });
+  const [learningErrors, setLearningErrors] = useState<
+    Partial<Record<keyof ConceptLearningTaskInput, string>>
+  >({});
+  const [activeLearningTaskId, setActiveLearningTaskId] = useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsSection, setSettingsSection] = useState<
     import('@/lib/types/settings').SettingsSection | undefined
@@ -219,11 +250,41 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
   // so the cache is hydrated into the form once we know the live requirement is empty.
   const draftRestoredRef = useRef(false);
   useEffect(() => {
+    if (isLearningExperience) return;
     if (draftRestoredRef.current) return;
     if (!cachedRequirement) return;
     draftRestoredRef.current = true;
     setForm((prev) => (prev.requirement ? prev : { ...prev, requirement: cachedRequirement }));
-  }, [cachedRequirement]);
+  }, [cachedRequirement, isLearningExperience]);
+
+  useEffect(() => {
+    if (!isLearningExperience) return;
+    const hasAnyValue = Object.values(learningInput).some((value) => value?.trim());
+    setForm((previous) => ({
+      ...previous,
+      requirement: hasAnyValue ? buildConceptLearningRequirement(learningInput, locale) : '',
+    }));
+  }, [isLearningExperience, learningInput, locale]);
+
+  useEffect(() => {
+    if (!isLearningExperience) return;
+    try {
+      const taskId = sessionStorage.getItem(LEARNING_TASK_DRAFT_SESSION_KEY);
+      if (!taskId) return;
+      sessionStorage.removeItem(LEARNING_TASK_DRAFT_SESSION_KEY);
+      const task = getLearningTask(taskId);
+      if (!task || task.classroomId) return;
+      setActiveLearningTaskId(task.id);
+      setLearningInput({
+        courseName: task.courseName,
+        knowledgePoint: task.knowledgePoint,
+        learningGoal: task.learningGoal,
+        priorKnowledge: task.priorKnowledge,
+      });
+    } catch {
+      // Session storage is optional; the task remains available in local storage.
+    }
+  }, [isLearningExperience]);
 
   const [themeOpen, setThemeOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -257,13 +318,11 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
   const searchButtonRef = useRef<HTMLButtonElement>(null);
   const toolbarRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const isCreateExperience = experience === 'create';
-
   useEffect(() => {
-    if (!isCreateExperience) return;
+    if (!isCreateExperience || isLearningExperience) return;
     const frame = requestAnimationFrame(() => textareaRef.current?.focus());
     return () => cancelAnimationFrame(frame);
-  }, [isCreateExperience]);
+  }, [isCreateExperience, isLearningExperience]);
   const thumbnailsRef = useRef<Record<string, Slide>>({});
 
   const replaceThumbnails = (slides: Record<string, Slide>) => {
@@ -603,6 +662,18 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
     // provider always has a concrete model. State A (no usable provider)
     // surfaces through the toolbar's single Configure-Provider affordance.
     if (preparingGenerate) return;
+    const nextLearningErrors = isLearningExperience
+      ? validateConceptLearningTaskInput(learningInput)
+      : {};
+    if (Object.keys(nextLearningErrors).length > 0) {
+      setLearningErrors(nextLearningErrors);
+      setError(
+        locale === 'zh-CN' ? '请先补全学习任务的必填信息' : 'Complete the required task fields',
+      );
+      return;
+    }
+    setLearningErrors({});
+
     if (!form.requirement.trim()) {
       setError(t('upload.requirementRequired'));
       return;
@@ -634,7 +705,30 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
 
     // Flip the generating UI state before material bytes are copied locally.
     setPreparingGenerate(true);
+    let learningTaskId: string | undefined;
     try {
+      if (isLearningExperience) {
+        const task = activeLearningTaskId
+          ? updateLearningTask(activeLearningTaskId, {
+              ...learningInput,
+              priorKnowledge: learningInput.priorKnowledge ?? '',
+              status: 'generating',
+            })
+          : createConceptLearningTask(learningInput);
+        learningTaskId = task?.id;
+        const saved = task
+          ? activeLearningTaskId
+            ? true
+            : upsertLearningTask({ ...task, status: 'generating' })
+          : false;
+        if (!learningTaskId || !saved) {
+          throw new Error(
+            locale === 'zh-CN'
+              ? '无法在当前浏览器中保存学习任务，请检查存储权限'
+              : 'Unable to save the learning task in this browser',
+          );
+        }
+      }
       const userProfile = useUserProfileStore.getState();
       const requirements: UserRequirements = {
         requirement: form.requirement,
@@ -685,6 +779,7 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
 
       const sessionState = {
         sessionId: nanoid(),
+        learningTaskId,
         requirements,
         pdfText: '',
         pdfImages: [],
@@ -703,6 +798,7 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
 
       router.push('/generation-preview');
     } catch (err) {
+      if (learningTaskId) updateLearningTask(learningTaskId, { status: 'draft' });
       log.error('Error preparing generation:', err);
       setError(err instanceof Error ? err.message : t('upload.generateFailed'));
     } finally {
@@ -724,12 +820,14 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
     return date.toLocaleDateString();
   };
 
-  const canGenerate = !!form.requirement.trim() && hasUsableProvider;
-  const latestClassroom = useMemo(
-    () => [...classrooms].sort((a, b) => b.updatedAt - a.updatedAt)[0],
-    [classrooms],
-  );
-
+  const learningInputComplete =
+    !!learningInput.courseName.trim() &&
+    !!learningInput.knowledgePoint.trim() &&
+    !!learningInput.learningGoal.trim();
+  const canGenerate =
+    !!form.requirement.trim() &&
+    hasUsableProvider &&
+    (!isLearningExperience || learningInputComplete);
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
       e.preventDefault();
@@ -783,16 +881,32 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
               <button
                 type="button"
                 data-testid="nav-my-courses"
-                aria-current={!isCreateExperience ? 'page' : undefined}
+                aria-current={experience === 'dashboard' ? 'page' : undefined}
                 onClick={() => router.push('/')}
                 className={cn(
                   'rounded-lg px-3 py-2 transition-colors',
-                  !isCreateExperience
+                  experience === 'dashboard'
                     ? 'bg-primary/10 font-medium text-primary'
                     : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                 )}
               >
                 {t('classroom.recentClassrooms')}
+              </button>
+              <button
+                type="button"
+                data-testid="nav-learning-task"
+                aria-current={isLearningExperience ? 'page' : undefined}
+                onClick={() => {
+                  if (!isLearningExperience) router.push('/learn/new');
+                }}
+                className={cn(
+                  'rounded-lg px-3 py-2 transition-colors',
+                  isLearningExperience
+                    ? 'bg-primary/10 font-medium text-primary'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                )}
+              >
+                {locale === 'zh-CN' ? '学习任务' : 'Learning task'}
               </button>
               <button
                 type="button"
@@ -905,286 +1019,279 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
         <div className="absolute inset-0 opacity-[0.035] [background-image:linear-gradient(to_right,currentColor_1px,transparent_1px),linear-gradient(to_bottom,currentColor_1px,transparent_1px)] [background-size:32px_32px]" />
       </div>
 
-      {/* ═══ Course-space dashboard ═══ */}
-      <motion.div
-        initial={heroEnter({ opacity: 0, y: 20 })}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
-        className="relative z-20 mt-8 grid w-full max-w-6xl grid-cols-1 gap-5 px-4 md:mt-12 md:px-8 lg:grid-cols-12"
-      >
+      {/* Creation surfaces live on dedicated routes. The dashboard starts with
+          learning tasks and course management, so it no longer duplicates the
+          full AI course composer. */}
+      {!isDashboardExperience ? (
         <motion.div
-          initial={heroEnter({ opacity: 0, y: 10 })}
+          initial={heroEnter({ opacity: 0, y: 20 })}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mb-2 lg:col-span-12"
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          className="relative z-20 mt-8 grid w-full max-w-6xl grid-cols-1 gap-5 px-4 md:mt-12 md:px-8 lg:grid-cols-12"
         >
-          <div className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.15em] text-primary">
-            <Sparkles className="size-3.5" aria-hidden="true" />
-            {t('home.createEyebrow')}
-          </div>
-          {isCreateExperience && (
-            <div
-              className="mb-4 flex items-center gap-2 text-[11px] font-medium text-muted-foreground"
-              aria-label={locale === 'zh-CN' ? '创建课程步骤 1 / 3' : 'Course creation step 1 of 3'}
-            >
-              <span className="rounded-full bg-primary px-2 py-1 text-primary-foreground">1</span>
-              <span className="font-semibold text-primary">
-                {locale === 'zh-CN' ? '课程内容' : 'Course content'}
-              </span>
-              <span className="h-px w-8 bg-border" />
-              <span>2 {locale === 'zh-CN' ? '课程计划' : 'Course plan'}</span>
-              <span className="h-px w-8 bg-border" />
-              <span>3 {locale === 'zh-CN' ? '互动课堂' : 'Classroom'}</span>
-            </div>
-          )}
-          <h1 className="max-w-[760px] text-balance text-[28px] font-semibold leading-[1.2] tracking-[-0.03em] text-foreground sm:text-[34px]">
-            {t('home.createTitle')}
-          </h1>
-          <p className="mt-3 max-w-[720px] text-pretty text-sm leading-6 text-muted-foreground">
-            {t('home.createDescription')}
-          </p>
-        </motion.div>
-
-        {/* ── Unified input area ── */}
-        <motion.div
-          initial={heroEnter({ opacity: 0, scale: 0.97 })}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.35 }}
-          className="w-full lg:col-span-8"
-        >
-          <div
-            data-pro-morph="composer"
-            className="w-full rounded-2xl border border-border/80 bg-card shadow-[0_18px_50px_-34px_rgba(16,42,67,0.42)] transition-[border-color,box-shadow] focus-within:border-primary/35 focus-within:shadow-[0_22px_60px_-32px_color-mix(in_oklab,var(--primary)_38%,transparent)]"
+          <motion.div
+            initial={heroEnter({ opacity: 0, y: 10 })}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="mb-2 lg:col-span-12"
           >
-            {/* ── Greeting + Profile + Agents ── */}
-            <div className="relative z-20 flex min-w-0 items-start justify-between">
-              <GreetingBar />
-              <div className="pr-3 pt-3.5 shrink-0">
-                <AgentBar />
-              </div>
+            <div className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.15em] text-primary">
+              <Sparkles className="size-3.5" aria-hidden="true" />
+              {t('home.createEyebrow')}
             </div>
+            {isCreateExperience && (
+              <div
+                className="mb-4 flex items-center gap-2 text-[11px] font-medium text-muted-foreground"
+                aria-label={
+                  locale === 'zh-CN' ? '创建课程步骤 1 / 3' : 'Course creation step 1 of 3'
+                }
+              >
+                <span className="rounded-full bg-primary px-2 py-1 text-primary-foreground">1</span>
+                <span className="font-semibold text-primary">
+                  {locale === 'zh-CN' ? '课程内容' : 'Course content'}
+                </span>
+                <span className="h-px w-8 bg-border" />
+                <span>2 {locale === 'zh-CN' ? '课程计划' : 'Course plan'}</span>
+                <span className="h-px w-8 bg-border" />
+                <span>3 {locale === 'zh-CN' ? '互动课堂' : 'Classroom'}</span>
+              </div>
+            )}
+            <h1 className="max-w-[760px] text-balance text-[28px] font-semibold leading-[1.2] tracking-[-0.03em] text-foreground sm:text-[34px]">
+              {isLearningExperience
+                ? locale === 'zh-CN'
+                  ? '从一个明确目标，构建你的学习路径'
+                  : 'Build a learning path from one clear goal'
+                : t('home.createTitle')}
+            </h1>
+            <p className="mt-3 max-w-[720px] text-pretty text-sm leading-6 text-muted-foreground">
+              {isLearningExperience
+                ? locale === 'zh-CN'
+                  ? '创建概念理解任务，知构 AI 会生成与目标关联的课堂，并持续记录笔记与复习重点。'
+                  : 'Create a concept task linked to a classroom, notes, and review priorities.'
+                : t('home.createDescription')}
+            </p>
+          </motion.div>
 
-            {/* Textarea */}
-            <textarea
-              data-testid="course-requirement-input"
-              ref={textareaRef}
-              placeholder={t('upload.requirementPlaceholder')}
-              className="min-h-[150px] max-h-[300px] w-full resize-none border-0 bg-transparent px-5 pb-3 pt-2 text-[14px] leading-relaxed placeholder:text-muted-foreground/45 focus:outline-none"
-              value={form.requirement}
-              onChange={(e) => updateForm('requirement', e.target.value)}
-              onKeyDown={handleKeyDown}
-              rows={4}
-            />
-
-            {/* Toolbar row */}
-            <div className="flex flex-wrap items-end gap-2 px-3 pb-3 sm:flex-nowrap">
-              <div className="min-w-0 basis-full sm:basis-auto sm:flex-1">
-                <GenerationToolbar
-                  webSearch={form.webSearch}
-                  onWebSearchChange={(v) => updateForm('webSearch', v)}
-                  onSettingsOpen={(section) => {
-                    setSettingsSection(section);
-                    setSettingsOpen(true);
+          {/* ── Unified input area ── */}
+          <motion.div
+            initial={heroEnter({ opacity: 0, scale: 0.97 })}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.35 }}
+            className="w-full lg:col-span-8"
+          >
+            <div
+              data-pro-morph="composer"
+              className="w-full rounded-2xl border border-border/80 bg-card shadow-[0_18px_50px_-34px_rgba(16,42,67,0.42)] transition-[border-color,box-shadow] focus-within:border-primary/35 focus-within:shadow-[0_22px_60px_-32px_color-mix(in_oklab,var(--primary)_38%,transparent)]"
+            >
+              {isLearningExperience ? (
+                <TaskCreateFields
+                  value={learningInput}
+                  errors={learningErrors}
+                  locale={locale}
+                  disabled={preparingGenerate}
+                  onChange={(next) => {
+                    setLearningInput(next);
+                    setLearningErrors({});
+                    setError(null);
                   }}
-                  courseMaterials={form.courseMaterials}
-                  onCourseMaterialsAdd={addCourseMaterials}
-                  onCourseMaterialRemove={removeCourseMaterial}
-                  onPdfError={setError}
-                  materialsLocked={preparingGenerate}
                 />
+              ) : null}
+              {/* ── Greeting + Profile + Agents ── */}
+              <div className="relative z-20 flex min-w-0 items-start justify-between">
+                <GreetingBar />
+                <div className="pr-3 pt-3.5 shrink-0">
+                  <AgentBar />
+                </div>
               </div>
 
-              {/* Interactive mode toggle */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <InteractiveModeButton
-                    pressed={form.interactiveMode}
-                    label={t('toolbar.interactiveModeLabel')}
-                    onPressedChange={(pressed) => updateForm('interactiveMode', pressed)}
-                  />
-                </TooltipTrigger>
-                <TooltipContent side="top" className="text-xs">
-                  {t('toolbar.interactiveModeHint')}
-                </TooltipContent>
-              </Tooltip>
-
-              {/* Voice input */}
-              <SpeechButton
-                size="md"
-                onTranscription={(text) => {
-                  setForm((prev) => {
-                    const next = prev.requirement + (prev.requirement ? ' ' : '') + text;
-                    updateRequirementCache(next);
-                    return { ...prev, requirement: next };
-                  });
-                }}
+              {/* Textarea */}
+              <textarea
+                data-testid="course-requirement-input"
+                ref={textareaRef}
+                placeholder={t('upload.requirementPlaceholder')}
+                className="min-h-[150px] max-h-[300px] w-full resize-none border-0 bg-transparent px-5 pb-3 pt-2 text-[14px] leading-relaxed placeholder:text-muted-foreground/45 focus:outline-none"
+                value={form.requirement}
+                onChange={(e) => updateForm('requirement', e.target.value)}
+                onKeyDown={handleKeyDown}
+                rows={4}
               />
 
-              {/* Send button */}
-              <button
-                data-testid="course-generate-submit"
-                onClick={handleGenerate}
-                disabled={!canGenerate || preparingGenerate}
-                className={cn(
-                  'shrink-0 h-8 rounded-lg flex items-center justify-center gap-1.5 transition-all px-3',
-                  canGenerate && !preparingGenerate
-                    ? 'bg-primary text-primary-foreground hover:opacity-90 shadow-sm cursor-pointer'
-                    : 'bg-muted text-muted-foreground/40 cursor-not-allowed',
-                )}
-              >
-                <span className="text-xs font-medium">
-                  {preparingGenerate
-                    ? t('stage.generating')
-                    : isCreateExperience
-                      ? locale === 'zh-CN'
-                        ? '生成课程计划'
-                        : 'Generate course plan'
-                      : t('toolbar.enterClassroom')}
-                </span>
-                {preparingGenerate ? (
-                  <Loader2 className="size-3.5 animate-spin" />
-                ) : (
-                  <ArrowUp className="size-3.5" />
-                )}
-              </button>
-            </div>
-          </div>
-        </motion.div>
+              {/* Toolbar row */}
+              <div className="flex flex-wrap items-end gap-2 px-3 pb-3 sm:flex-nowrap">
+                <div className="min-w-0 basis-full sm:basis-auto sm:flex-1">
+                  <GenerationToolbar
+                    webSearch={form.webSearch}
+                    onWebSearchChange={(v) => updateForm('webSearch', v)}
+                    onSettingsOpen={(section) => {
+                      setSettingsSection(section);
+                      setSettingsOpen(true);
+                    }}
+                    courseMaterials={form.courseMaterials}
+                    onCourseMaterialsAdd={addCourseMaterials}
+                    onCourseMaterialRemove={removeCourseMaterial}
+                    onPdfError={setError}
+                    materialsLocked={preparingGenerate}
+                  />
+                </div>
 
-        <motion.aside
-          initial={heroEnter({ opacity: 0, x: 12 })}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.4 }}
-          className="relative min-h-[254px] overflow-hidden rounded-2xl border border-primary/15 bg-primary p-6 text-primary-foreground shadow-[0_22px_60px_-36px_color-mix(in_oklab,var(--primary)_70%,transparent)] lg:col-span-4 lg:row-span-3"
-        >
-          <div className="absolute -right-16 -top-20 size-52 rounded-full border-[34px] border-white/10" />
-          <div className="absolute -bottom-14 right-8 size-32 rounded-full bg-white/[0.06]" />
-          <div className="relative flex h-full flex-col">
-            <span className="flex size-10 items-center justify-center rounded-xl bg-white/12">
-              <Clock className="size-5" aria-hidden="true" />
-            </span>
-            <p className="mt-6 text-xs font-semibold uppercase tracking-[0.14em] text-primary-foreground/65">
-              {isCreateExperience
-                ? locale === 'zh-CN'
-                  ? '创建指引'
-                  : 'Creation guide'
-                : t('classroom.recentClassrooms')}
-            </p>
-            {latestClassroom && !isCreateExperience ? (
-              <>
-                <h2 className="mt-2 line-clamp-2 text-xl font-semibold leading-snug">
-                  {latestClassroom.name}
-                </h2>
-                <p className="mt-2 text-sm text-primary-foreground/65">
-                  {formatDate(latestClassroom.updatedAt)}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => router.push(`/classroom/${latestClassroom.id}`)}
-                  className="mt-auto inline-flex h-10 w-fit items-center gap-2 rounded-xl bg-white px-4 text-sm font-semibold text-primary transition-transform hover:-translate-y-0.5"
-                >
-                  {locale === 'zh-CN' ? '继续课程' : 'Continue course'}
-                  <ChevronRight className="size-4" />
-                </button>
-              </>
-            ) : (
-              <>
-                <h2 className="mt-2 text-xl font-semibold leading-snug">
-                  {locale === 'zh-CN' ? '三步生成互动课程' : 'Create in three steps'}
-                </h2>
-                <ol className="mt-5 space-y-3 text-sm text-primary-foreground/75">
-                  {[
-                    locale === 'zh-CN' ? '描述课程主题与教学目标' : 'Describe the topic and goals',
-                    locale === 'zh-CN' ? '确认 AI 生成的课程方案' : 'Review the AI course plan',
-                    locale === 'zh-CN' ? '进入课堂开展互动学习' : 'Enter the interactive classroom',
-                  ].map((step, index) => (
-                    <li key={step} className="flex items-center gap-3">
-                      <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-white/15 text-xs font-semibold text-white">
-                        {index + 1}
-                      </span>
-                      <span>{step}</span>
-                    </li>
-                  ))}
-                </ol>
-                <p className="mt-auto text-xs leading-5 text-primary-foreground/55">
-                  {locale === 'zh-CN'
-                    ? '从左侧输入课程需求即可开始'
-                    : 'Start by entering your course request on the left'}
-                </p>
-              </>
-            )}
-          </div>
-        </motion.aside>
+                {/* Interactive mode toggle */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <InteractiveModeButton
+                      pressed={form.interactiveMode}
+                      label={t('toolbar.interactiveModeLabel')}
+                      onPressedChange={(pressed) => updateForm('interactiveMode', pressed)}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="text-xs">
+                    {t('toolbar.interactiveModeHint')}
+                  </TooltipContent>
+                </Tooltip>
 
-        {showVocationalTestUi && (
-          <motion.div
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="mt-2 flex w-full justify-start px-1 lg:col-span-8"
-          >
-            <Tooltip>
-              <TooltipTrigger asChild>
+                {/* Voice input */}
+                <SpeechButton
+                  size="md"
+                  onTranscription={(text) => {
+                    setForm((prev) => {
+                      const next = prev.requirement + (prev.requirement ? ' ' : '') + text;
+                      updateRequirementCache(next);
+                      return { ...prev, requirement: next };
+                    });
+                  }}
+                />
+
+                {/* Send button */}
                 <button
-                  type="button"
-                  role="switch"
-                  aria-checked={form.vocationalTestMode}
-                  onClick={() => updateForm('vocationalTestMode', !form.vocationalTestMode)}
+                  data-testid="course-generate-submit"
+                  onClick={handleGenerate}
+                  disabled={!canGenerate || preparingGenerate}
                   className={cn(
-                    'inline-flex h-7 items-center gap-2 rounded-full border px-2.5 text-[11px] font-medium transition-colors',
-                    form.vocationalTestMode
-                      ? 'border-cyan-400/70 bg-cyan-50 text-cyan-700 shadow-[0_0_10px_rgba(6,182,212,0.16)] dark:bg-cyan-950/40 dark:text-cyan-300'
-                      : 'border-border/70 bg-background/70 text-muted-foreground hover:border-cyan-300/60 hover:text-cyan-700 dark:hover:text-cyan-300',
+                    'shrink-0 h-8 rounded-lg flex items-center justify-center gap-1.5 transition-all px-3',
+                    canGenerate && !preparingGenerate
+                      ? 'bg-primary text-primary-foreground hover:opacity-90 shadow-sm cursor-pointer'
+                      : 'bg-muted text-muted-foreground/40 cursor-not-allowed',
                   )}
                 >
-                  <span className="rounded-full bg-cyan-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-normal text-cyan-700 dark:bg-cyan-900/45 dark:text-cyan-300">
-                    测试功能
+                  <span className="text-xs font-medium">
+                    {preparingGenerate
+                      ? t('stage.generating')
+                      : isLearningExperience
+                        ? locale === 'zh-CN'
+                          ? '生成目标课程'
+                          : 'Generate learning course'
+                        : isCreateExperience
+                          ? locale === 'zh-CN'
+                            ? '生成课程计划'
+                            : 'Generate course plan'
+                          : t('toolbar.enterClassroom')}
                   </span>
-                  <Sparkles className="size-3.5" />
-                  <span>职教任务</span>
-                  <span
+                  {preparingGenerate ? (
+                    <Loader2 className="size-3.5 animate-spin" />
+                  ) : (
+                    <ArrowUp className="size-3.5" />
+                  )}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+
+          <CreationFlowCard
+            mode={isLearningExperience ? 'learning' : 'create'}
+            locale={locale}
+            requirementReady={Boolean(form.requirement.trim())}
+            materialCount={form.courseMaterials.length}
+            learningFieldsCompleted={
+              [
+                learningInput.courseName,
+                learningInput.knowledgePoint,
+                learningInput.learningGoal,
+              ].filter((value) => value.trim()).length
+            }
+            onFocusPrimary={() => {
+              if (isLearningExperience) {
+                const field = document.querySelector<HTMLInputElement>(
+                  '[data-testid="learning-task-fields"] input',
+                );
+                field?.focus();
+                field?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              } else {
+                textareaRef.current?.focus();
+              }
+            }}
+          />
+
+          {showVocationalTestUi && (
+            <motion.div
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="mt-2 flex w-full justify-start px-1 lg:col-span-8"
+            >
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={form.vocationalTestMode}
+                    onClick={() => updateForm('vocationalTestMode', !form.vocationalTestMode)}
                     className={cn(
-                      'relative h-3.5 w-6 rounded-full transition-colors',
-                      form.vocationalTestMode ? 'bg-cyan-500' : 'bg-muted-foreground/25',
+                      'inline-flex h-7 items-center gap-2 rounded-full border px-2.5 text-[11px] font-medium transition-colors',
+                      form.vocationalTestMode
+                        ? 'border-cyan-400/70 bg-cyan-50 text-cyan-700 shadow-[0_0_10px_rgba(6,182,212,0.16)] dark:bg-cyan-950/40 dark:text-cyan-300'
+                        : 'border-border/70 bg-background/70 text-muted-foreground hover:border-cyan-300/60 hover:text-cyan-700 dark:hover:text-cyan-300',
                     )}
                   >
+                    <span className="rounded-full bg-cyan-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-normal text-cyan-700 dark:bg-cyan-900/45 dark:text-cyan-300">
+                      测试功能
+                    </span>
+                    <Sparkles className="size-3.5" />
+                    <span>职教任务</span>
                     <span
                       className={cn(
-                        'absolute left-0.5 top-0.5 size-2.5 rounded-full bg-white transition-transform',
-                        form.vocationalTestMode ? 'translate-x-2.5' : 'translate-x-0',
+                        'relative h-3.5 w-6 rounded-full transition-colors',
+                        form.vocationalTestMode ? 'bg-cyan-500' : 'bg-muted-foreground/25',
                       )}
-                    />
-                  </span>
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" className="text-xs">
-                从当前输入框提交职教实操训练测试
-              </TooltipContent>
-            </Tooltip>
-          </motion.div>
-        )}
-
-        {/* ── Error ── */}
-        <AnimatePresence>
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="mt-3 w-full rounded-lg border border-destructive/20 bg-destructive/10 p-3 lg:col-span-8"
-            >
-              <p className="text-sm text-destructive">{error}</p>
+                    >
+                      <span
+                        className={cn(
+                          'absolute left-0.5 top-0.5 size-2.5 rounded-full bg-white transition-transform',
+                          form.vocationalTestMode ? 'translate-x-2.5' : 'translate-x-0',
+                        )}
+                      />
+                    </span>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="text-xs">
+                  从当前输入框提交职教实操训练测试
+                </TooltipContent>
+              </Tooltip>
             </motion.div>
           )}
-        </AnimatePresence>
-      </motion.div>
+
+          {/* ── Error ── */}
+          <AnimatePresence>
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-3 w-full rounded-lg border border-destructive/20 bg-destructive/10 p-3 lg:col-span-8"
+              >
+                <p className="text-sm text-destructive">{error}</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      ) : null}
+
+      {isDashboardExperience ? <RecentTaskList /> : null}
 
       {/* ═══ Course library — collapsible ═══ */}
       {/* The library action bar is always present after hydration: it carries
           the New-folder / import / search actions, so a brand-new user with
           zero courses and zero folders can still create the first folder or
           import. One stable action surface across root, folder, and empty. */}
-      {!hydrated && !isCreateExperience && (
+      {!hydrated && isDashboardExperience && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -1220,7 +1327,7 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
           </div>
         </motion.div>
       )}
-      {hydrated && !isCreateExperience && (
+      {hydrated && isDashboardExperience && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -1242,7 +1349,7 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
                 </span>
                 <span className="min-w-0">
                   <span className="flex items-center gap-2 text-xl font-semibold tracking-tight text-foreground">
-                    {t('classroom.recentClassrooms')}
+                    {locale === 'zh-CN' ? '课程资源库' : 'Course library'}
                     {currentFolder && (
                       <>
                         <ChevronRight className="size-4 text-muted-foreground/50" />
@@ -1261,7 +1368,9 @@ export function HomePage({ experience = 'dashboard' }: { experience?: 'dashboard
                     </motion.span>
                   </span>
                   <span className="mt-0.5 block text-xs text-muted-foreground sm:text-[13px]">
-                    {t('home.libraryDescription')}
+                    {locale === 'zh-CN'
+                      ? '管理生成或导入的课程资源，按文件夹整理并随时进入课堂。'
+                      : 'Manage generated or imported courses, organize them, and reopen any classroom.'}
                   </span>
                 </span>
               </span>
