@@ -84,6 +84,11 @@ eval/orchestration/results-answer-content/
 # e2e screenshot artifacts
 e2e/screenshots/
 
+# local visual QA and handoff artifacts
+/visual-qa-*.png
+/zhigou-*.png
+/ZHIGOU_PHASE_1_HANDOFF.md
+
 # local-only sandbox/demo pages (do not ship)
 /app/slide-renderer-demo
 
