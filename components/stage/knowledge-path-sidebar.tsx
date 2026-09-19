@@ -134,6 +134,7 @@ export function KnowledgePathSidebar({
     <TooltipProvider delayDuration={250}>
       <aside
         data-testid="knowledge-path"
+        data-collapsed={collapsed}
         aria-label={isChinese ? '知识路径' : 'Knowledge path'}
         style={{
           width: collapsed ? COLLAPSED_WIDTH : sidebarWidth,
@@ -155,7 +156,12 @@ export function KnowledgePathSidebar({
           </div>
         )}
 
-        <div className="flex h-20 shrink-0 items-center justify-between border-b border-[color:var(--classroom-line)] px-3">
+        <div
+          className={cn(
+            classroomShellStyles.knowledgePathHeader,
+            'flex h-20 shrink-0 items-center justify-between border-b border-[color:var(--classroom-line)] px-3',
+          )}
+        >
           {!collapsed && (
             <div className="min-w-0">
               <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-primary">
@@ -194,7 +200,12 @@ export function KnowledgePathSidebar({
         </div>
 
         {!collapsed && (
-          <div className="flex h-10 shrink-0 items-center justify-between border-b border-border/50 px-3">
+          <div
+            className={cn(
+              classroomShellStyles.knowledgePathGuide,
+              'flex h-10 shrink-0 items-center justify-between border-b border-border/50 px-3',
+            )}
+          >
             <span className="text-[10px] font-medium text-muted-foreground">
               {isChinese ? '沿路径逐步构建理解' : 'Build understanding step by step'}
             </span>
@@ -221,11 +232,12 @@ export function KnowledgePathSidebar({
         <div
           data-testid="scene-list"
           className={cn(
+            classroomShellStyles.knowledgePathList,
             'scrollbar-hide min-h-0 flex-1 overflow-x-hidden overflow-y-auto py-3',
             collapsed ? 'px-1.5' : 'px-3',
           )}
         >
-          <div className="relative">
+          <div className={cn(classroomShellStyles.knowledgePathTrack, 'relative')}>
             <div
               className={cn(
                 classroomShellStyles.knowledgePathLine,
@@ -233,7 +245,7 @@ export function KnowledgePathSidebar({
               )}
               aria-hidden="true"
             />
-            <div className="space-y-1.5">
+            <div className={cn(classroomShellStyles.knowledgePathNodes, 'space-y-1.5')}>
               {scenes.map((scene, index) => {
                 const isActive = currentSceneId === scene.id;
                 const isVisited = currentSceneIndex >= 0 && index < currentSceneIndex;

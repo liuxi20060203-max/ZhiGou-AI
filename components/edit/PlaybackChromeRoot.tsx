@@ -278,6 +278,7 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
     const activeSceneIdRef = useRef<string | null>(currentSceneId);
     const discussionAbortRef = useRef<AbortController | null>(null);
     const presentationIdleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const responsivePanelsInitializedRef = useRef(false);
     const cursorSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const pendingCursorRef = useRef<{ stageId: string; cursor: PlaybackCursor } | null>(null);
     const stageRef = useRef<HTMLDivElement>(null);
@@ -599,6 +600,13 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
         // Firefox may deny fullscreen from certain keyboard events (e.g. F11)
         console.warn('[Presentation] Fullscreen request denied — browser policy');
       }
+    }, [setChatAreaCollapsed, setSidebarCollapsed]);
+
+    useEffect(() => {
+      if (responsivePanelsInitializedRef.current) return;
+      responsivePanelsInitializedRef.current = true;
+      if (window.innerWidth < 1440) setChatAreaCollapsed(true);
+      if (window.innerWidth < 768) setSidebarCollapsed(true);
     }, [setChatAreaCollapsed, setSidebarCollapsed]);
 
     useEffect(() => {
@@ -1461,7 +1469,9 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
     return (
       <div
         ref={stageRef}
+        data-presenting={isPresenting}
         className={cn(
+          classroomShellStyles.playbackLayout,
           'flex-1 flex overflow-hidden bg-background',
           isPresenting && !controlsVisible && 'cursor-none',
         )}
@@ -1475,7 +1485,12 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
         />
 
         {/* Main Content Area */}
-        <div className="flex-1 flex flex-col overflow-hidden min-w-0 relative">
+        <div
+          className={cn(
+            classroomShellStyles.playbackMain,
+            'flex-1 flex flex-col overflow-hidden min-w-0 relative',
+          )}
+        >
           {/* Header — playback only. The Pro Switch fires `onEnterProMode`
             (passed by the parent Stage) which awaits our `teardown()`
             before the parent flips mode to 'edit'. */}
@@ -1774,7 +1789,7 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
         {/* Chat Area — playback / autonomous always renders it here; Pro
           (edit) mode unmounts this whole PlaybackChromeRoot, so the
           edit branch has no chat. */}
-        <div className="flex shrink-0">
+        <div className={cn(classroomShellStyles.assistantSlot, 'flex shrink-0')}>
           <ChatArea
             ref={chatAreaRef}
             width={chatAreaWidth}

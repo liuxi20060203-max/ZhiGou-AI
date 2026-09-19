@@ -140,7 +140,7 @@ export function HeaderControls({
   // the cluster pixel-stable; both hosts pad to `px-8`, so the right edge
   // anchors identically too.
   return (
-    <div className="flex items-center gap-1 sm:gap-4">
+    <div data-classroom-controls className="flex items-center gap-1 sm:gap-4">
       {showGlobalControls && (
         <Popover open={globalToolsOpen} onOpenChange={setGlobalToolsOpen}>
           <PopoverTrigger asChild>
@@ -238,6 +238,7 @@ export function HeaderControls({
           widths, so morphing made the pill visibly drift). */}
       {onToggleEditMode && (
         <label
+          data-classroom-pro
           className={cn(
             'inline-flex shrink-0 items-center gap-2.5 rounded-xl border shadow-sm transition-colors duration-200',
             'bg-background/70 backdrop-blur-md',
@@ -284,6 +285,7 @@ export function HeaderControls({
         <DropdownMenu modal={false} open={exportMenuOpen} onOpenChange={setExportMenuOpen}>
           <DropdownMenuTrigger asChild>
             <button
+              data-classroom-export
               disabled={!canExport || isExporting || isExportingZip || isExportingScript}
               title={
                 isExporting || isExportingZip || isExportingScript

@@ -22,6 +22,7 @@ import {
   Users,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import classroomShellStyles from '@/components/classroom/classroom-shell.module.css';
 import type { AudioIndicatorState } from './audio-indicator';
 import { CanvasToolbar } from '@/components/canvas/canvas-toolbar';
 import { useAudioRecorder } from '@/lib/hooks/use-audio-recorder';
@@ -1209,6 +1210,7 @@ export function Roundtable({
         onClick={() => onCollapsedChange?.(false)}
         aria-expanded={!collapsed}
         className={cn(
+          classroomShellStyles.coThinkingSummary,
           'flex shrink-0 items-center gap-3 overflow-hidden border-t border-primary/10 bg-[color:var(--classroom-surface)] px-4 text-left transition-all duration-300',
           collapsed ? 'h-[52px] opacity-100' : 'pointer-events-none h-0 border-t-0 opacity-0',
         )}
@@ -1258,6 +1260,7 @@ export function Roundtable({
           </span>
         </div>
         <button
+          data-co-thinking-collapse
           type="button"
           onClick={() => onCollapsedChange?.(true)}
           disabled={coThinkingActive}

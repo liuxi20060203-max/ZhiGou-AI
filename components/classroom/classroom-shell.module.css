@@ -84,6 +84,28 @@
   box-shadow: 0 0 0 3px var(--classroom-surface-soft);
 }
 
+.playbackLayout {
+  position: relative;
+  min-width: 0;
+}
+
+.playbackMain {
+  z-index: 1;
+}
+
+.assistantSlot {
+  z-index: 30;
+}
+
+.coThinkingSummary {
+  background-color: var(--classroom-surface) !important;
+}
+
+.playbackLayout[data-presenting='true'] .knowledgePath,
+.playbackLayout[data-presenting='true'] .assistantSlot {
+  display: none;
+}
+
 .shell[data-classroom-variant='pane'] .knowledgePath {
   background: color-mix(in srgb, var(--classroom-surface) 96%, transparent);
 }
@@ -155,16 +177,232 @@
   border-radius: 16px;
 }
 
+@media (max-width: 1439px) {
+  .shell :global([data-co-thinking-collapse]) {
+    right: 64px;
+  }
+
+  .assistantSlot {
+    position: absolute;
+    inset-block: 0;
+    right: 0;
+    filter: drop-shadow(-18px 0 28px rgb(7 27 35 / 0.08));
+  }
+
+  :global(.dark) .assistantSlot {
+    filter: drop-shadow(-18px 0 28px rgb(0 0 0 / 0.24));
+  }
+}
+
 @media (max-width: 1023px) {
+  .playbackLayout {
+    flex-direction: column;
+  }
+
+  .knowledgePath {
+    width: 100% !important;
+    height: 72px;
+    flex: 0 0 72px;
+    flex-direction: row;
+    overflow: hidden;
+    border-right: 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--classroom-line) 88%, transparent);
+    box-shadow: 0 8px 28px -30px color-mix(in srgb, var(--classroom-ink) 42%, transparent);
+  }
+
+  .knowledgePathHeader {
+    width: 188px;
+    height: 72px;
+    flex: 0 0 188px;
+    border-right: 1px solid color-mix(in srgb, var(--classroom-line) 78%, transparent);
+    border-bottom: 0;
+  }
+
+  .knowledgePath[data-collapsed='true'] .knowledgePathHeader {
+    width: 52px;
+    flex-basis: 52px;
+    padding-inline: 10px;
+  }
+
+  .knowledgePathGuide {
+    display: none;
+  }
+
+  .knowledgePathList {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 8px 10px;
+  }
+
+  .knowledgePathTrack,
+  .knowledgePathNodes {
+    height: 100%;
+  }
+
+  .knowledgePathNodes {
+    display: flex;
+    gap: 8px;
+  }
+
+  .knowledgePathNodes > * {
+    width: 176px !important;
+    min-width: 176px;
+    min-height: 54px !important;
+    height: 54px;
+  }
+
+  .knowledgePath[data-collapsed='true'] .knowledgePathNodes > * {
+    width: 40px !important;
+    min-width: 40px;
+    height: 40px;
+    min-height: 40px !important;
+  }
+
+  .knowledgePathLine {
+    inset: 50% 18px auto !important;
+    width: auto;
+    height: 1px;
+    transform: translateY(-50%);
+    background: linear-gradient(
+      to right,
+      color-mix(in srgb, var(--classroom-accent) 56%, var(--classroom-line)),
+      var(--classroom-line) 72%,
+      transparent
+    );
+  }
+
+  .assistantSlot > [data-testid='zhigou-assistant']:not([data-collapsed='true']) {
+    width: min(336px, 88vw) !important;
+  }
+
   .cognitionStage {
     padding-inline: 10px;
   }
 }
 
 @media (max-width: 767px) {
+  .shell :global([data-co-thinking-collapse]) {
+    right: 62px;
+  }
+
+  .shell :global([data-classroom-pro]),
+  .shell :global([data-classroom-export]) {
+    display: none;
+  }
+
+  .identityBar {
+    height: 56px;
+    min-height: 56px;
+    padding-inline: 8px;
+  }
+
+  .knowledgePath {
+    position: absolute;
+    z-index: 42;
+    inset: auto 8px calc(64px + env(safe-area-inset-bottom));
+    width: auto !important;
+    height: min(52vh, 420px);
+    max-height: calc(100% - 76px);
+    flex-basis: auto;
+    flex-direction: column;
+    border: 1px solid var(--classroom-line);
+    border-radius: 22px;
+    box-shadow: 0 24px 64px -24px rgb(7 27 35 / 0.32);
+  }
+
+  .knowledgePath[data-collapsed='true'] {
+    right: auto;
+    width: 48px !important;
+    height: 48px;
+    overflow: hidden;
+    border-radius: 16px;
+  }
+
+  .knowledgePathHeader,
+  .knowledgePath[data-collapsed='true'] .knowledgePathHeader {
+    width: 100%;
+    height: 56px;
+    flex: 0 0 56px;
+    border-right: 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--classroom-line) 78%, transparent);
+  }
+
+  .knowledgePath[data-collapsed='true'] .knowledgePathHeader {
+    height: 48px;
+    flex-basis: 48px;
+    padding: 8px;
+    border-bottom: 0;
+  }
+
+  .knowledgePathList {
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 10px 12px;
+  }
+
+  .knowledgePathTrack,
+  .knowledgePathNodes {
+    height: auto;
+  }
+
+  .knowledgePathNodes {
+    display: block;
+  }
+
+  .knowledgePathNodes > * {
+    width: 100% !important;
+    min-width: 0;
+    min-height: 62px !important;
+    height: auto;
+    margin-bottom: 6px;
+  }
+
+  .knowledgePathLine {
+    inset: 19px auto 19px 17px !important;
+    width: 1px;
+    height: auto;
+    transform: none;
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--classroom-accent) 56%, var(--classroom-line)),
+      var(--classroom-line) 72%,
+      transparent
+    );
+  }
+
+  .assistantSlot {
+    inset: auto 8px calc(64px + env(safe-area-inset-bottom));
+    align-items: flex-end;
+    justify-content: flex-end;
+    filter: none;
+  }
+
+  .assistantSlot > [data-testid='zhigou-assistant'] {
+    height: min(62vh, 520px);
+    max-height: calc(100vh - 88px - env(safe-area-inset-bottom));
+    border: 1px solid var(--classroom-line);
+    border-radius: 22px;
+    box-shadow: 0 24px 64px -24px rgb(7 27 35 / 0.34);
+  }
+
+  .assistantSlot > [data-testid='zhigou-assistant'][data-collapsed='true'] {
+    width: 48px !important;
+    height: 48px;
+    overflow: hidden;
+    border-radius: 16px;
+  }
+
+  .assistantSlot > [data-testid='zhigou-assistant']:not([data-collapsed='true']) {
+    width: calc(100vw - 16px) !important;
+  }
+
+  .playbackMain {
+    min-height: 0;
+  }
+
   .cognitionStage {
     gap: 4px;
-    padding: 6px;
+    padding: 4px;
   }
 
   .cognitionStageMeta {
@@ -182,5 +420,14 @@
   .shell {
     --classroom-motion-fast: 0ms;
     --classroom-motion-panel: 0ms;
+  }
+
+  .shell *,
+  .shell *::before,
+  .shell *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

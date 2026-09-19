@@ -305,6 +305,7 @@ export const ChatArea = forwardRef<ChatAreaRef, ChatAreaProps>(
     return (
       <div
         data-testid="zhigou-assistant"
+        data-collapsed={collapsed}
         data-assistant-state={assistantThinking ? 'thinking' : isStreaming ? 'responding' : 'idle'}
         style={{
           width: displayWidth,
@@ -418,7 +419,7 @@ export const ChatArea = forwardRef<ChatAreaRef, ChatAreaProps>(
                     color:
                       activeTab === 'lecture'
                         ? 'var(--classroom-ink)'
-                        : 'var(--classroom-ink-soft)',
+                        : 'var(--classroom-ink-muted)',
                   }}
                 >
                   <BookOpen className="w-3.5 h-3.5" />
@@ -435,7 +436,7 @@ export const ChatArea = forwardRef<ChatAreaRef, ChatAreaProps>(
                     boxShadow:
                       activeTab === 'chat' ? 'inset 0 -2px 0 var(--classroom-ink)' : 'none',
                     color:
-                      activeTab === 'chat' ? 'var(--classroom-ink)' : 'var(--classroom-ink-soft)',
+                      activeTab === 'chat' ? 'var(--classroom-ink)' : 'var(--classroom-ink-muted)',
                   }}
                 >
                   <MessageSquare className="w-3.5 h-3.5" />
