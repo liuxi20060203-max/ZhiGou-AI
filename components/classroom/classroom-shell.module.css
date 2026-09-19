@@ -37,6 +37,103 @@
   --classroom-grid: rgb(238 247 248 / 0.045);
 }
 
+.identityBar {
+  border-bottom: 1px solid color-mix(in srgb, var(--classroom-line) 78%, transparent);
+  background: color-mix(in srgb, var(--classroom-surface) 92%, transparent);
+  box-shadow: 0 10px 30px -28px color-mix(in srgb, var(--classroom-ink) 40%, transparent);
+  backdrop-filter: blur(18px) saturate(1.08);
+}
+
+.cognitionStage {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 14px 14px;
+  background-color: var(--classroom-ground);
+  background-image:
+    radial-gradient(
+      circle at 50% 12%,
+      color-mix(in srgb, var(--classroom-accent) 9%, transparent),
+      transparent 44%
+    ),
+    linear-gradient(to right, var(--classroom-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--classroom-grid) 1px, transparent 1px);
+  background-size:
+    auto,
+    32px 32px,
+    32px 32px;
+}
+
+.cognitionStageMeta {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-height: 28px;
+  flex: 0 0 28px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 6px;
+}
+
+.cognitionStagePulse {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--classroom-accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--classroom-accent) 12%, transparent);
+}
+
+.cognitionCanvas {
+  position: relative;
+  z-index: 1;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--classroom-line) 88%, transparent);
+  border-radius: 22px;
+  background: var(--classroom-surface);
+  box-shadow:
+    0 24px 60px -44px color-mix(in srgb, var(--classroom-ink) 44%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #ffffff 64%, transparent);
+}
+
+.shell[data-classroom-variant='pane'] .identityBar {
+  background: color-mix(in srgb, var(--classroom-surface) 96%, transparent);
+}
+
+.shell[data-classroom-variant='pane'] .cognitionStage {
+  padding: 6px 8px 8px;
+}
+
+.shell[data-classroom-variant='pane'] .cognitionCanvas {
+  border-radius: 16px;
+}
+
+@media (max-width: 1023px) {
+  .cognitionStage {
+    padding-inline: 10px;
+  }
+}
+
+@media (max-width: 767px) {
+  .cognitionStage {
+    gap: 4px;
+    padding: 6px;
+  }
+
+  .cognitionStageMeta {
+    min-height: 24px;
+    flex-basis: 24px;
+    padding-inline: 4px;
+  }
+
+  .cognitionCanvas {
+    border-radius: 14px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .shell {
     --classroom-motion-fast: 0ms;

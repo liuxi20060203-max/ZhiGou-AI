@@ -153,6 +153,12 @@ test.describe('Classroom Interaction', () => {
     await expect(classroomShell).toBeVisible();
     await expect(classroomShell).toHaveAttribute('data-classroom-shell', 'zhigou');
     await expect(classroomShell).toHaveAttribute('data-classroom-variant', 'page');
+    await expect(page.getByTestId('classroom-identity-bar')).toBeVisible();
+    await expect(page.getByTestId('classroom-block-progress')).toHaveText(
+      'Knowledge block 01 / 03',
+    );
+    await expect(page.getByTestId('cognition-stage')).toBeVisible();
+    await expect(page.getByTestId('cognition-stage-type')).toHaveText('Course Explanation');
 
     // Sidebar shows 3 scenes
     await expect(classroom.sidebarScenes).toHaveCount(3, { timeout: 10_000 });
@@ -169,6 +175,9 @@ test.describe('Classroom Interaction', () => {
 
     // Verify second scene is now active — heading in the top bar shows the current scene name
     await expect(page.getByRole('heading', { name: '光反应' })).toBeVisible();
+    await expect(page.getByTestId('classroom-block-progress')).toHaveText(
+      'Knowledge block 02 / 03',
+    );
     await expect(playbackProgress).toHaveAttribute('aria-valuenow', '33');
   });
 
@@ -306,6 +315,7 @@ test.describe('Classroom Interaction', () => {
         });
     };
 
+    await page.getByRole('button', { name: 'More classroom tools' }).click();
     await page.getByRole('button', { name: 'EN', exact: true }).click();
     await expect(page.getByRole('menuitem', { name: 'English' })).toBeVisible();
     await expectBodyScrollState(false);

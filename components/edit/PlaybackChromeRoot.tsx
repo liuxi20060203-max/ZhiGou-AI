@@ -63,6 +63,7 @@ import {
   getSlideElementTypeLabel,
 } from '@/components/canvas/slide-element-pick-overlay';
 import { shouldClearDraftElementReference } from '@/components/chat/element-reference-receipt';
+import classroomShellStyles from '@/components/classroom/classroom-shell.module.css';
 
 type DraftSlideElementReference = {
   reference: SlideElementReference;
@@ -125,7 +126,7 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
     },
     ref,
   ) {
-    const { t } = useI18n();
+    const { t, locale } = useI18n();
     const {
       mode,
       stage,
@@ -1208,6 +1209,15 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
       ? scenes.length
       : scenes.findIndex((s) => s.id === currentSceneId);
     const totalScenesCount = scenes.length + (canAdvanceToPendingSlot ? 1 : 0);
+    const currentSceneTypeLabel = currentScene
+      ? t(`edit.sceneType.${currentScene.type}`)
+      : isCourseComplete
+        ? t('stage.courseComplete')
+        : t('stage.generating');
+    const currentBlockLabel =
+      locale === 'zh-CN'
+        ? `知识构件 ${(currentSceneIndex + 1).toString().padStart(2, '0')}`
+        : `Knowledge block ${(currentSceneIndex + 1).toString().padStart(2, '0')}`;
     const showElementReference = piChatEnabled && mode === 'playback';
     const canPickSlideElement = Boolean(
       showElementReference &&
@@ -1472,6 +1482,8 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
                 currentScene?.title ||
                 (isCourseComplete && isPendingScene ? t('stage.courseComplete') : '')
               }
+              currentSceneIndex={currentSceneIndex}
+              scenesCount={totalScenesCount}
               mode={mode}
               proModeActive={proModeActive}
               canEdit={!!canEnterProMode}
@@ -1487,71 +1499,94 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
             this whole PlaybackChromeRoot out when entering edit mode, so
             no inline branching is needed here. */}
           <div
-            className="overflow-hidden relative flex-1 min-h-0 isolate"
+            data-testid="cognition-stage"
+            className={`${classroomShellStyles.cognitionStage} overflow-hidden relative flex-1 min-h-0 isolate`}
             style={{
               height: sceneViewerHeight,
             }}
             suppressHydrationWarning
           >
-            <CanvasArea
-              currentScene={currentScene}
-              currentSceneIndex={currentSceneIndex}
-              scenesCount={totalScenesCount}
-              playbackProgress={
-                totalActions > 0
-                  ? Math.min(
-                      100,
-                      Math.max(0, ((currentPlaybackActionIndex ?? 0) / totalActions) * 100),
-                    )
-                  : 0
-              }
-              mode={mode}
-              engineState={canvasEngineState}
-              isLiveSession={
-                chatIsStreaming ||
-                chatIsSoftClosing ||
-                isTopicPending ||
-                engineMode === 'live' ||
-                !!chatSessionType
-              }
-              isSoftClosing={chatIsSoftClosing}
-              softCloseDeadline={softCloseDeadline}
-              whiteboardOpen={whiteboardOpen}
-              sidebarCollapsed={sidebarCollapsed}
-              chatCollapsed={chatAreaCollapsed}
-              onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
-              onToggleChat={() => setChatAreaCollapsed(!chatAreaCollapsed)}
-              onPrevSlide={handlePreviousScene}
-              onNextSlide={handleNextScene}
-              onPlayPause={handlePlayPause}
-              onWhiteboardClose={handleWhiteboardToggle}
-              isPresenting={isPresenting}
-              onTogglePresentation={togglePresentation}
-              showStopDiscussion={
-                engineMode === 'live' ||
-                ((chatIsStreaming || chatIsSoftClosing) &&
-                  (chatSessionType === 'qa' || chatSessionType === 'discussion'))
-              }
-              onStopDiscussion={handleStopDiscussion}
-              onContinueDiscussion={handleContinueDiscussion}
-              showElementReference={showElementReference}
-              canPickSlideElement={canPickSlideElement}
-              elementPickActive={elementPickActive}
-              onToggleElementPick={handleToggleElementPick}
-              onPickElement={handlePickElement}
-              onCancelElementPick={() => setElementPickActive(false)}
-              hideToolbar={mode === 'playback' || (isPresenting && !controlsVisible)}
-              isPendingScene={isPendingScene}
-              isCourseComplete={isCourseComplete}
-              isGenerationFailed={
-                isPendingScene && failedOutlines.some((f) => f.id === generatingOutlines[0]?.id)
-              }
-              onRetryGeneration={
-                onRetryOutline && generatingOutlines[0]
-                  ? () => onRetryOutline(generatingOutlines[0].id)
-                  : undefined
-              }
-            />
+            {!isPresenting && (
+              <div className={classroomShellStyles.cognitionStageMeta}>
+                <div className="flex min-w-0 items-center gap-2">
+                  <span className={classroomShellStyles.cognitionStagePulse} aria-hidden="true" />
+                  <span className="truncate text-[10px] font-semibold uppercase tracking-[0.15em] text-primary">
+                    {locale === 'zh-CN' ? '认知舞台' : 'Cognition stage'}
+                  </span>
+                  <span className="h-3 w-px bg-border/80" aria-hidden="true" />
+                  <span
+                    data-testid="cognition-stage-type"
+                    className="truncate text-xs font-medium text-muted-foreground"
+                  >
+                    {currentSceneTypeLabel}
+                  </span>
+                </div>
+                <span className="shrink-0 text-[10px] font-semibold tracking-[0.1em] text-muted-foreground tabular-nums">
+                  {currentBlockLabel}
+                </span>
+              </div>
+            )}
+            <div className={classroomShellStyles.cognitionCanvas}>
+              <CanvasArea
+                currentScene={currentScene}
+                currentSceneIndex={currentSceneIndex}
+                scenesCount={totalScenesCount}
+                playbackProgress={
+                  totalActions > 0
+                    ? Math.min(
+                        100,
+                        Math.max(0, ((currentPlaybackActionIndex ?? 0) / totalActions) * 100),
+                      )
+                    : 0
+                }
+                mode={mode}
+                engineState={canvasEngineState}
+                isLiveSession={
+                  chatIsStreaming ||
+                  chatIsSoftClosing ||
+                  isTopicPending ||
+                  engineMode === 'live' ||
+                  !!chatSessionType
+                }
+                isSoftClosing={chatIsSoftClosing}
+                softCloseDeadline={softCloseDeadline}
+                whiteboardOpen={whiteboardOpen}
+                sidebarCollapsed={sidebarCollapsed}
+                chatCollapsed={chatAreaCollapsed}
+                onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
+                onToggleChat={() => setChatAreaCollapsed(!chatAreaCollapsed)}
+                onPrevSlide={handlePreviousScene}
+                onNextSlide={handleNextScene}
+                onPlayPause={handlePlayPause}
+                onWhiteboardClose={handleWhiteboardToggle}
+                isPresenting={isPresenting}
+                onTogglePresentation={togglePresentation}
+                showStopDiscussion={
+                  engineMode === 'live' ||
+                  ((chatIsStreaming || chatIsSoftClosing) &&
+                    (chatSessionType === 'qa' || chatSessionType === 'discussion'))
+                }
+                onStopDiscussion={handleStopDiscussion}
+                onContinueDiscussion={handleContinueDiscussion}
+                showElementReference={showElementReference}
+                canPickSlideElement={canPickSlideElement}
+                elementPickActive={elementPickActive}
+                onToggleElementPick={handleToggleElementPick}
+                onPickElement={handlePickElement}
+                onCancelElementPick={() => setElementPickActive(false)}
+                hideToolbar={mode === 'playback' || (isPresenting && !controlsVisible)}
+                isPendingScene={isPendingScene}
+                isCourseComplete={isCourseComplete}
+                isGenerationFailed={
+                  isPendingScene && failedOutlines.some((f) => f.id === generatingOutlines[0]?.id)
+                }
+                onRetryGeneration={
+                  onRetryOutline && generatingOutlines[0]
+                    ? () => onRetryOutline(generatingOutlines[0].id)
+                    : undefined
+                }
+              />
+            </div>
           </div>
 
           {/* Roundtable Area */}
