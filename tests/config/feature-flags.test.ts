@@ -3,6 +3,8 @@ import {
   isAgentRuntimeConfigured,
   isAgentRuntimeEnabled,
   isEditorRendererEnabled,
+  isLearningLoopAiEnabled,
+  isLearningLoopEnabled,
   isMaicEditorEnabled,
   isPlaybackRendererEnabled,
   isPiChatEnabled,
@@ -228,6 +230,36 @@ describe('isPiChatEnabled', () => {
 
     process.env[flag] = 'yes';
     expect(isPiChatEnabled()).toBe(false);
+  });
+});
+
+describe.each([
+  ['NEXT_PUBLIC_LEARNING_LOOP_ENABLED', isLearningLoopEnabled],
+  ['OPENMAIC_LEARNING_LOOP_AI_ENABLED', isLearningLoopAiEnabled],
+])('%s', (flag, readFlag) => {
+  let original: string | undefined;
+
+  beforeEach(() => {
+    original = process.env[flag];
+  });
+
+  afterEach(() => {
+    if (original === undefined) delete process.env[flag];
+    else process.env[flag] = original;
+  });
+
+  it('defaults off and accepts only the standard true values', () => {
+    delete process.env[flag];
+    expect(readFlag()).toBe(false);
+
+    process.env[flag] = 'true';
+    expect(readFlag()).toBe(true);
+    process.env[flag] = '1';
+    expect(readFlag()).toBe(true);
+    process.env[flag] = 'false';
+    expect(readFlag()).toBe(false);
+    process.env[flag] = 'yes';
+    expect(readFlag()).toBe(false);
   });
 });
 

@@ -303,6 +303,44 @@ export function runRuntimeStoreContract(name: string, makeStore: () => RuntimeSt
     });
 
     describe('learner ops', () => {
+      test('app-defined kinds participate in merge and deletion lifecycle operations', async () => {
+        const store = makeStore();
+        await store.createSession(makeSession({ id: 'journey-source', kind: 'learningJourney' }));
+        await store.appendRecord(
+          makeRecordInit('journey-source', {
+            payload: { type: 'scene_visited', componentId: 'kc:stage-1:scene-1' },
+          }),
+        );
+        await store.createSession(
+          makeSession({
+            id: 'journey-target',
+            kind: 'learningJourney',
+            learnerKey: 'user:42',
+          }),
+        );
+        await store.createSession(
+          makeSession({
+            id: 'journey-other-stage',
+            kind: 'learningJourney',
+            stageId: 'stage-2',
+          }),
+        );
+
+        expect(await store.mergeLearner('anon:device-1', 'user:42')).toBe(2);
+        expect(
+          (await store.listSessions('stage-1', 'user:42')).map((session) => session.id).sort(),
+        ).toEqual(['journey-source', 'journey-target']);
+
+        await store.deleteStageRuntime('stage-1');
+        expect(await store.getSession('journey-source')).toBeUndefined();
+        expect(await store.getSession('journey-target')).toBeUndefined();
+        expect(await store.listRecords('journey-source')).toEqual([]);
+        expect(await store.getSession('journey-other-stage')).toBeDefined();
+
+        await store.deleteAllRuntime();
+        expect(await store.getSession('journey-other-stage')).toBeUndefined();
+      });
+
       test('mergeLearner re-keys every session of the source learner across all stages', async () => {
         const store = makeStore();
         await store.createSession(makeSession({ id: 'from-1' }));

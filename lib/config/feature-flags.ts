@@ -74,6 +74,22 @@ export function isPiChatEnabled(): boolean {
 }
 
 /**
+ * Evidence-based classroom learning loop. Default OFF while the knowledge
+ * component, evidence, repair, and reporting slices land independently.
+ */
+export function isLearningLoopEnabled(): boolean {
+  return readBoolean(process.env.NEXT_PUBLIC_LEARNING_LOOP_ENABLED);
+}
+
+/**
+ * Server-only gate for AI-authored repair plans. The classroom may still use
+ * deterministic local repair templates when this is disabled.
+ */
+export function isLearningLoopAiEnabled(): boolean {
+  return readBoolean(process.env.OPENMAIC_LEARNING_LOOP_AI_ENABLED);
+}
+
+/**
  * Server-only selector for the Pi Child execution harness. Default OFF keeps
  * the existing Legacy JSON-action Child runtime.
  */
