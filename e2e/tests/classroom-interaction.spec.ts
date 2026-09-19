@@ -149,6 +149,11 @@ test.describe('Classroom Interaction', () => {
     await classroom.goto(TEST_STAGE_ID);
     await classroom.waitForLoaded();
 
+    const classroomShell = page.getByTestId('zhigou-classroom-shell');
+    await expect(classroomShell).toBeVisible();
+    await expect(classroomShell).toHaveAttribute('data-classroom-shell', 'zhigou');
+    await expect(classroomShell).toHaveAttribute('data-classroom-variant', 'page');
+
     // Sidebar shows 3 scenes
     await expect(classroom.sidebarScenes).toHaveCount(3, { timeout: 10_000 });
 

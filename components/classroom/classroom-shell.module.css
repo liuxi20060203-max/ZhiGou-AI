@@ -1,0 +1,45 @@
+.shell {
+  --classroom-ground: #edf4f6;
+  --classroom-surface: #ffffff;
+  --classroom-surface-soft: #f4f8fa;
+  --classroom-ink: #102a43;
+  --classroom-ink-muted: #5f7482;
+  --classroom-accent: #176b87;
+  --classroom-accent-soft: #ddf7f3;
+  --classroom-success: #2a9d8f;
+  --classroom-line: #d7e3e8;
+  --classroom-warning: #d98b3a;
+  --classroom-grid: rgb(16 42 67 / 0.035);
+  --classroom-motion-fast: 160ms;
+  --classroom-motion-panel: 220ms;
+
+  isolation: isolate;
+  position: relative;
+  color: var(--classroom-ink);
+  background-color: var(--classroom-ground);
+  background-image:
+    linear-gradient(to right, var(--classroom-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--classroom-grid) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+:global(.dark) .shell {
+  --classroom-ground: #071b23;
+  --classroom-surface: #102e39;
+  --classroom-surface-soft: #0c2530;
+  --classroom-ink: #eef7f8;
+  --classroom-ink-muted: #a5bbc1;
+  --classroom-accent: #4fb6c5;
+  --classroom-accent-soft: #123e43;
+  --classroom-success: #62c7b8;
+  --classroom-line: #294953;
+  --classroom-warning: #f2b66d;
+  --classroom-grid: rgb(238 247 248 / 0.045);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell {
+    --classroom-motion-fast: 0ms;
+    --classroom-motion-panel: 0ms;
+  }
+}
