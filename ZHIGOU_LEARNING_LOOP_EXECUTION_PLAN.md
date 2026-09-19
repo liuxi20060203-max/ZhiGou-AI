@@ -15,7 +15,8 @@
 - 执行分支：`feature/zhigou-learning-loop`；
 - Phase 0：已完成（2026-09-19）；
 - Phase 1：已完成（2026-09-19）；
-- 当前阶段：等待进入 Phase 2“学习证据与状态引擎”；
+- Phase 2：已完成（2026-09-19）；
+- 当前阶段：正在执行 Phase 3“自适应补学路径 MVP”；
 - Runtime 契约结论见 `LEARNING_LOOP_RUNTIME_CONTRACT.md`；
 - 功能默认关闭，现有课堂行为不变。
 

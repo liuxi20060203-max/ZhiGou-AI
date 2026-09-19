@@ -8,7 +8,7 @@ const VERIFICATION_EVIDENCE: LearningEvidenceType[] = [
   'verification_failed',
 ];
 
-function knowledgeComponentId(stageId: string, sceneId: string): string {
+export function knowledgeComponentId(stageId: string, sceneId: string): string {
   return `kc:${stageId}:${sceneId}`;
 }
 

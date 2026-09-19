@@ -2,6 +2,7 @@ import { isChatMessageSkeleton, isQuizAttemptSkeleton } from '@openmaic/dsl';
 import type { RuntimePayloadValidator } from '@openmaic/storage';
 
 import { whiteboardRuntimePayloadValidator } from '@/lib/whiteboard/runtime/validate';
+import { learningJourneyPayloadValidator } from '@/lib/learning-loop/validators';
 
 const chat: RuntimePayloadValidator = (payload) =>
   isChatMessageSkeleton(payload)
@@ -32,6 +33,7 @@ const quizAttempt: RuntimePayloadValidator = (payload) =>
 /** Complete app validator table. RuntimeStore options replace their defaults. */
 export const APP_RUNTIME_PAYLOAD_VALIDATORS = Object.freeze({
   chat,
+  learningJourney: learningJourneyPayloadValidator,
   quizAttempt,
   whiteboard: whiteboardRuntimePayloadValidator,
 }) satisfies Readonly<Record<string, RuntimePayloadValidator>>;

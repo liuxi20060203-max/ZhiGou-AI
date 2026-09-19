@@ -17,6 +17,10 @@ import { cn } from '@/lib/utils';
 import { useI18n } from '@/lib/hooks/use-i18n';
 import { getCurrentModelConfig } from '@/lib/utils/model-config';
 import { createLogger } from '@/lib/logger';
+import { isLearningLoopEnabled } from '@/lib/config/feature-flags';
+import { quizReviewedEvidence, quizReviewEvidenceAttemptId } from '@/lib/learning-loop/evidence';
+import { knowledgeComponentId } from '@/lib/learning-loop/knowledge-model';
+import { recordQuizReviewedEvidence } from '@/lib/learning-loop/runtime';
 
 const log = createLogger('QuizView');
 import type { QuizQuestion } from '@/lib/types/stage';
@@ -815,6 +819,32 @@ export function QuizView({ questions, sceneId, stageId }: QuizViewProps) {
       cancelled = true;
     };
   }, [phase, questions, answers, locale, sceneId, stageId, attemptId, runtimeWriter]);
+
+  useEffect(() => {
+    if (!isLearningLoopEnabled() || phase !== 'reviewing' || !attemptId || results.length === 0) {
+      return;
+    }
+    const occurredAt = new Date().toISOString();
+    const componentId = knowledgeComponentId(stageId, sceneId);
+    const evidenceAttemptId = quizReviewEvidenceAttemptId(attemptId, results);
+    void recordQuizReviewedEvidence({
+      stageId,
+      sceneId,
+      componentId,
+      attemptId: evidenceAttemptId,
+      evidence: results.map((result) =>
+        quizReviewedEvidence({
+          attemptId: evidenceAttemptId,
+          sceneId,
+          componentId,
+          result,
+          occurredAt,
+        }),
+      ),
+    }).catch((error) => {
+      log.warn('Failed to persist quiz learning evidence:', error);
+    });
+  }, [attemptId, phase, results, sceneId, stageId]);
 
   const handleRetry = useCallback(async () => {
     if (!attemptId || retrying) return;

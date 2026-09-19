@@ -25,8 +25,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { isLearningLoopEnabled } from '@/lib/config/feature-flags';
 import { useNearViewport } from '@/lib/hooks/use-near-viewport';
 import { useI18n } from '@/lib/hooks/use-i18n';
+import { learnerConfusionEvidence, sceneVisitedEvidence } from '@/lib/learning-loop/evidence';
+import { foldComponentLearningState } from '@/lib/learning-loop/fold';
 import { buildKnowledgeModel } from '@/lib/learning-loop/knowledge-model';
-import type { KnowledgeComponent } from '@/lib/learning-loop/types';
+import { appendLearningEvidence, notifyLearningJourneyChanged } from '@/lib/learning-loop/runtime';
+import type { ComponentLearningState } from '@/lib/learning-loop/fold';
+import type { KnowledgeComponent, LearningComponentStatus } from '@/lib/learning-loop/types';
+import { useLearningJourney } from '@/lib/learning-loop/use-learning-journey';
 import { useCanvasStore, useStageStore } from '@/lib/store';
 import { PENDING_SCENE_ID } from '@/lib/store/stage';
 import type { SceneType, SlideContent } from '@/lib/types/stage';
@@ -93,7 +98,74 @@ export function KnowledgePathSidebar({
       ),
     [knowledgeModel],
   );
+  const {
+    evidence,
+    error: evidenceReadError,
+    refresh: refreshEvidence,
+  } = useLearningJourney(stage?.id, learningLoopEnabled);
+  const [evidenceWriteFailed, setEvidenceWriteFailed] = useState(false);
+  const learningStateByComponentId = useMemo(
+    () =>
+      new Map(
+        (knowledgeModel?.components ?? []).map((component) => {
+          const state = foldComponentLearningState(component, evidence);
+          return [component.id, state] as const;
+        }),
+      ),
+    [evidence, knowledgeModel],
+  );
   const currentSceneIndex = scenes.findIndex((scene) => scene.id === currentSceneId);
+
+  useEffect(() => {
+    if (!learningLoopEnabled || !stage?.id || !currentSceneId) return;
+    const component = componentBySceneId.get(currentSceneId);
+    if (!component) return;
+    const occurredAt = new Date().toISOString();
+    void appendLearningEvidence(
+      stage.id,
+      sceneVisitedEvidence({
+        stageId: stage.id,
+        sceneId: currentSceneId,
+        componentId: component.id,
+        occurredAt,
+      }),
+    )
+      .then(() => {
+        setEvidenceWriteFailed(false);
+        notifyLearningJourneyChanged(stage.id);
+      })
+      .catch(() => setEvidenceWriteFailed(true));
+  }, [componentBySceneId, currentSceneId, learningLoopEnabled, stage?.id]);
+
+  const markConfusion = useCallback(
+    async (component: KnowledgeComponent) => {
+      if (!stage?.id) return;
+      const sceneId = component.sceneIds[0];
+      if (!sceneId) return;
+      const occurredAt = new Date().toISOString();
+      const randomPart =
+        typeof crypto !== 'undefined' && 'randomUUID' in crypto
+          ? crypto.randomUUID()
+          : `${Date.now()}`;
+      try {
+        await appendLearningEvidence(
+          stage.id,
+          learnerConfusionEvidence({
+            eventId: `confusion:${component.id}:${randomPart}`,
+            sceneId,
+            componentId: component.id,
+            occurredAt,
+          }),
+        );
+        setEvidenceWriteFailed(false);
+        notifyLearningJourneyChanged(stage.id);
+        await refreshEvidence();
+      } catch {
+        setEvidenceWriteFailed(true);
+      }
+    },
+    [refreshEvidence, stage?.id],
+  );
 
   useEffect(() => {
     activeNodeRef.current?.scrollIntoView({ block: 'nearest' });
@@ -276,18 +348,23 @@ export function KnowledgePathSidebar({
                 const isActive = currentSceneId === scene.id;
                 const isVisited = currentSceneIndex >= 0 && index < currentSceneIndex;
                 const knowledgeComponent = componentBySceneId.get(scene.id);
+                const learningState = knowledgeComponent
+                  ? learningStateByComponentId.get(knowledgeComponent.id)
+                  : undefined;
                 const Icon = SCENE_ICONS[scene.type] ?? BookOpen;
-                const status = isActive
-                  ? isChinese
-                    ? '构建中'
-                    : 'Building'
-                  : isVisited
+                const status = learningState
+                  ? learningStatusLabel(learningState.status, isChinese)
+                  : isActive
                     ? isChinese
-                      ? '已浏览'
-                      : 'Visited'
-                    : isChinese
-                      ? '待探索'
-                      : 'To explore';
+                      ? '构建中'
+                      : 'Building'
+                    : isVisited
+                      ? isChinese
+                        ? '已浏览'
+                        : 'Visited'
+                      : isChinese
+                        ? '待探索'
+                        : 'To explore';
                 const sceneNode = (
                   <button
                     key={scene.id}
@@ -296,6 +373,7 @@ export function KnowledgePathSidebar({
                     data-testid="scene-item"
                     data-knowledge-component-id={knowledgeComponent?.id}
                     data-knowledge-component-source={knowledgeComponent?.source}
+                    data-learning-status={learningState?.status}
                     data-scene-state={isActive ? 'current' : isVisited ? 'visited' : 'upcoming'}
                     onClick={() => selectScene(scene.id)}
                     aria-current={isActive ? 'step' : undefined}
@@ -401,7 +479,9 @@ export function KnowledgePathSidebar({
                       {sceneNode}
                       <KnowledgeComponentDetailsButton
                         component={knowledgeComponent}
+                        learningState={learningState}
                         isChinese={isChinese}
+                        onMarkConfusion={() => markConfusion(knowledgeComponent)}
                       />
                     </div>
                   ) : (
@@ -481,6 +561,16 @@ export function KnowledgePathSidebar({
             </div>
           </div>
         </div>
+        {learningLoopEnabled && (evidenceReadError || evidenceWriteFailed) && !collapsed && (
+          <div
+            role="status"
+            className="border-t border-amber-200/70 bg-amber-50/80 px-3 py-2 text-[10px] leading-4 text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-300"
+          >
+            {isChinese
+              ? '学习证据暂未同步，不影响继续学习。'
+              : 'Learning evidence is not synced yet. You can keep learning.'}
+          </div>
+        )}
       </aside>
     </TooltipProvider>
   );
@@ -488,10 +578,14 @@ export function KnowledgePathSidebar({
 
 function KnowledgeComponentDetailsButton({
   component,
+  learningState,
   isChinese,
+  onMarkConfusion,
 }: {
   readonly component: KnowledgeComponent;
+  readonly learningState?: ComponentLearningState;
   readonly isChinese: boolean;
+  readonly onMarkConfusion: () => Promise<void>;
 }) {
   return (
     <Popover>
@@ -523,7 +617,7 @@ function KnowledgeComponentDetailsButton({
             {isChinese ? '理解状态' : 'Understanding status'}
           </span>
           <span className="font-medium text-foreground">
-            {isChinese ? '尚未记录证据' : 'No evidence yet'}
+            {learningStatusLabel(learningState?.status ?? 'not_started', isChinese)}
           </span>
         </div>
         {component.objective && (
@@ -549,6 +643,30 @@ function KnowledgeComponentDetailsButton({
             </ul>
           </div>
         )}
+        {learningState && learningState.evidence.length > 0 && (
+          <div className="mt-3">
+            <p className="text-[10px] font-medium text-muted-foreground">
+              {isChinese ? '理解证据' : 'Understanding evidence'}
+            </p>
+            <ul className="mt-1.5 space-y-1.5" data-testid="learning-evidence-list">
+              {learningState.evidence.slice(-4).map((item) => (
+                <li
+                  key={item.eventId}
+                  className="rounded-lg bg-muted/40 px-2.5 py-2 text-[11px] text-foreground/80"
+                >
+                  {evidenceLabel(item.type, item.outcome, isChinese)}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={() => void onMarkConfusion()}
+          className="mt-3 w-full rounded-xl border border-primary/20 bg-primary/5 px-3 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35"
+        >
+          {isChinese ? '这里没懂' : "I don't understand this yet"}
+        </button>
         <p className="mt-3 border-t border-border/60 pt-2 text-[10px] text-muted-foreground/75">
           {component.source === 'outline-derived'
             ? isChinese
@@ -561,6 +679,29 @@ function KnowledgeComponentDetailsButton({
       </PopoverContent>
     </Popover>
   );
+}
+
+function learningStatusLabel(status: LearningComponentStatus, isChinese: boolean): string {
+  const labels: Record<LearningComponentStatus, readonly [string, string]> = {
+    not_started: ['未开始', 'Not started'],
+    in_progress: ['构建中', 'Building'],
+    evidence_available: ['已有证据', 'Evidence available'],
+    needs_revisit: ['建议回看', 'Revisit suggested'],
+    verified: ['已有验证', 'Verified'],
+  };
+  return labels[status][isChinese ? 0 : 1];
+}
+
+function evidenceLabel(type: string, outcome: string, isChinese: boolean): string {
+  if (type === 'scene_visited') return isChinese ? '已进入该知识构件' : 'Component visited';
+  if (type === 'learner_confusion') return isChinese ? '你标记了“这里没懂”' : 'Marked as unclear';
+  if (type === 'quiz_reviewed') {
+    if (outcome === 'supports') return isChinese ? '理解检测回答正确' : 'Quiz answer correct';
+    return isChinese ? '理解检测需要回看' : 'Quiz answer needs review';
+  }
+  if (type === 'verification_passed') return isChinese ? '补学验证通过' : 'Verification passed';
+  if (type === 'verification_failed') return isChinese ? '补学验证未通过' : 'Verification failed';
+  return isChinese ? '已记录一条学习证据' : 'Learning evidence recorded';
 }
 
 function PathStatusNode({
