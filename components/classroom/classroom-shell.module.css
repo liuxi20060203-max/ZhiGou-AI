@@ -44,6 +44,50 @@
   backdrop-filter: blur(18px) saturate(1.08);
 }
 
+.knowledgePath {
+  border-right: 1px solid color-mix(in srgb, var(--classroom-line) 88%, transparent);
+  background: color-mix(in srgb, var(--classroom-surface-soft) 91%, transparent);
+  box-shadow: 8px 0 28px -30px color-mix(in srgb, var(--classroom-ink) 42%, transparent);
+  backdrop-filter: blur(18px) saturate(1.05);
+}
+
+.knowledgePathCollapsed {
+  background: color-mix(in srgb, var(--classroom-surface) 94%, transparent);
+}
+
+.knowledgePathLine {
+  position: absolute;
+  top: 19px;
+  bottom: 19px;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--classroom-accent) 56%, var(--classroom-line)),
+    var(--classroom-line) 72%,
+    transparent
+  );
+}
+
+.knowledgeNode {
+  border: 1px solid transparent;
+}
+
+.knowledgeNodeActive {
+  border-color: color-mix(in srgb, var(--classroom-accent) 23%, var(--classroom-line));
+  background: color-mix(in srgb, var(--classroom-accent-soft) 70%, var(--classroom-surface));
+  box-shadow:
+    0 10px 24px -22px color-mix(in srgb, var(--classroom-accent) 70%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #ffffff 64%, transparent);
+}
+
+.knowledgeNodeDot {
+  box-shadow: 0 0 0 3px var(--classroom-surface-soft);
+}
+
+.shell[data-classroom-variant='pane'] .knowledgePath {
+  background: color-mix(in srgb, var(--classroom-surface) 96%, transparent);
+}
+
 .cognitionStage {
   display: flex;
   flex-direction: column;

@@ -159,9 +159,15 @@ test.describe('Classroom Interaction', () => {
     );
     await expect(page.getByTestId('cognition-stage')).toBeVisible();
     await expect(page.getByTestId('cognition-stage-type')).toHaveText('Course Explanation');
+    const knowledgePath = page.getByTestId('knowledge-path');
+    await expect(knowledgePath).toBeVisible();
+    await expect(knowledgePath).toHaveAccessibleName('Knowledge path');
 
     // Sidebar shows 3 scenes
     await expect(classroom.sidebarScenes).toHaveCount(3, { timeout: 10_000 });
+    await expect(classroom.sidebarScenes.nth(0)).toHaveAttribute('aria-current', 'step');
+    await expect(classroom.sidebarScenes.nth(0)).toHaveAttribute('data-scene-state', 'current');
+    await expect(classroom.sidebarScenes.nth(1)).toHaveAttribute('data-scene-state', 'upcoming');
 
     // First scene title visible
     await expect(classroom.getSceneTitle(0)).toContainText('基本概念');
@@ -178,7 +184,16 @@ test.describe('Classroom Interaction', () => {
     await expect(page.getByTestId('classroom-block-progress')).toHaveText(
       'Knowledge block 02 / 03',
     );
+    await expect(classroom.sidebarScenes.nth(0)).toHaveAttribute('data-scene-state', 'visited');
+    await expect(classroom.sidebarScenes.nth(1)).toHaveAttribute('aria-current', 'step');
     await expect(playbackProgress).toHaveAttribute('aria-valuenow', '33');
+
+    // Collapsed rail keeps every path node mounted and preserves the active scene.
+    await page.getByRole('button', { name: 'Collapse knowledge path' }).click();
+    await expect(classroom.sidebarScenes).toHaveCount(3);
+    await expect(classroom.sidebarScenes.nth(1)).toHaveAttribute('aria-current', 'step');
+    await page.getByRole('button', { name: 'Expand knowledge path' }).click();
+    await expect(page.getByRole('heading', { name: '光反应' })).toBeVisible();
   });
 
   test('caps and restores the non-presentation roundtable draft height', async ({ page }) => {
