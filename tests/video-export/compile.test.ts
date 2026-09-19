@@ -36,7 +36,7 @@ describe('compileVideoTimeline — end-to-end golden', () => {
   it('stamps the envelope + config', () => {
     expect(ir).toMatchObject({
       schema: 'openmaic.videoTimeline',
-      version: 4,
+      version: 5,
       compiler: 'openmaic-video-timeline',
       stage: { id: 'stg', name: 'Demo' },
       config: { playbackSpeed: 1, ttsEnabled: true, whiteboardInitiallyOpen: false },

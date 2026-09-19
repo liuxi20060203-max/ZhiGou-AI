@@ -29,6 +29,7 @@ import {
   type VideoResolution,
 } from '@/lib/video-export-app/export-options';
 import type { Locale } from '@/lib/i18n';
+import type { DigitalHumanProfile } from '@/lib/digital-human/types';
 
 const log = createLogger('VideoRenderStore');
 
@@ -56,16 +57,19 @@ export interface RenderOptions {
   quality?: VideoQuality;
   /** Burn subtitles into the MP4. Default false (sidecar SRT/VTT only). */
   burnInSubtitles?: boolean;
+  digitalHumanProfile?: DigitalHumanProfile;
 }
 
 /** Fully-resolved render options (the store always holds concrete values). */
-type ResolvedOptions = Required<RenderOptions>;
+type ResolvedOptions = Required<Omit<RenderOptions, 'digitalHumanProfile'>> &
+  Pick<RenderOptions, 'digitalHumanProfile'>;
 
 const DEFAULT_OPTIONS: ResolvedOptions = {
   resolution: '1080p',
   fps: 30,
   quality: 'standard',
   burnInSubtitles: false,
+  digitalHumanProfile: undefined,
 };
 
 interface JobStatusResponse {
@@ -122,7 +126,7 @@ export const useVideoRenderStore = create<VideoRenderState>()((set, get) => ({
     // Guard against a duplicate submit — the whole reason state lives here.
     if (inFlight(get().status)) return;
 
-    const { resolution, fps, quality, burnInSubtitles } = get().options;
+    const { resolution, fps, quality, burnInSubtitles, digitalHumanProfile } = get().options;
 
     set({ status: 'compiling', percent: 0, etaMs: null, filename: null, error: null });
     const toastId = toast.loading(t('export.videoCompiling'));
@@ -133,7 +137,15 @@ export const useVideoRenderStore = create<VideoRenderState>()((set, get) => ({
     let errorCount = 0;
     try {
       const { buildExportZip } = await import('@/lib/video-export-app/build-export-zip');
-      const built = await buildExportZip({ resolution, burnInSubtitles, locale });
+      const built = await buildExportZip({
+        resolution,
+        burnInSubtitles,
+        locale,
+        digitalHumanProfile,
+        digitalHumanFps: fps,
+        onDigitalHumanProgress: (progress) =>
+          set({ percent: Math.min(35, Math.round(progress * 0.35)) }),
+      });
       ({ zipBlob, stageName, missingCount, errorCount } = built);
     } catch (error) {
       if (error instanceof NoScenesError) {

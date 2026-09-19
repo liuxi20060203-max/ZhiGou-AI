@@ -58,6 +58,13 @@ export interface VideoManifestEntry {
 
 export type VideoManifest = Record<string, VideoManifestEntry>;
 
+/** Provider-neutral digital presenter binding. Remote vendor ids never enter a classroom file. */
+export interface StageDigitalHumanBinding {
+  /** Owner-scoped OpenMAIC profile id. Imports under another owner must rebind it. */
+  profileId: string;
+  placement: 'bottom-right';
+}
+
 /**
  * Provider-neutral vocal identity for an agent, described as a 3-layer recipe.
  * Consumed by any TTS integration: as an inline voice prompt where supported,
@@ -152,6 +159,8 @@ export interface Stage {
   // Generated video requests keyed by the mediaRef used by PPTVideoElement.
   // Runtime media state lives in the media task store / persisted media files.
   videoManifest?: VideoManifest;
+  /** Optional presenter used only by exported video; live classroom playback ignores it. */
+  digitalHuman?: StageDigitalHumanBinding;
   // Agent IDs selected when this classroom was created
   agentIds?: string[];
   /**

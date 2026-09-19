@@ -122,6 +122,11 @@ export function isVideoExportEnabled(): boolean {
   return readBoolean(process.env.NEXT_PUBLIC_ENABLE_VIDEO_EXPORT);
 }
 
+/** Digital-human export needs both the public rollout flag and server persistence. */
+export function isDigitalHumanExportEnabled(): boolean {
+  return readBoolean(process.env.NEXT_PUBLIC_ENABLE_DIGITAL_HUMAN_EXPORT);
+}
+
 /** Experimental PPTX import entry point. Default OFF. */
 export function isPptxImportEnabled(): boolean {
   return readBoolean(process.env.NEXT_PUBLIC_ENABLE_PPTX_IMPORT);

@@ -93,9 +93,11 @@ export function stubProbe(
 export function stubAssets(
   audio: Record<string, AssetMeta> = {},
   media: Record<string, AssetMeta> = {},
+  presenter: Record<string, AssetMeta> = {},
 ): AssetSource {
   return {
     audio: (a) => (a.id && a.id in audio ? audio[a.id] : null),
+    presenter: (a) => (a.id && a.id in presenter ? presenter[a.id] : null),
     media: (elementId) => (elementId in media ? media[elementId] : null),
   };
 }

@@ -8,6 +8,9 @@
  */
 import { createHash, randomUUID } from 'node:crypto';
 import { mkdtemp, rm } from 'node:fs/promises';
+import { readFile, rename } from 'node:fs/promises';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import { dirname, join } from 'node:path';
 import type { ArtifactStore } from './artifact-store.js';
 import { config } from './config.js';
@@ -27,6 +30,43 @@ import type {
  * responses so clients can react to backpressure without parsing prose.
  */
 export type RenderRejectionReason = 'queue_full' | 'per_identity_limit';
+
+const execFileAsync = promisify(execFile);
+
+/** Copy-only MP4 tagging for the implicit generated-content disclosure. */
+async function tagDigitalHumanOutput(projectDir: string, outputPath: string): Promise<void> {
+  const manifestPath = join(projectDir, 'openmaic-video-manifest.json');
+  const raw = await readFile(manifestPath, 'utf8').catch(() => '');
+  if (!raw) return;
+  let manifest: { generatedContent?: { digitalHuman?: boolean; metadataLabel?: string } };
+  try {
+    manifest = JSON.parse(raw);
+  } catch {
+    return;
+  }
+  if (!manifest.generatedContent?.digitalHuman) return;
+  const tagged = `${outputPath}.tagged.mp4`;
+  const ffmpeg = process.env.HYPERFRAMES_FFMPEG_PATH || process.env.FFMPEG_PATH || 'ffmpeg';
+  await execFileAsync(
+    ffmpeg,
+    [
+      '-y',
+      '-i',
+      outputPath,
+      '-map',
+      '0',
+      '-c',
+      'copy',
+      '-metadata',
+      `comment=${manifest.generatedContent.metadataLabel || 'AI-generated digital human / OpenMAIC'}`,
+      '-metadata',
+      'description=Contains AI-generated digital-human compositing',
+      tagged,
+    ],
+    { windowsHide: true },
+  );
+  await rename(tagged, outputPath);
+}
 
 /**
  * Thrown when admission control rejects a submission (mapped to HTTP 429).
@@ -298,6 +338,8 @@ export class RenderCoordinator {
         });
         return;
       }
+
+      await tagDigitalHumanOutput(projectDir, outputPath);
 
       await this.artifacts.put(id, outputPath);
       await this.jobs.update(id, {

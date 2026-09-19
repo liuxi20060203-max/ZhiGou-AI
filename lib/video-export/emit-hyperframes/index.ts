@@ -676,6 +676,19 @@ function renderNarration(scene: VideoTimelineScene): string[] {
     });
 }
 
+/** Muted teacher presenter: visible only for its narration window, above subtitles. */
+function renderPresenters(scene: VideoTimelineScene): string[] {
+  return scene.narration
+    .filter((seg) => seg.presenter?.present && seg.presenter.assetRef)
+    .map((seg, i) => {
+      const start = sec(seg.startMs);
+      const duration = sec(seg.durationMs);
+      const id = `scene-${scene.index + 1}-presenter-${i + 1}`;
+      const clip = `id="${id}" class="clip" data-start="${start}" data-duration="${duration}" data-track-index="3"`;
+      return `<div ${clip} style="position:absolute;right:2.2%;bottom:15%;width:22%;aspect-ratio:9/16;border-radius:18px;overflow:hidden;background:#111;box-shadow:0 8px 28px rgba(0,0,0,.28);z-index:35"><video src="${escapeHtml(assetUrl(seg.presenter!.assetRef!))}" muted playsinline style="width:100%;height:100%;object-fit:cover"></video><div style="position:absolute;right:8px;bottom:8px;padding:3px 7px;border-radius:999px;background:rgba(0,0,0,.72);color:#fff;font:600 12px/1.3 sans-serif">AI生成/数字人</div></div>`;
+    });
+}
+
 /**
  * Burned-in subtitle band layout. All sizes derive from the render height so the
  * captions read the same at any resolution; the fractions/ratios are the tuning
@@ -1281,6 +1294,7 @@ export function emitHyperframes(
     sceneHtml.push(...visuals.html);
     statements.push(...visuals.statements);
     sceneHtml.push(...renderVideo(scene));
+    sceneHtml.push(...renderPresenters(scene));
     sceneHtml.push(...renderNarration(scene));
 
     for (const effect of scene.effects) {

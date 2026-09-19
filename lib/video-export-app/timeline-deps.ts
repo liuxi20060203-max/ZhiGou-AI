@@ -58,6 +58,8 @@ export interface VideoTimelineRecords {
   videoDurationMsByElementId: Map<string, number>;
   /** Prepared self-contained HTML pages, addressable by asset id. */
   interactiveHtml: PreparedInteractiveHtmlSet;
+  /** Prepared muted presenter MP4s, keyed by speech action id. */
+  presenterByActionId?: Map<string, Blob>;
 }
 
 export interface VideoTimelineDeps {
@@ -216,8 +218,10 @@ export async function createVideoTimelineDeps(input: {
   skipGeometry?: boolean;
   /** Skip HTML inlining for subtitle-only compilation. */
   skipInteractiveHtml?: boolean;
+  presenterByActionId?: ReadonlyMap<string, Blob>;
 }): Promise<VideoTimelineDeps> {
   const { stage, scenes, skipGeometry = false, skipInteractiveHtml = false } = input;
+  const presenterByActionId = new Map(input.presenterByActionId ?? []);
 
   const interactiveHtml = skipInteractiveHtml
     ? emptyPreparedInteractiveHtmlSet()
@@ -433,6 +437,16 @@ export async function createVideoTimelineDeps(input: {
         present: record.blob.size > 0 || !!record.ossKey,
       };
     },
+    presenter(action: SpeechAction): AssetMeta | null {
+      const blob = presenterByActionId.get(action.id);
+      if (!blob) return null;
+      return {
+        id: `digital-human:${action.id}`,
+        mimeType: 'video/mp4',
+        format: 'mp4',
+        present: blob.size > 0,
+      };
+    },
     media(elementId: string, scene: SceneCore): AssetMeta | null {
       // `elementId` is the slide element `.id` a `play_video` targets; the media
       // records are keyed by the element's media ref, so bridge id → ref first,
@@ -505,6 +519,12 @@ export async function createVideoTimelineDeps(input: {
     assets,
     geometry,
     interactive: interactiveHtml,
-    records: { audioById, mediaByElementId, videoDurationMsByElementId, interactiveHtml },
+    records: {
+      audioById,
+      mediaByElementId,
+      videoDurationMsByElementId,
+      interactiveHtml,
+      presenterByActionId,
+    },
   };
 }

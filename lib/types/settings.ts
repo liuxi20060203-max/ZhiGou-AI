@@ -10,6 +10,7 @@ export type SettingsSection =
   | 'pdf'
   | 'image'
   | 'video'
+  | 'digital-human'
   | 'web-search'
   | 'skills';
 

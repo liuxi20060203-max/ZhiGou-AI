@@ -14,10 +14,11 @@ function plan(
   audio: Parameters<typeof stubAssets>[0] = {},
   media: Parameters<typeof stubAssets>[1] = {},
   probe = NO_PROBE,
+  presenter: Record<string, import('@/lib/video-export').AssetMeta> = {},
 ) {
   const source = normalizeScenes(scenes).scenes;
   const tl = buildTimeline(source, buildTimelineOptions(probe));
-  return planAssets(source, tl.scenes, stubAssets(audio, media));
+  return planAssets(source, tl.scenes, stubAssets(audio, media, presenter));
 }
 
 describe('sanitizeFilenamePart', () => {
@@ -28,6 +29,26 @@ describe('sanitizeFilenamePart', () => {
 });
 
 describe('planAssets — audio', () => {
+  it('plans a muted digital-human presenter beside its narration', () => {
+    const res = plan(
+      [slide('s', [speech('a', 'hi')])],
+      { a: { id: 'aud-a', present: true, format: 'mp3' } },
+      {},
+      NO_PROBE,
+      { a: { id: 'presenter-a', present: true, format: 'mp4', mimeType: 'video/mp4' } },
+    );
+    expect(res.scenes[0].narration[0].presenter).toMatchObject({
+      assetId: 'presenter-a',
+      present: true,
+      placement: 'bottom-right',
+      label: 'AI生成/数字人',
+      assetRef: 'digital-human/001-s/speech-001.mp4',
+    });
+    expect(res.plan.entries).toContainEqual(
+      expect.objectContaining({ kind: 'presenter', assetId: 'presenter-a' }),
+    );
+  });
+
   it('plans a present audio clip with an assetRef and a plan entry', () => {
     const res = plan([slide('s', [speech('a', 'hi')])], {
       a: { id: 'aud-a', present: true, format: 'mp3' },

@@ -304,6 +304,18 @@ export function validateStage(doc: unknown): ValidationResult {
   reqString(doc, 'name', '', errors);
   reqNumber(doc, 'createdAt', '', errors);
   reqNumber(doc, 'updatedAt', '', errors);
+  if (doc.digitalHuman !== undefined) {
+    if (!isObject(doc.digitalHuman))
+      errors.push({ path: '/digitalHuman', message: '`digitalHuman` must be an object' });
+    else {
+      reqString(doc.digitalHuman, 'profileId', '/digitalHuman', errors);
+      if (doc.digitalHuman.placement !== 'bottom-right')
+        errors.push({
+          path: '/digitalHuman/placement',
+          message: 'expected `bottom-right` placement',
+        });
+    }
+  }
   return done(errors);
 }
 

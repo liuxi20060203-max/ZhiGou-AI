@@ -18,7 +18,7 @@
  * "Download subtitles" button always yields an SRT the user can add in an editor.
  */
 import { useEffect, useState } from 'react';
-import { Film, Loader2, Download } from 'lucide-react';
+import { Film, Loader2, Download, UserRound } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -39,6 +39,8 @@ import {
   VIDEO_RESOLUTIONS,
   type VideoResolution,
 } from '@/lib/video-export-app/export-options';
+import type { DigitalHumanProfile } from '@/lib/digital-human/types';
+import { isDigitalHumanExportEnabled } from '@/lib/config/feature-flags';
 
 const RESOLUTIONS = Object.keys(VIDEO_RESOLUTIONS) as VideoResolution[];
 
@@ -107,6 +109,10 @@ export function VideoExportDialog({
   const { resolution, fps, quality, burnInSubtitles } = options;
   // undefined = unknown (still probing); true/false = capability answer.
   const [serviceEnabled, setServiceEnabled] = useState<boolean | undefined>(undefined);
+  const [digitalHumanEnabled, setDigitalHumanEnabled] = useState(false);
+  const [profiles, setProfiles] = useState<DigitalHumanProfile[]>([]);
+  const [profilesLoading, setProfilesLoading] = useState(false);
+  const digitalHumanFeature = isDigitalHumanExportEnabled();
 
   useEffect(() => {
     if (!open) return;
@@ -123,6 +129,21 @@ export function VideoExportDialog({
       active = false;
     };
   }, [open]);
+
+  useEffect(() => {
+    if (!open || !digitalHumanFeature) return;
+    fetch('/api/digital-human/profiles')
+      .then((r) => r.json())
+      .then((data: { profiles?: DigitalHumanProfile[] }) => {
+        const ready = (data.profiles ?? []).filter((profile) => profile.status === 'ready');
+        setProfiles(ready);
+        const selected = options.digitalHumanProfile;
+        if (selected && !ready.some((profile) => profile.id === selected.id))
+          setOptions({ digitalHumanProfile: undefined });
+      })
+      .catch(() => setProfiles([]))
+      .finally(() => setProfilesLoading(false));
+  }, [open, digitalHumanFeature, options.digitalHumanProfile, setOptions]);
 
   // Any in-flight export operation (ZIP build, in-app render, or subtitle
   // download) blocks the others — they share one compile/store critical section.
@@ -198,6 +219,60 @@ export function VideoExportDialog({
             </button>
           </div>
 
+          {digitalHumanFeature && serviceEnabled && (
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-3 flex flex-col gap-2">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-sm flex items-center gap-1.5">
+                    <UserRound className="w-3.5 h-3.5" />
+                    使用数字人
+                  </div>
+                  <div className="text-[11px] text-gray-400">
+                    仅在教师配音时显示；成片保留 AI 标识
+                  </div>
+                </div>
+                <Switch
+                  checked={digitalHumanEnabled}
+                  onCheckedChange={(checked) => {
+                    setDigitalHumanEnabled(checked);
+                    setOptions({ digitalHumanProfile: checked ? profiles[0] : undefined });
+                  }}
+                  disabled={busy || profilesLoading || profiles.length === 0}
+                />
+              </div>
+              {digitalHumanEnabled && (
+                <select
+                  className="w-full rounded-md border bg-background px-2 py-2 text-sm"
+                  value={options.digitalHumanProfile?.id || ''}
+                  onChange={(event) =>
+                    setOptions({
+                      digitalHumanProfile: profiles.find(
+                        (profile) => profile.id === event.target.value,
+                      ),
+                    })
+                  }
+                  disabled={busy}
+                >
+                  {profiles.map((profile) => (
+                    <option key={profile.id} value={profile.id}>
+                      {profile.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+              {!profilesLoading && profiles.length === 0 && (
+                <div className="text-[11px] text-amber-600">
+                  尚无已建模形象，请先在数字人设置中上传并完成授权。
+                </div>
+              )}
+              {digitalHumanEnabled && (
+                <div className="text-[11px] text-gray-400">
+                  生成按供应商计费；实际费用以供应商账单为准。失败后可重试，或关闭开关导出普通视频。
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Progress */}
           {rendering && (
             <div>
@@ -226,7 +301,13 @@ export function VideoExportDialog({
               </button>
             )}
             <button
-              onClick={() => exportVideo(resolution, burnInSubtitles)}
+              onClick={() =>
+                exportVideo(
+                  resolution,
+                  burnInSubtitles,
+                  digitalHumanEnabled ? options.digitalHumanProfile : undefined,
+                )
+              }
               disabled={busy}
               className="w-full px-2 py-2 text-sm rounded-md border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
             >

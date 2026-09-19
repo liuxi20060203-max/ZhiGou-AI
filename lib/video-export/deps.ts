@@ -101,6 +101,8 @@ export interface AssetMeta {
 export interface AssetSource {
   /** Audio asset backing a speech action, or null when it has none. */
   audio(action: SpeechAction): AssetMeta | null;
+  /** Muted digital-presenter clip for this narration, when prepared. */
+  presenter?(action: SpeechAction): AssetMeta | null;
   /** Media asset (image/video) for an element on a scene, or null when none. */
   media(elementId: string, scene: SceneCore): AssetMeta | null;
 }

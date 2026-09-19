@@ -212,6 +212,15 @@ export function compileVideoTimeline(input: CompileInput, deps: CompileDeps): Vi
       ttsEnabled: timeline.ttsEnabled,
       whiteboardInitiallyOpen: config.whiteboardInitiallyOpen ?? false,
     },
+    generatedContent: assets.scenes.some((scene) =>
+      scene.narration.some((segment) => segment.presenter?.present),
+    )
+      ? {
+          digitalHuman: true,
+          visibleLabel: 'AI生成/数字人',
+          metadataLabel: 'AI-generated digital human / OpenMAIC',
+        }
+      : { digitalHuman: false },
     totalDurationMs: reflow.totalDurationMs,
     scenes,
     subtitles: reflow.subtitles,
