@@ -29,6 +29,7 @@ import {
   Plus,
   CreditCard,
   Sparkles,
+  UserRound,
 } from 'lucide-react';
 import { useI18n } from '@/lib/hooks/use-i18n';
 import { useSettingsStore } from '@/lib/store/settings';
@@ -66,6 +67,7 @@ import { AddAudioProviderDialog, type NewAudioProviderData } from './add-audio-p
 import { isCustomTTSProvider, isCustomASRProvider } from '@/lib/audio/types';
 import { resolveASRProviderName, resolveTTSProviderName } from '@/lib/audio/provider-display';
 import type { SettingsSection, EditingModel } from '@/lib/types/settings';
+import { DigitalHumanSettings } from './digital-human-settings';
 
 // ─── Provider List Column (reusable) ───
 function ProviderListColumn<T extends string>({
@@ -686,6 +688,13 @@ export function SettingsDialog({ open, onOpenChange, initialSection }: SettingsD
           </>
         );
       }
+      case 'digital-human':
+        return (
+          <>
+            <UserRound className="h-6 w-6 text-muted-foreground" />
+            <h2 className="text-lg font-semibold">数字人服务</h2>
+          </>
+        );
       case 'tts': {
         const ttsIcon = TTS_PROVIDERS[ttsProviderId as keyof typeof TTS_PROVIDERS]?.icon;
         return (
@@ -802,6 +811,19 @@ export function SettingsDialog({ open, onOpenChange, initialSection }: SettingsD
             >
               <Volume2 className="h-4 w-4 shrink-0" />
               <span className="truncate">{t('settings.ttsSettings')}</span>
+            </button>
+
+            <button
+              onClick={() => setActiveSection('digital-human')}
+              className={cn(
+                'w-full flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors text-left min-w-0',
+                activeSection === 'digital-human'
+                  ? 'bg-primary/10 text-primary font-medium'
+                  : 'hover:bg-muted',
+              )}
+            >
+              <UserRound className="h-4 w-4 shrink-0" />
+              <span className="truncate">数字人服务</span>
             </button>
 
             <button
@@ -1116,6 +1138,7 @@ export function SettingsDialog({ open, onOpenChange, initialSection }: SettingsD
               {activeSection === 'video' && (
                 <VideoSettings selectedProviderId={selectedVideoProviderId} />
               )}
+              {activeSection === 'digital-human' && <DigitalHumanSettings />}
               {activeSection === 'tts' && <TTSSettings selectedProviderId={ttsProviderId} />}
               {activeSection === 'asr' && <ASRSettings selectedProviderId={asrProviderId} />}
             </div>

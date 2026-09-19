@@ -172,6 +172,31 @@ export function planAssets(
           message: `Audio asset "${meta.id}" is referenced but its bytes are unavailable.`,
         });
       }
+      const presenterMeta = action ? assetSource.presenter?.(action) : null;
+      let presenter;
+      if (presenterMeta) {
+        const planned = planner.plan(
+          presenterMeta.id,
+          'presenter',
+          `digital-human/${sceneSlug}/speech-${String(speechSeq).padStart(3, '0')}.mp4`,
+          presenterMeta.present,
+        );
+        presenter = {
+          assetId: presenterMeta.id,
+          ...(planned.present ? { assetRef: planned.path } : {}),
+          present: planned.present,
+          placement: 'bottom-right' as const,
+          label: 'AI生成/数字人' as const,
+        };
+        if (!planned.present)
+          diagnostics.push({
+            severity: 'error',
+            code: 'missing-digital-human',
+            sceneId: scene.id,
+            actionId: seg.actionId,
+            message: `Digital-human clip "${presenterMeta.id}" is unavailable.`,
+          });
+      }
       return {
         ...seg,
         audio: {
@@ -180,6 +205,7 @@ export function planAssets(
           present,
           ...(present ? { assetRef: path } : {}),
         },
+        ...(presenter ? { presenter } : {}),
       };
     });
 

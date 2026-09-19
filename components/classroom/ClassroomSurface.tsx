@@ -50,6 +50,7 @@ import {
   paneAvailabilityRetryDelay,
   shouldResumeClassroomGeneration,
 } from '@/lib/classroom/progressive-load-policy';
+import classroomShellStyles from './classroom-shell.module.css';
 
 const log = createLogger('Classroom');
 
@@ -319,7 +320,10 @@ export function ClassroomSurface({
     <ThemeProvider>
       <MediaStageProvider value={classroomId}>
         <div
-          className={
+          data-testid="zhigou-classroom-shell"
+          data-classroom-shell="zhigou"
+          data-classroom-variant={variant}
+          className={`${classroomShellStyles.shell} ${
             variant === 'pane'
               ? // A flex CHILD of the pane's row box, so it has to claim both
                 // axes explicitly: `h-full` alone leaves the width to shrink
@@ -327,7 +331,7 @@ export function ClassroomSurface({
                 // `absolute inset-0`) then has nothing to fill.
                 'flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden'
               : 'h-screen flex flex-col overflow-hidden'
-          }
+          }`}
         >
           {loading || (variant === 'pane' && !error && loadedClassroomId !== classroomId) ? (
             <ClassroomStatusState variant="loading" />

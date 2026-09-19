@@ -10,9 +10,12 @@ import { HeaderControls } from './stage/header-controls';
 import { useBrand } from '@/lib/brand/brand-context';
 import { useTheme } from '@/lib/hooks/use-theme';
 import { useStageStore } from '@/lib/store';
+import classroomShellStyles from '@/components/classroom/classroom-shell.module.css';
 
 interface HeaderProps {
   readonly currentSceneTitle: string;
+  readonly currentSceneIndex?: number;
+  readonly scenesCount?: number;
   readonly mode?: StageMode;
   readonly proModeActive?: boolean;
   readonly canEdit?: boolean;
@@ -36,6 +39,8 @@ interface HeaderProps {
 
 export function Header({
   currentSceneTitle,
+  currentSceneIndex = -1,
+  scenesCount = 0,
   mode,
   proModeActive,
   canEdit,
@@ -45,17 +50,29 @@ export function Header({
   hideGlobalControls,
   hideCourseActions,
 }: HeaderProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const router = useRouter();
   const searchParams = useSearchParams();
   const exitLabel = t(classroomExitLabelKey(searchParams));
   const brand = useBrand();
   const { resolvedTheme } = useTheme();
   const stageName = useStageStore((state) => state.stage?.name);
+  const currentBlockNumber = currentSceneIndex >= 0 ? currentSceneIndex + 1 : 0;
+  const blockProgressLabel =
+    locale === 'zh-CN'
+      ? `知识构件 ${currentBlockNumber.toString().padStart(2, '0')} / ${scenesCount
+          .toString()
+          .padStart(2, '0')}`
+      : `Knowledge block ${currentBlockNumber.toString().padStart(2, '0')} / ${scenesCount
+          .toString()
+          .padStart(2, '0')}`;
 
   return (
     <>
-      <header className="z-10 flex h-16 items-center justify-between gap-2 border-b border-border/70 bg-background/90 px-2 backdrop-blur-xl sm:gap-4 sm:px-5 md:px-7">
+      <header
+        data-testid="classroom-identity-bar"
+        className={`${classroomShellStyles.identityBar} z-10 flex h-16 items-center justify-between gap-2 px-2 sm:gap-4 sm:px-5 md:px-7`}
+      >
         <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
           {hideBackControl
             ? null
@@ -89,8 +106,8 @@ export function Header({
               briefly stack on top of the incoming EditChromeRoot's
               CommandBar title during the cross-fade. */}
           {mode !== 'edit' && (
-            <div className="flex min-w-0 flex-col">
-              <span className="mb-0.5 hidden truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground sm:block">
+            <div className="flex min-w-0 flex-col justify-center">
+              <span className="mb-0.5 hidden truncate text-[10px] font-semibold uppercase tracking-[0.15em] text-primary sm:block">
                 {stageName || t('stage.currentScene')}
               </span>
               <h1
@@ -99,6 +116,16 @@ export function Header({
               >
                 {currentSceneTitle || t('common.loading')}
               </h1>
+            </div>
+          )}
+          {mode !== 'edit' && scenesCount > 0 && (
+            <div
+              data-testid="classroom-block-progress"
+              className="ml-1 hidden shrink-0 items-center gap-2 rounded-full border border-primary/15 bg-primary/10 px-2.5 py-1 text-[10px] font-semibold tracking-[0.08em] text-primary lg:flex"
+              aria-label={blockProgressLabel}
+            >
+              <span className="size-1.5 rounded-full bg-primary shadow-[0_0_0_3px_color-mix(in_oklab,var(--primary)_12%,transparent)]" />
+              <span className="tabular-nums">{blockProgressLabel}</span>
             </div>
           )}
         </div>

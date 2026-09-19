@@ -32,7 +32,7 @@ import { SCENE_TYPES } from '@openmaic/dsl';
 export const VIDEO_TIMELINE_SCHEMA = 'openmaic.videoTimeline';
 
 /** IR/manifest version. Bump on any breaking shape change. */
-export const VIDEO_TIMELINE_VERSION = 4;
+export const VIDEO_TIMELINE_VERSION = 5;
 
 /** Compiler identity stamped into the manifest for provenance. */
 export const VIDEO_TIMELINE_COMPILER = 'openmaic-video-timeline';
@@ -91,6 +91,7 @@ export const DiagnosticCodeSchema = z.enum([
   'missing-interactive-html',
   'interactive-html-packaging',
   'unresolved-interactive-resource',
+  'missing-digital-human',
 ]);
 
 /** A recorded compile-time degradation or note. Never thrown away — first-class in the IR. */
@@ -220,6 +221,16 @@ export const NarrationSegmentSchema = z.object({
     source: DurationSourceSchema,
     present: z.boolean(),
   }),
+  /** Optional muted presenter clip driven by this narration's original TTS audio. */
+  presenter: z
+    .object({
+      assetId: z.string(),
+      assetRef: z.string().optional(),
+      present: z.boolean(),
+      placement: z.literal('bottom-right'),
+      label: z.literal('AI生成/数字人'),
+    })
+    .optional(),
 });
 
 /**
@@ -330,7 +341,15 @@ export const SubtitleCueSchema = z.object({
 });
 
 /** The kind of asset a plan entry bundles. */
-export const AssetKindSchema = z.enum(['audio', 'image', 'video', 'poster', 'frame', 'html']);
+export const AssetKindSchema = z.enum([
+  'audio',
+  'image',
+  'video',
+  'presenter',
+  'poster',
+  'frame',
+  'html',
+]);
 
 /**
  * A single planned asset in the export zip. The plan is layout + naming only —
@@ -377,6 +396,11 @@ export const VideoTimelineSchema = z.object({
   stage: z.object({ id: z.string(), name: z.string() }),
   canvas: CanvasSchema,
   config: TimelineConfigSchema,
+  generatedContent: z.object({
+    digitalHuman: z.boolean(),
+    visibleLabel: z.string().optional(),
+    metadataLabel: z.string().optional(),
+  }),
   totalDurationMs: z.number(),
   scenes: z.array(VideoTimelineSceneSchema),
   subtitles: z.array(SubtitleCueSchema),

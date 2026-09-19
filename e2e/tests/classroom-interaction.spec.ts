@@ -145,12 +145,56 @@ test.describe('Classroom Interaction', () => {
   });
 
   test('loads classroom and switches scenes', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
     const classroom = new ClassroomPage(page);
     await classroom.goto(TEST_STAGE_ID);
     await classroom.waitForLoaded();
 
+    const classroomShell = page.getByTestId('zhigou-classroom-shell');
+    await expect(classroomShell).toBeVisible();
+    await expect(classroomShell).toHaveAttribute('data-classroom-shell', 'zhigou');
+    await expect(classroomShell).toHaveAttribute('data-classroom-variant', 'page');
+    await expect(page.getByTestId('classroom-identity-bar')).toBeVisible();
+    await expect(page.getByTestId('classroom-block-progress')).toHaveText(
+      'Knowledge block 01 / 03',
+    );
+    await expect(page.getByTestId('cognition-stage')).toBeVisible();
+    await expect(page.getByTestId('cognition-stage-type')).toHaveText('Course Explanation');
+    const knowledgePath = page.getByTestId('knowledge-path');
+    await expect(knowledgePath).toBeVisible();
+    await expect(knowledgePath).toHaveAccessibleName('Knowledge path');
+    await expect(page.getByTestId('learning-console')).toBeVisible();
+    const coThinkingDock = page.getByTestId('roundtable-learning-dock');
+    const coThinkingSummary = page.getByTestId('co-thinking-summary');
+    await expect(coThinkingDock).toHaveAttribute('data-co-thinking-state', 'summary');
+    const assistant = page.getByTestId('zhigou-assistant');
+    await expect(assistant).toBeVisible();
+    await expect(assistant).toHaveAttribute('data-assistant-state', 'idle');
+    await page.getByRole('button', { name: 'Expand ZhiGou tutor' }).click();
+    await expect(page.getByTestId('assistant-title')).toHaveText('ZhiGou tutor');
+    await expect(page.getByText(/Following knowledge block 1/)).toBeVisible();
+    const askTab = page.getByRole('tab', { name: 'Ask' });
+    await askTab.click();
+    await expect(askTab).toHaveAttribute('data-state', 'active');
+    await expect(page.getByTestId('assistant-quick-prompt')).toHaveCount(4);
+    await expect(page.getByTestId('assistant-quick-prompt').first()).toBeVisible();
+    await page.getByRole('button', { name: 'Collapse ZhiGou tutor' }).click();
+    await expect(page.getByRole('button', { name: 'Expand ZhiGou tutor' })).toBeVisible();
+    await page.getByRole('button', { name: 'Expand ZhiGou tutor' }).click();
+    await expect(askTab).toHaveAttribute('data-state', 'active');
+    await page.getByRole('button', { name: 'Collapse ZhiGou tutor' }).click();
+    await expect(coThinkingSummary).toBeVisible();
+    await expect(coThinkingSummary).toHaveAttribute('aria-expanded', 'false');
+    await coThinkingSummary.click();
+    await expect(coThinkingDock).toHaveAttribute('data-co-thinking-state', 'expanded');
+    await page.getByRole('button', { name: 'Collapse co-thinking dock' }).click();
+    await expect(coThinkingDock).toHaveAttribute('data-co-thinking-state', 'summary');
+
     // Sidebar shows 3 scenes
     await expect(classroom.sidebarScenes).toHaveCount(3, { timeout: 10_000 });
+    await expect(classroom.sidebarScenes.nth(0)).toHaveAttribute('aria-current', 'step');
+    await expect(classroom.sidebarScenes.nth(0)).toHaveAttribute('data-scene-state', 'current');
+    await expect(classroom.sidebarScenes.nth(1)).toHaveAttribute('data-scene-state', 'upcoming');
 
     // First scene title visible
     await expect(classroom.getSceneTitle(0)).toContainText('基本概念');
@@ -164,7 +208,81 @@ test.describe('Classroom Interaction', () => {
 
     // Verify second scene is now active — heading in the top bar shows the current scene name
     await expect(page.getByRole('heading', { name: '光反应' })).toBeVisible();
+    await expect(page.getByTestId('classroom-block-progress')).toHaveText(
+      'Knowledge block 02 / 03',
+    );
+    await expect(classroom.sidebarScenes.nth(0)).toHaveAttribute('data-scene-state', 'visited');
+    await expect(classroom.sidebarScenes.nth(1)).toHaveAttribute('aria-current', 'step');
+    await expect(assistant).toContainText('Following knowledge block 2');
     await expect(playbackProgress).toHaveAttribute('aria-valuenow', '33');
+
+    // Collapsed rail keeps every path node mounted and preserves the active scene.
+    await page.getByRole('button', { name: 'Collapse knowledge path' }).click();
+    await expect(classroom.sidebarScenes).toHaveCount(3);
+    await expect(classroom.sidebarScenes.nth(1)).toHaveAttribute('aria-current', 'step');
+    await page.getByRole('button', { name: 'Expand knowledge path' }).click();
+    await expect(page.getByRole('heading', { name: '光反应' })).toBeVisible();
+  });
+
+  test('reflows the knowledge path and assistant on tablet', async ({ page }) => {
+    await page.setViewportSize({ width: 768, height: 900 });
+    const classroom = new ClassroomPage(page);
+    await classroom.goto(TEST_STAGE_ID);
+    await classroom.waitForLoaded();
+
+    const pathBox = await page.getByTestId('knowledge-path').boundingBox();
+    expect(pathBox).not.toBeNull();
+    expect(pathBox!.width).toBeGreaterThanOrEqual(740);
+    expect(pathBox!.height).toBeLessThanOrEqual(74);
+    await expect(page.getByTestId('scene-list')).toBeVisible();
+
+    const assistant = page.getByTestId('zhigou-assistant');
+    await expect(assistant).toHaveAttribute('data-collapsed', 'true');
+    const assistantBox = await assistant.boundingBox();
+    expect(assistantBox).not.toBeNull();
+    expect(assistantBox!.width).toBeLessThanOrEqual(54);
+    await expect(page.getByTestId('cognition-stage')).toBeVisible();
+  });
+
+  test('uses state-preserving bottom panels on phone', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    const classroom = new ClassroomPage(page);
+    await classroom.goto(TEST_STAGE_ID);
+    await classroom.waitForLoaded();
+
+    const knowledgePath = page.getByTestId('knowledge-path');
+    await expect(knowledgePath).toHaveAttribute('data-collapsed', 'true');
+    let pathBox = await knowledgePath.boundingBox();
+    expect(pathBox).not.toBeNull();
+    expect(pathBox!.width).toBeLessThanOrEqual(50);
+    expect(pathBox!.height).toBeLessThanOrEqual(50);
+
+    await page.getByRole('button', { name: 'Expand knowledge path' }).click();
+    await expect(knowledgePath).toHaveAttribute('data-collapsed', 'false');
+    pathBox = await knowledgePath.boundingBox();
+    expect(pathBox).not.toBeNull();
+    expect(pathBox!.width).toBeGreaterThanOrEqual(350);
+    expect(pathBox!.height).toBeLessThanOrEqual(440);
+    await expect(classroom.sidebarScenes.nth(0)).toBeVisible();
+    await page.getByRole('button', { name: 'Collapse knowledge path' }).click();
+    await expect
+      .poll(async () => (await knowledgePath.boundingBox())?.width ?? Number.POSITIVE_INFINITY)
+      .toBeLessThanOrEqual(50);
+
+    const assistant = page.getByTestId('zhigou-assistant');
+    await expect(assistant).toHaveAttribute('data-collapsed', 'true');
+    await page.getByRole('button', { name: 'Expand ZhiGou tutor' }).click();
+    await expect(assistant).toHaveAttribute('data-collapsed', 'false');
+    await expect
+      .poll(async () => (await assistant.boundingBox())?.width ?? 0)
+      .toBeGreaterThanOrEqual(350);
+    const assistantBox = await assistant.boundingBox();
+    expect(assistantBox).not.toBeNull();
+    expect(assistantBox!.width).toBeGreaterThanOrEqual(350);
+    expect(assistantBox!.height).toBeLessThanOrEqual(530);
+    await expect(page.getByTestId('assistant-title')).toBeVisible();
+    await page.getByRole('button', { name: 'Collapse ZhiGou tutor' }).click();
+    await expect(page.getByTestId('cognition-stage')).toBeVisible();
   });
 
   test('caps and restores the non-presentation roundtable draft height', async ({ page }) => {
@@ -173,7 +291,10 @@ test.describe('Classroom Interaction', () => {
     await classroom.waitForLoaded();
 
     await page.keyboard.press('T');
-    const textarea = page.getByPlaceholder('Type your message...', { exact: true });
+    const coThinkingDock = page.getByTestId('roundtable-learning-dock');
+    await expect(coThinkingDock).toHaveAttribute('data-co-thinking-state', 'active');
+    await expect(page.getByRole('button', { name: 'Collapse co-thinking dock' })).toBeDisabled();
+    const textarea = page.getByPlaceholder('Write your judgment or question', { exact: true });
     const inputStage = page.getByTestId('roundtable-non-presentation-input-stage');
     await expect(textarea).toBeVisible();
 
@@ -301,6 +422,7 @@ test.describe('Classroom Interaction', () => {
         });
     };
 
+    await page.getByRole('button', { name: 'More classroom tools' }).click();
     await page.getByRole('button', { name: 'EN', exact: true }).click();
     await expect(page.getByRole('menuitem', { name: 'English' })).toBeVisible();
     await expectBodyScrollState(false);

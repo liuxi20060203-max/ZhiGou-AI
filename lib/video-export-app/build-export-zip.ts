@@ -24,6 +24,8 @@ import { getVideoExportCoverLabels, resolveVideoExportCta } from './cover-config
 import { NoScenesError, VIDEO_RESOLUTIONS, type VideoResolution } from './export-options';
 import { createQuizLayoutProbe } from './quiz-layout';
 import { packageVideoZip } from './package-zip';
+import type { DigitalHumanProfile } from '@/lib/digital-human/types';
+import { prepareDigitalHumanClips } from '@/lib/digital-human/prepare-export';
 
 export {
   NoScenesError,
@@ -77,6 +79,7 @@ async function compileStageIr(options: {
   labels: ReturnType<typeof getVideoExportCoverLabels>;
   skipGeometry?: boolean;
   skipInteractiveHtml?: boolean;
+  presenterByActionId?: ReadonlyMap<string, Blob>;
 }): Promise<{
   ir: ReturnType<typeof compileVideoTimeline>;
   stageName: string;
@@ -98,6 +101,7 @@ async function compileStageIr(options: {
       scenes,
       skipGeometry: options.skipGeometry,
       skipInteractiveHtml: options.skipInteractiveHtml,
+      presenterByActionId: options.presenterByActionId,
     }),
     createQuizLayoutProbe({
       scenes,
@@ -128,6 +132,11 @@ export interface BuildExportZipOptions {
   burnInSubtitles?: boolean;
   /** Locale the card chrome and the emitted document are written in. */
   locale: Locale;
+  /** Successfully prepared, muted H.264 presenter clips keyed by speech action id. */
+  presenterByActionId?: ReadonlyMap<string, Blob>;
+  digitalHumanProfile?: DigitalHumanProfile;
+  digitalHumanFps?: number;
+  onDigitalHumanProgress?: (progress: number) => void;
 }
 
 /**
@@ -148,11 +157,49 @@ export async function buildExportZip(
   const cta = configuredVideoExportCta();
 
   // 1. DI deps (Dexie durations + asset presence + measured geometry) → 2. pure compile.
-  const { ir, stageName, scenes, deps } = await compileStageIr({
+  const compiled = await compileStageIr({
     resolution,
     locale,
     labels,
+    presenterByActionId: options.presenterByActionId,
   });
+  let ir = compiled.ir;
+  const { stageName, scenes, deps } = compiled;
+
+  if (options.digitalHumanProfile && !options.presenterByActionId) {
+    const prepared = await prepareDigitalHumanClips({
+      profile: options.digitalHumanProfile,
+      scenes,
+      records: deps.records,
+      width,
+      height,
+      fps: options.digitalHumanFps ?? 30,
+      onProgress: options.onDigitalHumanProgress,
+    });
+    deps.records.presenterByActionId = prepared;
+    deps.assets.presenter = (action) => {
+      const blob = prepared.get(action.id);
+      return blob
+        ? {
+            id: `digital-human:${action.id}`,
+            mimeType: 'video/mp4',
+            format: 'mp4',
+            present: blob.size > 0,
+          }
+        : null;
+    };
+    const current = useStageStore.getState().stage!;
+    ir = compileVideoTimeline(
+      { stage: { id: current.id, name: stageName }, scenes },
+      {
+        timing: deps.timing,
+        assets: deps.assets,
+        geometry: deps.geometry,
+        interactive: deps.interactive,
+        quizLayout: await createQuizLayoutProbe({ scenes, width, height, locale, labels }),
+      },
+    );
+  }
 
   // 3. emit the Hyperframes project text.
   const project = emitHyperframes(ir, {

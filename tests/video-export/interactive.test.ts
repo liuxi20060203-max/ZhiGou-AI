@@ -133,7 +133,7 @@ describe('compileVideoTimeline — static interactive HTML', () => {
     const list = ir.scenes[0].visuals.find((visual) => visual.kind === 'quiz-question-list');
     if (!list || list.kind !== 'quiz-question-list') throw new Error('Quiz list not planned');
 
-    expect(ir.version).toBe(4);
+    expect(ir.version).toBe(5);
     expect(() => VideoTimelineSchema.parse(ir)).not.toThrow();
     expect(ir.scenes[1]).toMatchObject({
       startMs: baseline.scenes[1].startMs + list.durationMs,

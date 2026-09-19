@@ -364,6 +364,13 @@ export async function collectVideoAssets(
         const bytes = await resolveBytes(record?.blob, record?.ossKey);
         if (bytes) blobs.set(entry.path, bytes);
         else missing.push(entry.path);
+      } else if (entry.kind === 'presenter') {
+        const actionId = entry.assetId.startsWith('digital-human:')
+          ? entry.assetId.slice('digital-human:'.length)
+          : '';
+        const bytes = records.presenterByActionId?.get(actionId);
+        if (bytes?.size) blobs.set(entry.path, bytes);
+        else missing.push(entry.path);
       } else if (entry.kind === 'video' || entry.kind === 'image') {
         const record = mediaById.get(entry.assetId);
         const bytes = await resolveMediaBytesWithFallback(

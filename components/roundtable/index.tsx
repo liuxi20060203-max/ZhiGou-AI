@@ -17,8 +17,12 @@ import {
   Volume2,
   Quote,
   X,
+  ChevronDown,
+  ChevronUp,
+  Users,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import classroomShellStyles from '@/components/classroom/classroom-shell.module.css';
 import type { AudioIndicatorState } from './audio-indicator';
 import { CanvasToolbar } from '@/components/canvas/canvas-toolbar';
 import { useAudioRecorder } from '@/lib/hooks/use-audio-recorder';
@@ -43,6 +47,8 @@ export interface DiscussionRequest {
 }
 
 interface RoundtableProps {
+  readonly collapsed?: boolean;
+  readonly onCollapsedChange?: (collapsed: boolean) => void;
   readonly mode?: 'playback' | 'autonomous';
   readonly initialParticipants?: Participant[];
   readonly playbackView?: PlaybackView; // Centralised derived state from Stage
@@ -151,6 +157,8 @@ function VoiceWaveformBars({ barClassName }: { readonly barClassName: string }) 
 }
 
 export function Roundtable({
+  collapsed = false,
+  onCollapsedChange,
   mode: _mode = 'autonomous',
   initialParticipants = [],
   playbackView,
@@ -210,7 +218,7 @@ export function Roundtable({
   elementReferencePill,
   onClearElementReference,
 }: RoundtableProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const ttsMuted = useSettingsStore((s) => s.ttsMuted);
   const setTTSMuted = useSettingsStore((s) => s.setTTSMuted);
   const ttsEnabled = useSettingsStore((state) => state.ttsEnabled);
@@ -615,6 +623,32 @@ export function Roundtable({
   // brief loading gaps (e.g. between user message and agent SSE response).
   const showStopButton =
     engineMode === 'live' || sessionType === 'qa' || sessionType === 'discussion';
+  const coThinkingActive = Boolean(
+    isInputOpen ||
+    isVoiceOpen ||
+    isRecording ||
+    isProcessing ||
+    isStreaming ||
+    sessionType ||
+    speakingAgentId ||
+    thinkingState ||
+    discussionRequest ||
+    isCueUser ||
+    isTopicPending ||
+    isSoftClosing,
+  );
+
+  useEffect(() => {
+    if (coThinkingActive && collapsed) onCollapsedChange?.(false);
+  }, [coThinkingActive, collapsed, onCollapsedChange]);
+
+  const coThinkingStatus = coThinkingActive
+    ? locale === 'zh-CN'
+      ? '共思进行中'
+      : 'Co-thinking in progress'
+    : locale === 'zh-CN'
+      ? '等待下一次共思'
+      : 'Ready for the next exchange';
 
   const coursePlaybackProgress = getCoursePlaybackProgress({
     currentSceneIndex,
@@ -679,7 +713,7 @@ export function Roundtable({
     isProcessing;
   const toolbar = (
     <CanvasToolbar
-      className="shrink-0 h-9 border-b border-primary/15 bg-card/75 px-4 backdrop-blur-xl dark:border-primary/20 dark:bg-card/45"
+      className="h-14 shrink-0 border-b border-primary/15 bg-card/75 px-4 backdrop-blur-xl dark:border-primary/20 dark:bg-card/45"
       currentSceneIndex={currentSceneIndex}
       scenesCount={scenesCount}
       engineState={
@@ -1151,8 +1185,10 @@ export function Roundtable({
   return (
     <div
       data-testid="roundtable-learning-dock"
+      data-co-thinking-state={collapsed ? 'summary' : coThinkingActive ? 'active' : 'expanded'}
       className={cn(
-        'relative z-10 flex h-[192px] w-full flex-col overflow-hidden transition-all duration-300 sm:h-[200px]',
+        'relative z-10 flex w-full flex-col overflow-hidden transition-[height] duration-300',
+        collapsed ? 'h-[108px]' : 'h-[220px]',
         isPresenting && !controlsVisible
           ? 'border-t border-transparent bg-transparent backdrop-blur-none'
           : 'border-t border-primary/15 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--background)_92%,var(--primary)_8%),var(--background))] shadow-[0_-18px_48px_-34px_color-mix(in_oklab,var(--primary)_48%,transparent)] backdrop-blur-xl',
@@ -1167,8 +1203,79 @@ export function Roundtable({
       >
         {toolbar}
       </div>
+      {/* ── Co-thinking summary — remains mounted beside the full surface. ── */}
+      <button
+        type="button"
+        data-testid="co-thinking-summary"
+        onClick={() => onCollapsedChange?.(false)}
+        aria-expanded={!collapsed}
+        className={cn(
+          classroomShellStyles.coThinkingSummary,
+          'flex shrink-0 items-center gap-3 overflow-hidden border-t border-primary/10 bg-[color:var(--classroom-surface)] px-4 text-left transition-all duration-300',
+          collapsed ? 'h-[52px] opacity-100' : 'pointer-events-none h-0 border-t-0 opacity-0',
+        )}
+      >
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <Users className="size-4" aria-hidden="true" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-[10px] font-semibold uppercase tracking-[0.15em] text-primary">
+            {locale === 'zh-CN' ? '共思台' : 'Co-thinking dock'}
+          </span>
+          <span className="block truncate text-xs text-muted-foreground">{coThinkingStatus}</span>
+        </span>
+        <span className="hidden items-center gap-1.5 text-[10px] font-medium text-muted-foreground sm:flex">
+          <span className="flex -space-x-1.5" aria-hidden="true">
+            {initialParticipants.slice(0, 3).map((participant) => (
+              <span
+                key={participant.id}
+                className="size-5 overflow-hidden rounded-full border-2 border-background bg-muted"
+              >
+                {participant.avatar && (
+                  <img src={participant.avatar} alt="" className="size-full object-cover" />
+                )}
+              </span>
+            ))}
+          </span>
+          {initialParticipants.length}
+        </span>
+        <ChevronUp className="size-4 shrink-0 text-primary" aria-hidden="true" />
+      </button>
       {/* ── Interaction area — three-column layout ── */}
-      <div className="flex-1 flex items-stretch min-h-0">
+      <div
+        className={cn(
+          'relative flex min-h-0 flex-1 items-stretch transition-opacity duration-200',
+          collapsed && 'pointer-events-none opacity-0',
+        )}
+      >
+        <div className="pointer-events-none absolute inset-x-0 top-1 z-40 flex items-center justify-center">
+          <span className="rounded-full border border-primary/15 bg-background/90 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-primary shadow-sm backdrop-blur">
+            {discussionRequest
+              ? locale === 'zh-CN'
+                ? '引导问题'
+                : 'Guiding question'
+              : locale === 'zh-CN'
+                ? '共思台'
+                : 'Co-thinking dock'}
+          </span>
+        </div>
+        <button
+          data-co-thinking-collapse
+          type="button"
+          onClick={() => onCollapsedChange?.(true)}
+          disabled={coThinkingActive}
+          className="absolute right-3 top-2 z-50 flex size-7 items-center justify-center rounded-lg border border-border/70 bg-background/85 text-muted-foreground shadow-sm transition-colors hover:bg-primary/10 hover:text-primary disabled:cursor-not-allowed disabled:opacity-35"
+          aria-label={locale === 'zh-CN' ? '收起共思台' : 'Collapse co-thinking dock'}
+          title={
+            coThinkingActive
+              ? locale === 'zh-CN'
+                ? '共思进行中，暂不可收起'
+                : 'Co-thinking is active'
+              : undefined
+          }
+        >
+          <ChevronDown className="size-4" />
+        </button>
         {/* Left: Teacher identity */}
         <div
           className={cn(
@@ -1379,7 +1486,11 @@ export function Roundtable({
                             handleSendMessage();
                           }
                         }}
-                        placeholder={t('roundtable.inputPlaceholder')}
+                        placeholder={
+                          locale === 'zh-CN'
+                            ? '写下你的判断或疑问'
+                            : 'Write your judgment or question'
+                        }
                         autoFocus
                         rows={1}
                         className="w-full resize-none overflow-y-auto bg-transparent border-none focus:ring-0 focus:outline-none outline-none shadow-none ring-0 text-gray-700 dark:text-gray-200 text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 min-h-[40px] max-h-[100px]"

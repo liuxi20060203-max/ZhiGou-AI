@@ -18,6 +18,7 @@ import { useAgentRegistry } from '@/lib/orchestration/registry/store';
 import { fetchStageMeta } from '@/lib/classroom/stage-meta-client';
 import { noteStageOwnership } from '@/lib/classroom/stage-ownership-signal';
 import { ClassroomStatusState } from '@/components/classroom/classroom-status-state';
+import classroomShellStyles from '@/components/classroom/classroom-shell.module.css';
 import {
   applyClassroomStageAndScenes,
   defaultClassroomLoadDeps,
@@ -224,7 +225,12 @@ export default function ClassroomDetailPage() {
   return (
     <ThemeProvider>
       <MediaStageProvider value={classroomId}>
-        <div className="h-screen flex flex-col overflow-hidden">
+        <div
+          data-testid="zhigou-classroom-shell"
+          data-classroom-shell="zhigou"
+          data-classroom-variant="page"
+          className={`${classroomShellStyles.shell} h-screen flex flex-col overflow-hidden`}
+        >
           {loading ? (
             <ClassroomStatusState variant="loading" />
           ) : error ? (

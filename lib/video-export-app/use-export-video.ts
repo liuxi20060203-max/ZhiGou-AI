@@ -24,6 +24,7 @@ import {
   VIDEO_RESOLUTIONS,
   type VideoResolution,
 } from './export-options';
+import type { DigitalHumanProfile } from '@/lib/digital-human/types';
 
 const log = createLogger('ExportVideo');
 
@@ -36,7 +37,11 @@ export function useExportVideo() {
   const { t, locale } = useI18n();
 
   const exportVideo = useCallback(
-    async (resolution: VideoResolution = '1080p', burnInSubtitles = false) => {
+    async (
+      resolution: VideoResolution = '1080p',
+      burnInSubtitles = false,
+      digitalHumanProfile?: DigitalHumanProfile,
+    ) => {
       // Shared with the subtitles-only download: only one export operation reads
       // the stage store / Dexie / off-screen renders at a time.
       if (!acquireExport()) return;
@@ -51,6 +56,7 @@ export function useExportVideo() {
           resolution,
           burnInSubtitles,
           locale,
+          digitalHumanProfile,
         });
 
         toast.loading(t('export.videoPackaging'), { id: toastId });
