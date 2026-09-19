@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   AlertCircle,
   BookOpen,
@@ -9,6 +9,7 @@ import {
   Cpu,
   Eye,
   EyeOff,
+  Info,
   Loader2,
   MousePointer2,
   PanelLeftClose,
@@ -20,8 +21,12 @@ import {
 } from 'lucide-react';
 import { SlideThumbnail } from '@/components/slide-renderer/SlideThumbnail';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { isLearningLoopEnabled } from '@/lib/config/feature-flags';
 import { useNearViewport } from '@/lib/hooks/use-near-viewport';
 import { useI18n } from '@/lib/hooks/use-i18n';
+import { buildKnowledgeModel } from '@/lib/learning-loop/knowledge-model';
+import type { KnowledgeComponent } from '@/lib/learning-loop/types';
 import { useCanvasStore, useStageStore } from '@/lib/store';
 import { PENDING_SCENE_ID } from '@/lib/store/stage';
 import type { SceneType, SlideContent } from '@/lib/types/stage';
@@ -56,8 +61,15 @@ export function KnowledgePathSidebar({
   isCourseComplete,
 }: KnowledgePathSidebarProps) {
   const { t, locale } = useI18n();
-  const { scenes, currentSceneId, setCurrentSceneId, generatingOutlines, generationStatus } =
-    useStageStore();
+  const {
+    stage,
+    scenes,
+    outlines,
+    currentSceneId,
+    setCurrentSceneId,
+    generatingOutlines,
+    generationStatus,
+  } = useStageStore();
   const failedOutlines = useStageStore.use.failedOutlines();
   const viewportSize = useCanvasStore.use.viewportSize();
   const viewportRatio = useCanvasStore.use.viewportRatio();
@@ -67,6 +79,20 @@ export function KnowledgePathSidebar({
   const [showPreviews, setShowPreviews] = useState(false);
   const [retryingOutlineId, setRetryingOutlineId] = useState<string | null>(null);
   const isChinese = locale === 'zh-CN';
+  const learningLoopEnabled = isLearningLoopEnabled();
+  const knowledgeModel = useMemo(
+    () => (learningLoopEnabled ? buildKnowledgeModel(stage, scenes, outlines) : null),
+    [learningLoopEnabled, outlines, scenes, stage],
+  );
+  const componentBySceneId = useMemo(
+    () =>
+      new Map(
+        (knowledgeModel?.components ?? []).flatMap((component) =>
+          component.sceneIds.map((sceneId) => [sceneId, component] as const),
+        ),
+      ),
+    [knowledgeModel],
+  );
   const currentSceneIndex = scenes.findIndex((scene) => scene.id === currentSceneId);
 
   useEffect(() => {
@@ -249,6 +275,7 @@ export function KnowledgePathSidebar({
               {scenes.map((scene, index) => {
                 const isActive = currentSceneId === scene.id;
                 const isVisited = currentSceneIndex >= 0 && index < currentSceneIndex;
+                const knowledgeComponent = componentBySceneId.get(scene.id);
                 const Icon = SCENE_ICONS[scene.type] ?? BookOpen;
                 const status = isActive
                   ? isChinese
@@ -261,12 +288,14 @@ export function KnowledgePathSidebar({
                     : isChinese
                       ? '待探索'
                       : 'To explore';
-                const node = (
+                const sceneNode = (
                   <button
                     key={scene.id}
                     ref={isActive ? activeNodeRef : undefined}
                     type="button"
                     data-testid="scene-item"
+                    data-knowledge-component-id={knowledgeComponent?.id}
+                    data-knowledge-component-source={knowledgeComponent?.source}
                     data-scene-state={isActive ? 'current' : isVisited ? 'visited' : 'upcoming'}
                     onClick={() => selectScene(scene.id)}
                     aria-current={isActive ? 'step' : undefined}
@@ -277,6 +306,7 @@ export function KnowledgePathSidebar({
                       collapsed
                         ? 'h-10 items-center justify-center rounded-xl'
                         : 'min-h-[68px] gap-3 rounded-2xl py-2.5 pl-1.5 pr-2',
+                      learningLoopEnabled && !collapsed && 'pr-10',
                       isActive
                         ? classroomShellStyles.knowledgeNodeActive
                         : 'hover:bg-background/65',
@@ -336,6 +366,14 @@ export function KnowledgePathSidebar({
                             {status}
                           </span>
                         </span>
+                        {learningLoopEnabled && knowledgeComponent?.objective && (
+                          <span
+                            data-testid="knowledge-component-objective"
+                            className="mt-1.5 line-clamp-2 block text-[10px] leading-4 text-muted-foreground/80"
+                          >
+                            {knowledgeComponent.objective}
+                          </span>
+                        )}
                         {showPreviews && (
                           <span className="mt-2 block aspect-[16/7] overflow-hidden rounded-xl border border-border/70 bg-muted/50">
                             {scene.type === 'slide' ? (
@@ -357,6 +395,18 @@ export function KnowledgePathSidebar({
                     )}
                   </button>
                 );
+                const node =
+                  learningLoopEnabled && !collapsed && knowledgeComponent ? (
+                    <div key={scene.id} className="relative">
+                      {sceneNode}
+                      <KnowledgeComponentDetailsButton
+                        component={knowledgeComponent}
+                        isChinese={isChinese}
+                      />
+                    </div>
+                  ) : (
+                    sceneNode
+                  );
 
                 return collapsed ? (
                   <Tooltip key={scene.id}>
@@ -433,6 +483,83 @@ export function KnowledgePathSidebar({
         </div>
       </aside>
     </TooltipProvider>
+  );
+}
+
+function KnowledgeComponentDetailsButton({
+  component,
+  isChinese,
+}: {
+  readonly component: KnowledgeComponent;
+  readonly isChinese: boolean;
+}) {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          data-testid="knowledge-component-details-trigger"
+          className="absolute right-2 top-2.5 z-20 flex size-6 items-center justify-center rounded-lg text-muted-foreground/70 transition-colors hover:bg-primary/10 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+          aria-label={
+            isChinese ? `查看“${component.title}”构件详情` : `View ${component.title} details`
+          }
+        >
+          <Info className="size-3.5" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        side="right"
+        align="start"
+        sideOffset={10}
+        data-testid="knowledge-component-details"
+        className="w-72 rounded-2xl p-4"
+      >
+        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
+          {isChinese ? '知识构件' : 'Knowledge component'}
+        </p>
+        <h3 className="mt-1 text-sm font-semibold text-foreground">{component.title}</h3>
+        <div className="mt-3 flex items-center justify-between rounded-xl bg-muted/50 px-3 py-2 text-[11px]">
+          <span className="text-muted-foreground">
+            {isChinese ? '理解状态' : 'Understanding status'}
+          </span>
+          <span className="font-medium text-foreground">
+            {isChinese ? '尚未记录证据' : 'No evidence yet'}
+          </span>
+        </div>
+        {component.objective && (
+          <div className="mt-3">
+            <p className="text-[10px] font-medium text-muted-foreground">
+              {isChinese ? '构建目标' : 'Learning objective'}
+            </p>
+            <p className="mt-1 text-xs leading-5 text-foreground/85">{component.objective}</p>
+          </div>
+        )}
+        {component.keyPoints.length > 0 && (
+          <div className="mt-3">
+            <p className="text-[10px] font-medium text-muted-foreground">
+              {isChinese ? '关键支点' : 'Key points'}
+            </p>
+            <ul className="mt-1.5 space-y-1.5">
+              {component.keyPoints.slice(0, 4).map((point) => (
+                <li key={point} className="flex gap-2 text-xs leading-5 text-foreground/80">
+                  <span className="mt-2 size-1 shrink-0 rounded-full bg-primary/70" />
+                  <span>{point}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        <p className="mt-3 border-t border-border/60 pt-2 text-[10px] text-muted-foreground/75">
+          {component.source === 'outline-derived'
+            ? isChinese
+              ? '目标与关键点来自课程生成大纲'
+              : 'Objective and key points come from the course outline'
+            : isChinese
+              ? '此构件由当前教学场景安全派生'
+              : 'This component is safely derived from the current scene'}
+        </p>
+      </PopoverContent>
+    </Popover>
   );
 }
 
