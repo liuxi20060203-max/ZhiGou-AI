@@ -187,12 +187,12 @@ export const ChatArea = forwardRef<ChatAreaRef, ChatAreaProps>(
           : 'Ready';
     const quickPrompts =
       locale === 'zh-CN'
-        ? ['换一种方式解释', '给我一个例子', '检查我是否理解', '总结这一环节']
+        ? ['换一种方式解释', '给我一个例子', '检查我是否理解', '把这段和前面的内容连起来']
         : [
             'Explain it another way',
             'Give me an example',
             'Check my understanding',
-            'Summarize this block',
+            'Connect this to what came before',
           ];
 
     const softClosingChatSession = useMemo(

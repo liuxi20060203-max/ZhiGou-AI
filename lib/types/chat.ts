@@ -291,6 +291,7 @@ export interface LectureNoteEntry {
 
 import type { Stage, Scene, StageMode } from '@/lib/types/stage';
 import type { SceneOutline } from '@/lib/types/generation';
+import type { TutorLearningContext } from '@/lib/learning-loop/types';
 import type { AgentTurnSummary, WhiteboardActionRecord } from '@/lib/orchestration/types';
 import type { DirectorCompactionTrace } from '@/lib/chat/pi/director-compaction';
 import type { DirectorToolTraceEntry } from '@/lib/chat/pi/types';
@@ -350,6 +351,8 @@ export interface StatelessChatRequest {
         aiComment?: string;
       }>;
     };
+    /** Evidence-grounded context for the active knowledge component. */
+    learningContext?: TutorLearningContext;
   };
   /** Optional Pi-only, identity-only reference to one slide element. */
   elementReference?: SlideElementReference;

@@ -14,6 +14,7 @@
 import type { StatelessEvent, DirectorState } from '@/lib/types/chat';
 import type { ThinkingConfig } from '@/lib/types/provider';
 import { createLogger } from '@/lib/logger';
+import type { TutorLearningContext } from '@/lib/learning-loop/types';
 
 const log = createLogger('AgentLoop');
 
@@ -44,6 +45,8 @@ export interface AgentLoopStoreState {
       aiComment?: string;
     }>;
   };
+  /** Evidence-grounded context for the active knowledge component. */
+  learningContext?: TutorLearningContext;
 }
 
 /** Request template — fields that stay constant across loop iterations */

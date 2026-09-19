@@ -134,7 +134,8 @@ export function summarizeElements(
  * Build context string from store state
  */
 export function buildStateContext(storeState: StatelessChatRequest['storeState']): string {
-  const { stage, scenes, currentSceneId, mode, whiteboardOpen, quizResults } = storeState;
+  const { stage, scenes, currentSceneId, mode, whiteboardOpen, quizResults, learningContext } =
+    storeState;
 
   const lines: string[] = [];
 
@@ -150,6 +151,29 @@ export function buildStateContext(storeState: StatelessChatRequest['storeState']
   if (stage) {
     lines.push(
       `Course: ${stage.name || 'Untitled'}${stage.description ? ` - ${stage.description}` : ''}`,
+    );
+  }
+
+  if (learningContext) {
+    lines.push(
+      [
+        `Knowledge component: "${learningContext.currentComponent.title}" (id: ${learningContext.currentComponent.id}, scene: ${learningContext.currentComponent.sceneId})`,
+        learningContext.currentComponent.objective
+          ? `Component objective: ${learningContext.currentComponent.objective}`
+          : undefined,
+        `Evidence-derived status: ${learningContext.status}`,
+        learningContext.recentEvidence.length > 0
+          ? `Recent evidence: ${learningContext.recentEvidence
+              .map((item) => `${item.type}/${item.outcome} from ${item.source}`)
+              .join('; ')}`
+          : 'Recent evidence: none',
+        learningContext.activeRepairPlan
+          ? `Active repair path: ${learningContext.activeRepairPlan.rationale}`
+          : undefined,
+        'Learning-context rules: cite the component title or current scene when explaining; treat this status as an evidence summary, never as a grade or mastery percentage; a visit alone does not prove understanding; do not mark the learner verified merely because they say they understand.',
+      ]
+        .filter(Boolean)
+        .join('\n'),
     );
   }
 

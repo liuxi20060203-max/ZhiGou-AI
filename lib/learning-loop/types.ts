@@ -102,3 +102,39 @@ export interface KnowledgeModel {
   components: KnowledgeComponent[];
   version: 1;
 }
+
+export interface TutorLearningContext {
+  currentComponent: {
+    id: string;
+    title: string;
+    objective?: string;
+    sceneId: string;
+  };
+  status: LearningComponentStatus;
+  recentEvidence: Array<{
+    type: LearningEvidenceType;
+    outcome: LearningEvidenceOutcome;
+    source: LearningEvidenceSource;
+    occurredAt: string;
+  }>;
+  activeRepairPlan?: {
+    id: string;
+    rationale: string;
+    status: RepairPlanStatus;
+  };
+}
+
+export interface KnowledgeConstructionReport {
+  stageId: string;
+  generatedAt: string;
+  components: Array<{
+    componentId: string;
+    title: string;
+    status: LearningComponentStatus;
+    evidenceIds: string[];
+    explanation: string;
+    suggestedNextAction?: string;
+  }>;
+  repairedComponentIds: string[];
+  unresolvedComponentIds: string[];
+}

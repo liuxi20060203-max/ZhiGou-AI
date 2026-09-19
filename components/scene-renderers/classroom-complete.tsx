@@ -15,6 +15,14 @@ import {
 } from '@/lib/classroom/complete-summary';
 import { loadQuizAttemptState } from '@/lib/quiz/runtime';
 import { createLogger } from '@/lib/logger';
+import { isLearningLoopEnabled } from '@/lib/config/feature-flags';
+import { buildKnowledgeModel } from '@/lib/learning-loop/knowledge-model';
+import { buildKnowledgeConstructionReport } from '@/lib/learning-loop/report';
+import type {
+  KnowledgeConstructionReport,
+  LearningComponentStatus,
+} from '@/lib/learning-loop/types';
+import { useLearningJourney } from '@/lib/learning-loop/use-learning-journey';
 
 const log = createLogger('ClassroomComplete');
 
@@ -311,9 +319,14 @@ function QuizRing({ pct, delay = 0 }: { pct: number; delay?: number }) {
 interface ClassroomCompletePageProps {
   readonly scenes: Scene[];
   readonly title: string;
+  readonly knowledgeReport?: KnowledgeConstructionReport;
 }
 
-export function ClassroomCompletePage({ scenes, title }: ClassroomCompletePageProps) {
+export function ClassroomCompletePage({
+  scenes,
+  title,
+  knowledgeReport,
+}: ClassroomCompletePageProps) {
   const { t, locale } = useI18n();
   const prefersReducedMotion = useReducedMotion();
 
@@ -493,6 +506,10 @@ export function ClassroomCompletePage({ scenes, title }: ClassroomCompletePagePr
             </div>
           )}
 
+          {knowledgeReport && knowledgeReport.components.length > 0 && (
+            <KnowledgeReportCard report={knowledgeReport} isChinese={locale === 'zh-CN'} />
+          )}
+
           {/* Quiz card */}
           {summary.quiz && (
             <motion.div
@@ -523,8 +540,109 @@ export function ClassroomCompletePage({ scenes, title }: ClassroomCompletePagePr
   );
 }
 
+function KnowledgeReportCard({
+  report,
+  isChinese,
+}: {
+  readonly report: KnowledgeConstructionReport;
+  readonly isChinese: boolean;
+}) {
+  const labels: Record<LearningComponentStatus, readonly [string, string]> = {
+    not_started: ['未开始', 'Not started'],
+    in_progress: ['构建中', 'Building'],
+    evidence_available: ['已有证据', 'Evidence available'],
+    needs_revisit: ['建议回看', 'Revisit suggested'],
+    verified: ['已有验证', 'Verified'],
+  };
+  const verified = report.components.filter((item) => item.status === 'verified').length;
+  const revisit = report.unresolvedComponentIds.length;
+  return (
+    <motion.div
+      data-testid="knowledge-construction-report"
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 1.1, duration: 0.4 }}
+      className="w-full rounded-3xl border border-primary/15 bg-card/95 p-5 shadow-lg shadow-primary/5"
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-primary">
+            {isChinese ? '知识构建报告' : 'Knowledge construction report'}
+          </p>
+          <h3 className="mt-1 text-base font-bold text-foreground">
+            {isChinese ? '基于本次学习证据' : 'Based on this session’s evidence'}
+          </h3>
+        </div>
+        <div className="flex gap-2 text-[10px]">
+          <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 font-medium text-emerald-700 dark:text-emerald-300">
+            {isChinese ? `已有验证 ${verified}` : `Verified ${verified}`}
+          </span>
+          <span className="rounded-full bg-amber-500/10 px-2.5 py-1 font-medium text-amber-700 dark:text-amber-300">
+            {isChinese ? `建议回看 ${revisit}` : `Revisit ${revisit}`}
+          </span>
+        </div>
+      </div>
+      <div className="mt-4 space-y-2">
+        {report.components.map((item) => (
+          <div
+            key={item.componentId}
+            className="rounded-2xl border border-border/65 bg-background/70 p-3"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <p className="text-xs font-semibold leading-5 text-foreground">{item.title}</p>
+              <span
+                className={cn(
+                  'shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium',
+                  item.status === 'verified' &&
+                    'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
+                  item.status === 'needs_revisit' &&
+                    'bg-amber-500/10 text-amber-700 dark:text-amber-300',
+                  item.status !== 'verified' &&
+                    item.status !== 'needs_revisit' &&
+                    'bg-muted text-muted-foreground',
+                )}
+              >
+                {labels[item.status][isChinese ? 0 : 1]}
+              </span>
+            </div>
+            <p className="mt-1 text-[11px] leading-5 text-muted-foreground">{item.explanation}</p>
+            {item.suggestedNextAction && (
+              <p className="mt-1 text-[11px] font-medium leading-5 text-primary">
+                {item.suggestedNextAction}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+      <p className="mt-3 text-[10px] leading-4 text-muted-foreground/75">
+        {isChinese
+          ? '状态仅反映当前已记录证据，不代表正式成绩或永久掌握度。'
+          : 'Statuses reflect recorded evidence only; they are not grades or permanent mastery scores.'}
+      </p>
+    </motion.div>
+  );
+}
+
 export function ClassroomCompletePageConnected() {
+  const { locale } = useI18n();
   const stage = useStageStore((s) => s.stage);
   const scenes = useStageStore((s) => s.scenes);
-  return <ClassroomCompletePage scenes={scenes} title={stage?.name ?? ''} />;
+  const outlines = useStageStore((s) => s.outlines);
+  const learningLoopEnabled = isLearningLoopEnabled();
+  const { evidence } = useLearningJourney(stage?.id, learningLoopEnabled);
+  const knowledgeReport = useMemo(() => {
+    if (!learningLoopEnabled || !stage) return undefined;
+    return buildKnowledgeConstructionReport({
+      model: buildKnowledgeModel(stage, scenes, outlines),
+      evidence,
+      language: locale,
+    });
+  }, [evidence, learningLoopEnabled, locale, outlines, scenes, stage]);
+  return (
+    <ClassroomCompletePage
+      scenes={scenes}
+      title={stage?.name ?? ''}
+      knowledgeReport={knowledgeReport}
+    />
+  );
 }

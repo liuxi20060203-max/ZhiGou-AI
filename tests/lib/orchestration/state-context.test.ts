@@ -116,3 +116,33 @@ describe('buildStateContext whiteboard code summary', () => {
     expect(context.indexOf('[id:old]')).toBeLessThan(context.indexOf('[id:new]'));
   });
 });
+
+describe('buildStateContext learning evidence', () => {
+  it('grounds the tutor in the active component without presenting status as a grade', () => {
+    const state = makeStoreState([]);
+    state.learningContext = {
+      currentComponent: {
+        id: 'kc:stage:scene',
+        title: 'Closures',
+        objective: 'Explain captured variables',
+        sceneId: 'scene',
+      },
+      status: 'needs_revisit',
+      recentEvidence: [
+        {
+          type: 'quiz_reviewed',
+          outcome: 'contradicts',
+          source: 'quiz',
+          occurredAt: '2026-01-01T00:00:00.000Z',
+        },
+      ],
+    };
+
+    const context = buildStateContext(state);
+
+    expect(context).toContain('Knowledge component: "Closures"');
+    expect(context).toContain('Evidence-derived status: needs_revisit');
+    expect(context).toContain('never as a grade or mastery percentage');
+    expect(context).toContain('quiz_reviewed/contradicts from quiz');
+  });
+});

@@ -36,7 +36,9 @@ import {
 } from '@/lib/chat/quiz-results-for-store-state';
 import { toast } from 'sonner';
 import { createLogger } from '@/lib/logger';
-import { isPiChatEnabled } from '@/lib/config/feature-flags';
+import { isLearningLoopEnabled, isPiChatEnabled } from '@/lib/config/feature-flags';
+import { readLearningEvidence, readRepairPlans } from '@/lib/learning-loop/runtime';
+import { buildTutorLearningContext } from '@/lib/learning-loop/tutor-context';
 import type { CleanupSource } from '@/lib/playback/auto-resume';
 import { nanoid } from 'nanoid';
 import type { BaiduSubSources, WebSearchProviderId } from '@/lib/web-search/types';
@@ -182,11 +184,31 @@ export interface ChatMessageSendOptions {
  */
 async function buildFreshAgentLoopStoreState(): Promise<AgentLoopStoreState> {
   const stateBeforeQuizRead = useStageStore.getState();
-  const quizResults = await buildQuizResultsForStoreState(
+  const quizResultsPromise = buildQuizResultsForStoreState(
     stateBeforeQuizRead.scenes,
     stateBeforeQuizRead.currentSceneId,
   );
+  const learningRuntimePromise =
+    isLearningLoopEnabled() && stateBeforeQuizRead.stage?.id
+      ? Promise.all([
+          readLearningEvidence(stateBeforeQuizRead.stage.id),
+          readRepairPlans(stateBeforeQuizRead.stage.id),
+        ]).catch((error) => {
+          log.warn('Failed to load learning context for chat:', error);
+          return undefined;
+        })
+      : Promise.resolve(undefined);
+  const [quizResults, learningRuntime] = await Promise.all([
+    quizResultsPromise,
+    learningRuntimePromise,
+  ]);
   const freshState = useStageStore.getState();
+  const activeSceneUnchanged = didActiveSceneRemainUnchanged(
+    stateBeforeQuizRead.scenes,
+    stateBeforeQuizRead.currentSceneId,
+    freshState.scenes,
+    freshState.currentSceneId,
+  );
   return {
     stage: freshState.stage,
     scenes: freshState.scenes,
@@ -196,14 +218,18 @@ async function buildFreshAgentLoopStoreState(): Promise<AgentLoopStoreState> {
     whiteboardOpen: useCanvasStore.getState().whiteboardOpen,
     whiteboardManualVisibilityRevision:
       useCanvasStore.getState().whiteboardManualVisibilityRevision,
-    quizResults: didActiveSceneRemainUnchanged(
-      stateBeforeQuizRead.scenes,
-      stateBeforeQuizRead.currentSceneId,
-      freshState.scenes,
-      freshState.currentSceneId,
-    )
-      ? quizResults
-      : undefined,
+    quizResults: activeSceneUnchanged ? quizResults : undefined,
+    learningContext:
+      activeSceneUnchanged && learningRuntime
+        ? buildTutorLearningContext({
+            stage: freshState.stage,
+            scenes: freshState.scenes,
+            outlines: freshState.outlines,
+            currentSceneId: freshState.currentSceneId,
+            evidence: learningRuntime[0],
+            repairPlans: learningRuntime[1],
+          })
+        : undefined,
   };
 }
 
