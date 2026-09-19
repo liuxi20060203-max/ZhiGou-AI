@@ -3,12 +3,16 @@ import { IDBFactory, IDBKeyRange } from 'fake-indexeddb';
 import { BrowserRuntimeStore } from '@openmaic/storage';
 
 import { sceneVisitedEvidence } from '@/lib/learning-loop/evidence';
+import { buildTemplateRepairPlan } from '@/lib/learning-loop/repair-plan';
 import {
   appendLearningEvidence,
+  appendRepairPlanSnapshot,
   learningJourneyId,
   readLearningEvidence,
+  readRepairPlans,
 } from '@/lib/learning-loop/runtime';
 import { APP_RUNTIME_PAYLOAD_VALIDATORS } from '@/lib/runtime/payload-validators';
+import type { KnowledgeComponent } from '@/lib/learning-loop/types';
 
 describe('learning journey runtime', () => {
   beforeEach(() => {
@@ -87,5 +91,38 @@ describe('learning journey runtime', () => {
         payload: { recordType: 'evidence' },
       }),
     ).rejects.toThrow(/learningJourney payload/);
+  });
+
+  it('folds immutable repair snapshots to the latest plan status', async () => {
+    const store = harness();
+    const component: KnowledgeComponent = {
+      id: 'kc:stage-1:scene-1',
+      stageId: 'stage-1',
+      title: 'Concept',
+      keyPoints: ['Key point'],
+      sceneIds: ['scene-1'],
+      prerequisiteIds: [],
+      verification: { requiredEvidenceCount: 1, acceptedEvidenceTypes: ['verification_passed'] },
+      source: 'scene-derived',
+      version: 1,
+    };
+    const proposed = buildTemplateRepairPlan({
+      component,
+      evidence: [],
+      id: 'repair-1',
+      now: '2026-01-01T00:00:00.000Z',
+    });
+    const completed = {
+      ...proposed,
+      status: 'completed' as const,
+      updatedAt: '2026-01-01T00:01:00.000Z',
+    };
+
+    await appendRepairPlanSnapshot(proposed, { store, learnerKey: 'learner-1' });
+    await appendRepairPlanSnapshot(completed, { store, learnerKey: 'learner-1' });
+
+    expect(await readRepairPlans('stage-1', { store, learnerKey: 'learner-1' })).toEqual([
+      completed,
+    ]);
   });
 });

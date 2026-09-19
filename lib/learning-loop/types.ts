@@ -43,6 +43,44 @@ export interface LearningEvidenceRecordPayload {
   evidence: LearningEvidencePayload;
 }
 
+export type RepairPlanStatus = 'proposed' | 'active' | 'completed' | 'dismissed' | 'expired';
+
+export interface RepairVerification {
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+}
+
+export interface RepairStep {
+  id: string;
+  type: 'explanation' | 'example' | 'verification';
+  title: string;
+  content: string;
+  verification?: RepairVerification;
+}
+
+export interface RepairPlan {
+  id: string;
+  stageId: string;
+  componentId: string;
+  triggerEvidenceIds: string[];
+  rationale: string;
+  steps: RepairStep[];
+  status: RepairPlanStatus;
+  contentVersion: 1;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RepairPlanRecordPayload {
+  payloadVersion: 1;
+  recordType: 'repair_plan';
+  plan: RepairPlan;
+}
+
+export type LearningJourneyRecordPayload = LearningEvidenceRecordPayload | RepairPlanRecordPayload;
+
 export interface KnowledgeComponent {
   id: string;
   stageId: string;

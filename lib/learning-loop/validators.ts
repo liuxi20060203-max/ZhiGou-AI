@@ -1,7 +1,13 @@
 import type { RuntimePayloadValidator } from '@openmaic/storage';
 
 import { LEARNING_EVIDENCE_SOURCES, LEARNING_EVIDENCE_TYPES } from './evidence';
-import type { LearningEvidenceRecordPayload } from './types';
+import { isValidRepairPlan } from './repair-plan';
+import type {
+  LearningEvidenceRecordPayload,
+  LearningJourneyRecordPayload,
+  RepairPlan,
+  RepairPlanRecordPayload,
+} from './types';
 
 function invalid(message: string): ReturnType<RuntimePayloadValidator> {
   return { valid: false, errors: [{ path: '/payload', message }] };
@@ -42,7 +48,43 @@ export function isLearningEvidenceRecordPayload(
   );
 }
 
+export function isRepairPlanRecordPayload(payload: unknown): payload is RepairPlanRecordPayload {
+  if (!isRecord(payload) || payload.payloadVersion !== 1 || payload.recordType !== 'repair_plan') {
+    return false;
+  }
+  const plan = payload.plan;
+  if (
+    !isRecord(plan) ||
+    typeof plan.id !== 'string' ||
+    typeof plan.stageId !== 'string' ||
+    typeof plan.componentId !== 'string' ||
+    !Array.isArray(plan.triggerEvidenceIds) ||
+    !plan.triggerEvidenceIds.every((id) => typeof id === 'string') ||
+    typeof plan.rationale !== 'string' ||
+    !Array.isArray(plan.steps) ||
+    !['proposed', 'active', 'completed', 'dismissed', 'expired'].includes(String(plan.status)) ||
+    plan.contentVersion !== 1 ||
+    typeof plan.createdAt !== 'string' ||
+    typeof plan.updatedAt !== 'string' ||
+    !Number.isFinite(Date.parse(plan.createdAt)) ||
+    !Number.isFinite(Date.parse(plan.updatedAt))
+  ) {
+    return false;
+  }
+  try {
+    return isValidRepairPlan(plan as unknown as RepairPlan);
+  } catch {
+    return false;
+  }
+}
+
+export function isLearningJourneyRecordPayload(
+  payload: unknown,
+): payload is LearningJourneyRecordPayload {
+  return isLearningEvidenceRecordPayload(payload) || isRepairPlanRecordPayload(payload);
+}
+
 export const learningJourneyPayloadValidator: RuntimePayloadValidator = (payload) =>
-  isLearningEvidenceRecordPayload(payload)
+  isLearningJourneyRecordPayload(payload)
     ? { valid: true }
-    : invalid('learningJourney payload must be a supported versioned evidence record');
+    : invalid('learningJourney payload must be a supported versioned journey record');

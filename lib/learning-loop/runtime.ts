@@ -8,8 +8,10 @@ import type {
   LearningEvidence,
   LearningEvidencePayload,
   LearningEvidenceRecordPayload,
+  RepairPlan,
+  RepairPlanRecordPayload,
 } from './types';
-import { isLearningEvidenceRecordPayload } from './validators';
+import { isLearningEvidenceRecordPayload, isRepairPlanRecordPayload } from './validators';
 
 export interface LearningJourneyRuntimeDeps {
   store?: RuntimeStore;
@@ -163,6 +165,87 @@ export async function recordQuizReviewedEvidence(input: {
     input.evidence.map((evidence) => appendLearningEvidence(input.stageId, evidence)),
   );
   notifyLearningJourneyChanged(input.stageId);
+}
+
+export async function appendRepairPlanSnapshot(
+  plan: RepairPlan,
+  deps: LearningJourneyRuntimeDeps = {},
+): Promise<void> {
+  const store = deps.store ?? getRuntimeStore();
+  const learnerKey = deps.learnerKey ?? (await getLearnerKey());
+  const sessionId = learningJourneyId(plan.stageId, learnerKey);
+  const recordId = `repair-plan:${segment(plan.id)}:${segment(plan.updatedAt)}:${plan.status}`;
+  await enqueue(store, sessionId, async () => {
+    while (true) {
+      let session = await store.getSession(sessionId);
+      if (!session) {
+        try {
+          session = await store.createSession({
+            id: sessionId,
+            kind: 'learningJourney',
+            stageId: plan.stageId,
+            learnerKey,
+            status: 'active',
+            createdAt: plan.createdAt,
+            updatedAt: plan.updatedAt,
+          });
+        } catch (error) {
+          session = await store.getSession(sessionId);
+          if (!session) throw error;
+        }
+      }
+      assertJourneyPartition(session, plan.stageId, learnerKey);
+      const records = await store.listRecords(sessionId);
+      if (records.some((record) => record.id === recordId)) return;
+      const payload: RepairPlanRecordPayload = {
+        payloadVersion: 1,
+        recordType: 'repair_plan',
+        plan,
+      };
+      try {
+        await store.appendRecord(
+          {
+            id: recordId,
+            sessionId,
+            sceneId: undefined,
+            createdAt: plan.updatedAt,
+            payload,
+          },
+          { expectedLastSeq: records.at(-1)?.seq ?? null },
+        );
+        notifyLearningJourneyChanged(plan.stageId);
+        return;
+      } catch (error) {
+        if (error instanceof RuntimeAppendConflictError) continue;
+        throw error;
+      }
+    }
+  });
+}
+
+export async function readRepairPlans(
+  stageId: string,
+  deps: LearningJourneyRuntimeDeps = {},
+): Promise<RepairPlan[]> {
+  const store = deps.store ?? getRuntimeStore();
+  const learnerKey = deps.learnerKey ?? (await getLearnerKey());
+  const sessions = (await store.listSessions(stageId, learnerKey)).filter(
+    (session) => session.kind === 'learningJourney',
+  );
+  const latest = new Map<string, RepairPlan>();
+  for (const session of sessions) {
+    for (const record of await store.listRecords(session.id)) {
+      if (!isRepairPlanRecordPayload(record.payload)) continue;
+      const candidate = record.payload.plan;
+      const current = latest.get(candidate.id);
+      if (!current || Date.parse(candidate.updatedAt) >= Date.parse(current.updatedAt)) {
+        latest.set(candidate.id, candidate);
+      }
+    }
+  }
+  return [...latest.values()].sort(
+    (left, right) => Date.parse(left.createdAt) - Date.parse(right.createdAt),
+  );
 }
 
 export const LEARNING_JOURNEY_CHANGED_EVENT = 'openmaic:learning-journey-changed';

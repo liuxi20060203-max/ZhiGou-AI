@@ -20,6 +20,7 @@ import {
   Trophy,
 } from 'lucide-react';
 import { SlideThumbnail } from '@/components/slide-renderer/SlideThumbnail';
+import { RepairPanel } from '@/components/learning-loop/repair-panel';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { isLearningLoopEnabled } from '@/lib/config/feature-flags';
@@ -104,6 +105,7 @@ export function KnowledgePathSidebar({
     refresh: refreshEvidence,
   } = useLearningJourney(stage?.id, learningLoopEnabled);
   const [evidenceWriteFailed, setEvidenceWriteFailed] = useState(false);
+  const [repairComponent, setRepairComponent] = useState<KnowledgeComponent>();
   const learningStateByComponentId = useMemo(
     () =>
       new Map(
@@ -160,6 +162,7 @@ export function KnowledgePathSidebar({
         setEvidenceWriteFailed(false);
         notifyLearningJourneyChanged(stage.id);
         await refreshEvidence();
+        setRepairComponent(component);
       } catch {
         setEvidenceWriteFailed(true);
       }
@@ -482,6 +485,7 @@ export function KnowledgePathSidebar({
                         learningState={learningState}
                         isChinese={isChinese}
                         onMarkConfusion={() => markConfusion(knowledgeComponent)}
+                        onStartRepair={() => setRepairComponent(knowledgeComponent)}
                       />
                     </div>
                   ) : (
@@ -571,6 +575,14 @@ export function KnowledgePathSidebar({
               : 'Learning evidence is not synced yet. You can keep learning.'}
           </div>
         )}
+        {learningLoopEnabled && repairComponent && (
+          <RepairPanel
+            component={repairComponent}
+            evidence={evidence.filter((item) => item.componentId === repairComponent.id)}
+            isChinese={isChinese}
+            onClose={() => setRepairComponent(undefined)}
+          />
+        )}
       </aside>
     </TooltipProvider>
   );
@@ -581,11 +593,13 @@ function KnowledgeComponentDetailsButton({
   learningState,
   isChinese,
   onMarkConfusion,
+  onStartRepair,
 }: {
   readonly component: KnowledgeComponent;
   readonly learningState?: ComponentLearningState;
   readonly isChinese: boolean;
   readonly onMarkConfusion: () => Promise<void>;
+  readonly onStartRepair: () => void;
 }) {
   return (
     <Popover>
@@ -662,10 +676,18 @@ function KnowledgeComponentDetailsButton({
         )}
         <button
           type="button"
-          onClick={() => void onMarkConfusion()}
+          onClick={() =>
+            learningState?.status === 'needs_revisit' ? onStartRepair() : void onMarkConfusion()
+          }
           className="mt-3 w-full rounded-xl border border-primary/20 bg-primary/5 px-3 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35"
         >
-          {isChinese ? '这里没懂' : "I don't understand this yet"}
+          {learningState?.status === 'needs_revisit'
+            ? isChinese
+              ? '开始补学'
+              : 'Start repair path'
+            : isChinese
+              ? '这里没懂'
+              : "I don't understand this yet"}
         </button>
         <p className="mt-3 border-t border-border/60 pt-2 text-[10px] text-muted-foreground/75">
           {component.source === 'outline-derived'
