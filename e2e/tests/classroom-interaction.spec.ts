@@ -166,6 +166,21 @@ test.describe('Classroom Interaction', () => {
     const coThinkingDock = page.getByTestId('roundtable-learning-dock');
     const coThinkingSummary = page.getByTestId('co-thinking-summary');
     await expect(coThinkingDock).toHaveAttribute('data-co-thinking-state', 'summary');
+    const assistant = page.getByTestId('zhigou-assistant');
+    await expect(assistant).toBeVisible();
+    await expect(assistant).toHaveAttribute('data-assistant-state', 'idle');
+    await page.getByRole('button', { name: 'Expand ZhiGou tutor' }).click();
+    await expect(page.getByTestId('assistant-title')).toHaveText('ZhiGou tutor');
+    await expect(page.getByText(/Following knowledge block 1/)).toBeVisible();
+    const askTab = page.getByRole('tab', { name: 'Ask' });
+    await askTab.click();
+    await expect(askTab).toHaveAttribute('data-state', 'active');
+    await expect(page.getByTestId('assistant-quick-prompt')).toHaveCount(4);
+    await expect(page.getByTestId('assistant-quick-prompt').first()).toBeVisible();
+    await page.getByRole('button', { name: 'Collapse ZhiGou tutor' }).click();
+    await expect(page.getByRole('button', { name: 'Expand ZhiGou tutor' })).toBeVisible();
+    await page.getByRole('button', { name: 'Expand ZhiGou tutor' }).click();
+    await expect(askTab).toHaveAttribute('data-state', 'active');
     await expect(coThinkingSummary).toBeVisible();
     await expect(coThinkingSummary).toHaveAttribute('aria-expanded', 'false');
     await coThinkingSummary.click();
@@ -196,6 +211,7 @@ test.describe('Classroom Interaction', () => {
     );
     await expect(classroom.sidebarScenes.nth(0)).toHaveAttribute('data-scene-state', 'visited');
     await expect(classroom.sidebarScenes.nth(1)).toHaveAttribute('aria-current', 'step');
+    await expect(page.getByText(/Following knowledge block 2/)).toBeVisible();
     await expect(playbackProgress).toHaveAttribute('aria-valuenow', '33');
 
     // Collapsed rail keeps every path node mounted and preserves the active scene.
