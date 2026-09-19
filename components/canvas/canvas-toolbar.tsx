@@ -64,7 +64,7 @@ export interface CanvasToolbarProps {
 
 /* Compact control button */
 const ctrlBtn = cn(
-  'relative w-7 h-7 rounded-md flex items-center justify-center',
+  'relative flex h-8 min-w-8 items-center justify-center rounded-xl',
   'transition-all duration-150 outline-none cursor-pointer',
   'hover:bg-muted active:scale-90',
 );
@@ -127,7 +127,7 @@ export function CanvasToolbar({
   elementPickActive,
   onToggleElementPick,
 }: CanvasToolbarProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const remainingSoftCloseSeconds = useSoftCloseCountdown(softCloseDeadline);
   const canGoPrev = currentSceneIndex > 0;
   const canGoNext = currentSceneIndex < scenesCount - 1;
@@ -159,14 +159,17 @@ export function CanvasToolbar({
   const presentationLabel = isPresenting ? t('stage.exitFullscreen') : t('stage.fullscreen');
 
   return (
-    <div className={cn('relative flex items-center gap-2', className)}>
+    <div
+      data-testid="learning-console"
+      className={cn('relative flex items-center gap-2', className)}
+    >
       {playbackProgress !== undefined && (
         <div
           aria-label={t('roundtable.courseProgress')}
           aria-valuemax={100}
           aria-valuemin={0}
           aria-valuenow={Math.round(playbackProgress)}
-          className="absolute inset-x-0 top-0 h-1.5 overflow-hidden bg-muted-foreground/20 dark:bg-muted-foreground/30"
+          className="absolute inset-x-0 top-0 h-1 overflow-hidden bg-muted-foreground/15 dark:bg-muted-foreground/25"
           data-testid="course-playback-progress"
           role="progressbar"
         >
@@ -177,13 +180,13 @@ export function CanvasToolbar({
         </div>
       )}
       {/* ── Left: sidebar toggle + page indicator ── */}
-      <div className="flex items-center gap-1 shrink-0 pl-1">
+      <div className="flex shrink-0 items-center gap-1 pl-1">
         {onToggleSidebar && (
           <button
             onClick={onToggleSidebar}
             className={cn(
               ctrlBtn,
-              'w-6 h-6',
+              'h-8 w-8',
               sidebarCollapsed ? 'text-muted-foreground' : 'text-foreground',
             )}
             aria-label="Toggle sidebar"
@@ -201,20 +204,18 @@ export function CanvasToolbar({
       <CtrlDivider />
 
       {/* ── Center: unified playback controls ── */}
-      <div className="flex-1 flex items-center justify-center min-w-0">
+      <div className="flex min-w-0 flex-1 items-center justify-center">
         <div
           className={cn(
-            'inline-flex items-center gap-0.5 px-1 h-7',
-            isPresenting
-              ? '' /* Single visual layer in fullscreen — buttons sit inside outer pill directly */
-              : 'bg-background/60 rounded-lg',
+            'inline-flex h-11 items-center gap-1 rounded-full border border-border/70 bg-background/90 px-1.5 shadow-[0_12px_30px_-22px_color-mix(in_oklab,var(--primary)_65%,transparent)] backdrop-blur-xl',
+            isPresenting ? 'border-white/15 bg-black/30 text-white' : '',
           )}
         >
           {/* Volume with vertical popover slider */}
           {onToggleMute && (
             <div
               ref={volumeContainerRef}
-              className="relative flex items-center"
+              className="relative order-5 flex items-center"
               onMouseEnter={handleVolumeEnter}
               onMouseLeave={handleVolumeLeave}
             >
@@ -223,7 +224,7 @@ export function CanvasToolbar({
                 disabled={!ttsEnabled}
                 className={cn(
                   ctrlBtn,
-                  'w-6 h-6',
+                  'h-8 w-8',
                   !ttsEnabled
                     ? 'text-muted-foreground/40 cursor-not-allowed'
                     : ttsMuted
@@ -285,6 +286,7 @@ export function CanvasToolbar({
                   <button
                     onClick={onCycleSpeed}
                     className={cn(
+                      'order-5',
                       'w-8 h-5 rounded flex items-center justify-center',
                       'transition-all duration-150 outline-none cursor-pointer',
                       'text-[11px] font-semibold tabular-nums leading-none',
@@ -305,7 +307,9 @@ export function CanvasToolbar({
             </TooltipProvider>
           )}
 
-          <CtrlDivider />
+          <div className="order-5">
+            <CtrlDivider />
+          </div>
 
           {/* Prev scene */}
           {scenesCount > 1 && (
@@ -314,24 +318,27 @@ export function CanvasToolbar({
               disabled={!canGoPrev}
               className={cn(
                 ctrlBtn,
-                'w-6 h-6 text-muted-foreground disabled:opacity-20 disabled:pointer-events-none',
+                'order-1 gap-1 px-2.5 text-muted-foreground disabled:pointer-events-none disabled:opacity-20',
               )}
-              aria-label="Previous scene"
+              aria-label={locale === 'zh-CN' ? '上一个知识构件' : 'Previous knowledge block'}
             >
-              <ChevronLeft className="w-3.5 h-3.5" />
+              <ChevronLeft className="size-4" />
+              <span className="hidden text-[11px] font-medium xl:inline">
+                {locale === 'zh-CN' ? '上一构件' : 'Previous'}
+              </span>
             </button>
           )}
 
           {/* Play / Pause / Stop Discussion */}
           {showStopDiscussion && onStopDiscussion ? (
-            <div className="flex items-center gap-1.5">
+            <div className="order-2 flex items-center gap-1.5">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   onStopDiscussion();
                 }}
                 className={cn(
-                  'flex items-center gap-1.5 h-6 px-2.5 rounded-md',
+                  'flex h-8 items-center gap-1.5 rounded-full px-3',
                   'bg-red-500/10 dark:bg-red-400/10 text-red-600 dark:text-red-400',
                   'text-[11px] font-semibold whitespace-nowrap',
                   'hover:bg-red-500/20 dark:hover:bg-red-400/20 active:scale-95 transition-all cursor-pointer',
@@ -347,7 +354,7 @@ export function CanvasToolbar({
                     e.stopPropagation();
                     onContinueDiscussion();
                   }}
-                  className="flex items-center gap-1.5 h-6 px-2.5 rounded-md border border-primary/25 dark:border-primary/40 bg-background/70 text-primary text-[11px] font-semibold whitespace-nowrap hover:bg-primary/10 dark:hover:bg-primary/20 active:scale-95 transition-all cursor-pointer"
+                  className="flex h-8 items-center gap-1.5 whitespace-nowrap rounded-full border border-primary/25 bg-background/70 px-3 text-[11px] font-semibold text-primary transition-all hover:bg-primary/10 active:scale-95 dark:border-primary/40 dark:hover:bg-primary/20"
                   title={t('roundtable.softClosing')}
                 >
                   {t('roundtable.softClosing')}
@@ -363,16 +370,14 @@ export function CanvasToolbar({
             <button
               onClick={onPlayPause}
               className={cn(
-                ctrlBtn,
-                'w-7 h-6',
-                engineState === 'playing' ? 'text-primary' : 'text-muted-foreground',
+                'order-2 flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/25 transition-all hover:scale-105 hover:bg-primary/90 active:scale-95',
               )}
               aria-label={engineState === 'playing' ? 'Pause' : 'Play'}
             >
               {engineState === 'playing' ? (
-                <Pause className="w-3.5 h-3.5" />
+                <Pause className="size-4" fill="currentColor" />
               ) : (
-                <Play className="w-3.5 h-3.5 ml-px" />
+                <Play className="ml-0.5 size-4" fill="currentColor" />
               )}
             </button>
           ) : null}
@@ -384,15 +389,20 @@ export function CanvasToolbar({
               disabled={!canGoNext}
               className={cn(
                 ctrlBtn,
-                'w-6 h-6 text-muted-foreground disabled:opacity-20 disabled:pointer-events-none',
+                'order-3 gap-1 px-2.5 text-muted-foreground disabled:pointer-events-none disabled:opacity-20',
               )}
-              aria-label="Next scene"
+              aria-label={locale === 'zh-CN' ? '下一个知识构件' : 'Next knowledge block'}
             >
-              <ChevronRight className="w-3.5 h-3.5" />
+              <span className="hidden text-[11px] font-medium xl:inline">
+                {locale === 'zh-CN' ? '下一构件' : 'Next'}
+              </span>
+              <ChevronRight className="size-4" />
             </button>
           )}
 
-          <CtrlDivider />
+          <div className="order-4">
+            <CtrlDivider />
+          </div>
 
           {/* Auto-play */}
           {onToggleAutoPlay && (
@@ -403,7 +413,7 @@ export function CanvasToolbar({
                     onClick={onToggleAutoPlay}
                     className={cn(
                       ctrlBtn,
-                      'w-8 h-6',
+                      'order-5 h-8 w-8',
                       autoPlayLecture ? 'text-primary' : 'text-muted-foreground',
                     )}
                     aria-label="Auto-play"
@@ -426,7 +436,7 @@ export function CanvasToolbar({
             }}
             className={cn(
               ctrlBtn,
-              'w-6 h-6',
+              'order-5 h-8 w-8',
               whiteboardOpen ? 'text-primary' : 'text-muted-foreground',
             )}
             title={whiteboardOpen ? t('whiteboard.minimize') : t('whiteboard.open')}
@@ -446,7 +456,7 @@ export function CanvasToolbar({
               }}
               disabled={!canPickSlideElement}
               className={cn(
-                'relative flex h-6 items-center gap-1 rounded-md px-2 text-[11px] font-medium transition-all',
+                'relative order-5 flex h-8 items-center gap-1 rounded-xl px-2 text-[11px] font-medium transition-all',
                 elementPickActive
                   ? 'bg-primary/10 text-primary ring-1 ring-primary/30'
                   : 'text-muted-foreground hover:bg-muted',
@@ -468,14 +478,14 @@ export function CanvasToolbar({
       </div>
 
       {/* ── Right: fullscreen + chat toggle ── */}
-      <div className="flex items-center justify-end gap-px shrink-0 pr-1">
+      <div className="flex shrink-0 items-center justify-end gap-px pr-1">
         <CtrlDivider />
         {onTogglePresentation && (
           <button
             onClick={onTogglePresentation}
             className={cn(
               ctrlBtn,
-              'w-6 h-6',
+              'h-8 w-8',
               isPresenting ? 'text-primary' : 'text-muted-foreground',
             )}
             aria-label={presentationLabel}
@@ -493,7 +503,7 @@ export function CanvasToolbar({
             onClick={onToggleChat}
             className={cn(
               ctrlBtn,
-              'w-6 h-6',
+              'h-8 w-8',
               chatCollapsed ? 'text-muted-foreground' : 'text-foreground',
             )}
             aria-label="Toggle chat"

@@ -164,6 +164,7 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
     const setChatAreaWidth = useSettingsStore((s) => s.setChatAreaWidth);
     const chatAreaCollapsed = useSettingsStore((s) => s.chatAreaCollapsed);
     const setChatAreaCollapsed = useSettingsStore((s) => s.setChatAreaCollapsed);
+    const [coThinkingCollapsed, setCoThinkingCollapsed] = useState(true);
     const setTTSMuted = useSettingsStore((s) => s.setTTSMuted);
     const setTTSVolume = useSettingsStore((s) => s.setTTSVolume);
 
@@ -1445,13 +1446,15 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
         }
       : null;
 
-    // Scene viewer height — header is 80px when visible, roundtable is
-    // 192px in playback mode (autonomous hides it). Mode is guaranteed
+    // Scene viewer height — header is 80px when visible. The co-thinking dock
+    // keeps its learning console mounted while its discussion surface changes
+    // between a 52px summary and the full interaction stage. Mode is guaranteed
     // non-'edit' here since the parent Stage unmounts this component
     // when entering Pro mode.
     const sceneViewerHeight = (() => {
       const headerHeight = isPresenting || hideHeader ? 0 : 80;
-      const roundtableHeight = mode === 'playback' && !isPresenting ? 192 : 0;
+      const roundtableHeight =
+        mode === 'playback' && !isPresenting ? (coThinkingCollapsed ? 108 : 220) : 0;
       return `calc(100% - ${headerHeight + roundtableHeight}px)`;
     })();
 
@@ -1761,6 +1764,8 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
                     : undefined
                 }
                 onClearElementReference={() => setDraftElementReference(null)}
+                collapsed={coThinkingCollapsed}
+                onCollapsedChange={setCoThinkingCollapsed}
               />
             </div>
           )}

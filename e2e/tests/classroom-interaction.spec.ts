@@ -162,6 +162,16 @@ test.describe('Classroom Interaction', () => {
     const knowledgePath = page.getByTestId('knowledge-path');
     await expect(knowledgePath).toBeVisible();
     await expect(knowledgePath).toHaveAccessibleName('Knowledge path');
+    await expect(page.getByTestId('learning-console')).toBeVisible();
+    const coThinkingDock = page.getByTestId('roundtable-learning-dock');
+    const coThinkingSummary = page.getByTestId('co-thinking-summary');
+    await expect(coThinkingDock).toHaveAttribute('data-co-thinking-state', 'summary');
+    await expect(coThinkingSummary).toBeVisible();
+    await expect(coThinkingSummary).toHaveAttribute('aria-expanded', 'false');
+    await coThinkingSummary.click();
+    await expect(coThinkingDock).toHaveAttribute('data-co-thinking-state', 'expanded');
+    await page.getByRole('button', { name: 'Collapse co-thinking dock' }).click();
+    await expect(coThinkingDock).toHaveAttribute('data-co-thinking-state', 'summary');
 
     // Sidebar shows 3 scenes
     await expect(classroom.sidebarScenes).toHaveCount(3, { timeout: 10_000 });
@@ -202,7 +212,10 @@ test.describe('Classroom Interaction', () => {
     await classroom.waitForLoaded();
 
     await page.keyboard.press('T');
-    const textarea = page.getByPlaceholder('Type your message...', { exact: true });
+    const coThinkingDock = page.getByTestId('roundtable-learning-dock');
+    await expect(coThinkingDock).toHaveAttribute('data-co-thinking-state', 'active');
+    await expect(page.getByRole('button', { name: 'Collapse co-thinking dock' })).toBeDisabled();
+    const textarea = page.getByPlaceholder('Write your judgment or question', { exact: true });
     const inputStage = page.getByTestId('roundtable-non-presentation-input-stage');
     await expect(textarea).toBeVisible();
 
