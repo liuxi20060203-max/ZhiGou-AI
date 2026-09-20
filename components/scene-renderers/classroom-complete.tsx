@@ -16,6 +16,7 @@ import {
 import { loadQuizAttemptState } from '@/lib/quiz/runtime';
 import { createLogger } from '@/lib/logger';
 import { isLearningLoopEnabled } from '@/lib/config/feature-flags';
+import { trackLearningLoopEvent } from '@/lib/learning-loop/analytics';
 import { buildKnowledgeModel } from '@/lib/learning-loop/knowledge-model';
 import { buildKnowledgeConstructionReport } from '@/lib/learning-loop/report';
 import type {
@@ -556,6 +557,12 @@ function KnowledgeReportCard({
   };
   const verified = report.components.filter((item) => item.status === 'verified').length;
   const revisit = report.unresolvedComponentIds.length;
+  useEffect(() => {
+    trackLearningLoopEvent({
+      name: 'learning_loop_report_viewed',
+      stageId: report.stageId,
+    });
+  }, [report.stageId]);
   return (
     <motion.div
       data-testid="knowledge-construction-report"

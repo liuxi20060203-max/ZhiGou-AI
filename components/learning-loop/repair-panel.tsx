@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Check, Loader2, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { trackLearningLoopEvent } from '@/lib/learning-loop/analytics';
 import { getCurrentModelConfig } from '@/lib/utils/model-config';
 import { buildTemplateRepairPlan, isValidRepairPlan } from '@/lib/learning-loop/repair-plan';
 import {
@@ -100,9 +101,22 @@ export function RepairPanel({ component, evidence, isChinese, onClose }: RepairP
           if (response.ok) {
             const body = (await response.json()) as { plan?: RepairPlan };
             if (body.plan && isValidRepairPlan(body.plan)) resolved = body.plan;
+          } else {
+            trackLearningLoopEvent({
+              name: 'learning_loop_generation_failed',
+              stageId: component.stageId,
+              componentId: component.id,
+              outcome: response.status === 404 ? 'disabled' : `http_${response.status}`,
+            });
           }
         } catch {
           // The deterministic fallback is a complete product path, not an error state.
+          trackLearningLoopEvent({
+            name: 'learning_loop_generation_failed',
+            stageId: component.stageId,
+            componentId: component.id,
+            outcome: 'network_error',
+          });
         }
         const active = {
           ...resolved,
@@ -110,6 +124,11 @@ export function RepairPanel({ component, evidence, isChinese, onClose }: RepairP
           updatedAt: new Date().toISOString(),
         };
         await appendRepairPlanSnapshot(active);
+        trackLearningLoopEvent({
+          name: 'learning_loop_repair_started',
+          stageId: component.stageId,
+          componentId: component.id,
+        });
         if (!cancelled) setPlan(active);
       } catch {
         if (!cancelled) setError(true);
@@ -141,6 +160,11 @@ export function RepairPanel({ component, evidence, isChinese, onClose }: RepairP
           payload: { planId: plan.id, stepId: step.id },
         }),
       );
+      trackLearningLoopEvent({
+        name: 'learning_loop_repair_step_completed',
+        stageId: component.stageId,
+        componentId: component.id,
+      });
       setStepIndex((current) => Math.min(current + 1, plan.steps.length - 1));
       notifyLearningJourneyChanged(component.stageId);
     } catch {
@@ -166,6 +190,12 @@ export function RepairPanel({ component, evidence, isChinese, onClose }: RepairP
         }),
       );
       notifyLearningJourneyChanged(component.stageId);
+      trackLearningLoopEvent({
+        name: 'learning_loop_verification_completed',
+        stageId: component.stageId,
+        componentId: component.id,
+        outcome: passed ? 'passed' : 'failed',
+      });
       if (!passed) {
         setVerificationFailed(true);
         return;

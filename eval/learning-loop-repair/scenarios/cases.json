@@ -1,0 +1,198 @@
+[
+  {
+    "id": "zh-math-01",
+    "language": "zh-CN",
+    "title": "一元二次方程判别式",
+    "objective": "根据判别式判断实根数量",
+    "keyPoints": ["Δ=b²-4ac", "Δ>0 有两个不等实根", "Δ=0 有两个相等实根"],
+    "evidence": [{ "type": "quiz_reviewed", "outcome": "contradicts" }]
+  },
+  {
+    "id": "zh-math-02",
+    "language": "zh-CN",
+    "title": "函数单调性",
+    "objective": "用定义判断区间上的单调性",
+    "keyPoints": ["比较自变量大小", "比较对应函数值", "结论必须限定区间"],
+    "evidence": [{ "type": "learner_confusion", "outcome": "contradicts" }]
+  },
+  {
+    "id": "zh-physics-01",
+    "language": "zh-CN",
+    "title": "牛顿第二定律",
+    "objective": "说明合力、质量与加速度的关系",
+    "keyPoints": ["F=ma", "F 是合力", "加速度方向与合力方向一致"],
+    "evidence": [{ "type": "quiz_reviewed", "outcome": "contradicts" }]
+  },
+  {
+    "id": "zh-chem-01",
+    "language": "zh-CN",
+    "title": "氧化还原反应",
+    "objective": "根据化合价变化识别氧化与还原",
+    "keyPoints": ["化合价升高是氧化", "化合价降低是还原", "电子转移守恒"],
+    "evidence": [{ "type": "quiz_reviewed", "outcome": "contradicts" }]
+  },
+  {
+    "id": "zh-bio-01",
+    "language": "zh-CN",
+    "title": "有丝分裂",
+    "objective": "区分有丝分裂各时期特征",
+    "keyPoints": ["前期染色体出现", "中期排列在赤道板", "后期姐妹染色单体分离"],
+    "evidence": [{ "type": "learner_confusion", "outcome": "contradicts" }]
+  },
+  {
+    "id": "zh-cs-01",
+    "language": "zh-CN",
+    "title": "JavaScript 闭包",
+    "objective": "解释函数如何捕获词法作用域变量",
+    "keyPoints": ["词法作用域", "函数作为值返回", "被捕获变量继续保留"],
+    "evidence": [{ "type": "quiz_reviewed", "outcome": "contradicts" }]
+  },
+  {
+    "id": "zh-cs-02",
+    "language": "zh-CN",
+    "title": "递归终止条件",
+    "objective": "识别递归函数的基线条件",
+    "keyPoints": ["基线条件停止递归", "递归调用必须趋近基线", "缺少基线会导致栈溢出"],
+    "evidence": [{ "type": "learner_confusion", "outcome": "contradicts" }]
+  },
+  {
+    "id": "zh-history-01",
+    "language": "zh-CN",
+    "title": "工业革命的影响",
+    "objective": "从生产、城市与社会结构解释影响",
+    "keyPoints": ["机器生产扩大", "城市化加速", "劳资关系变化"],
+    "evidence": [{ "type": "quiz_reviewed", "outcome": "contradicts" }]
+  },
+  {
+    "id": "zh-language-01",
+    "language": "zh-CN",
+    "title": "议论文论据",
+    "objective": "区分事实论据与道理论据",
+    "keyPoints": ["事实论据提供可核验事例", "道理论据引用原理或权威观点", "论据必须支撑论点"],
+    "evidence": [{ "type": "learner_confusion", "outcome": "contradicts" }]
+  },
+  {
+    "id": "zh-finance-01",
+    "language": "zh-CN",
+    "title": "复利",
+    "objective": "解释本金、利率与期数对终值的影响",
+    "keyPoints": ["终值=P(1+r)^n", "利息进入下一期本金", "期数带来指数增长"],
+    "evidence": [{ "type": "quiz_reviewed", "outcome": "contradicts" }]
+  },
+  {
+    "id": "en-math-01",
+    "language": "en-US",
+    "title": "Chain rule",
+    "objective": "Differentiate a composition of functions",
+    "keyPoints": [
+      "Differentiate the outer function",
+      "Keep the inner function",
+      "Multiply by the inner derivative"
+    ],
+    "evidence": [{ "type": "quiz_reviewed", "outcome": "contradicts" }]
+  },
+  {
+    "id": "en-math-02",
+    "language": "en-US",
+    "title": "Conditional probability",
+    "objective": "Interpret probability given an observed event",
+    "keyPoints": [
+      "P(A|B)=P(A∩B)/P(B)",
+      "The sample space is restricted to B",
+      "P(B) must be nonzero"
+    ],
+    "evidence": [{ "type": "learner_confusion", "outcome": "contradicts" }]
+  },
+  {
+    "id": "en-physics-01",
+    "language": "en-US",
+    "title": "Conservation of momentum",
+    "objective": "Apply momentum conservation to an isolated system",
+    "keyPoints": [
+      "Total initial momentum equals total final momentum",
+      "External impulse must be negligible",
+      "Momentum is a vector"
+    ],
+    "evidence": [{ "type": "quiz_reviewed", "outcome": "contradicts" }]
+  },
+  {
+    "id": "en-chem-01",
+    "language": "en-US",
+    "title": "Chemical equilibrium",
+    "objective": "Explain dynamic equilibrium and Le Châtelier's principle",
+    "keyPoints": [
+      "Forward and reverse rates are equal",
+      "Concentrations remain constant",
+      "A disturbance shifts the equilibrium response"
+    ],
+    "evidence": [{ "type": "learner_confusion", "outcome": "contradicts" }]
+  },
+  {
+    "id": "en-bio-01",
+    "language": "en-US",
+    "title": "Natural selection",
+    "objective": "Connect heritable variation to differential reproduction",
+    "keyPoints": [
+      "Variation is heritable",
+      "Fitness differs in an environment",
+      "Allele frequencies change across generations"
+    ],
+    "evidence": [{ "type": "quiz_reviewed", "outcome": "contradicts" }]
+  },
+  {
+    "id": "en-cs-01",
+    "language": "en-US",
+    "title": "Binary search invariant",
+    "objective": "Explain why binary search safely discards half the range",
+    "keyPoints": [
+      "The target remains inside the candidate interval",
+      "The midpoint comparison selects a half",
+      "The interval strictly shrinks"
+    ],
+    "evidence": [{ "type": "quiz_reviewed", "outcome": "contradicts" }]
+  },
+  {
+    "id": "en-cs-02",
+    "language": "en-US",
+    "title": "Database transactions",
+    "objective": "Explain atomicity and isolation",
+    "keyPoints": [
+      "Atomicity is all-or-nothing",
+      "Isolation limits interference",
+      "Commit makes changes durable"
+    ],
+    "evidence": [{ "type": "learner_confusion", "outcome": "contradicts" }]
+  },
+  {
+    "id": "en-econ-01",
+    "language": "en-US",
+    "title": "Opportunity cost",
+    "objective": "Identify the value of the best forgone alternative",
+    "keyPoints": [
+      "Choices use scarce resources",
+      "The relevant cost is the next-best alternative",
+      "Sunk costs are not opportunity costs"
+    ],
+    "evidence": [{ "type": "quiz_reviewed", "outcome": "contradicts" }]
+  },
+  {
+    "id": "en-writing-01",
+    "language": "en-US",
+    "title": "Thesis statements",
+    "objective": "Write a focused and arguable thesis",
+    "keyPoints": ["It makes a claim", "It defines scope", "It guides the essay's reasoning"],
+    "evidence": [{ "type": "learner_confusion", "outcome": "contradicts" }]
+  },
+  {
+    "id": "en-design-01",
+    "language": "en-US",
+    "title": "Visual hierarchy",
+    "objective": "Use contrast and spacing to guide attention",
+    "keyPoints": [
+      "Contrast signals priority",
+      "Grouping expresses relationships",
+      "Whitespace separates levels"
+    ],
+    "evidence": [{ "type": "quiz_reviewed", "outcome": "contradicts" }]
+  }
+]

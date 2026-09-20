@@ -27,6 +27,7 @@ import { isLearningLoopEnabled } from '@/lib/config/feature-flags';
 import { useNearViewport } from '@/lib/hooks/use-near-viewport';
 import { useI18n } from '@/lib/hooks/use-i18n';
 import { learnerConfusionEvidence, sceneVisitedEvidence } from '@/lib/learning-loop/evidence';
+import { trackLearningLoopEvent } from '@/lib/learning-loop/analytics';
 import { foldComponentLearningState } from '@/lib/learning-loop/fold';
 import { buildKnowledgeModel } from '@/lib/learning-loop/knowledge-model';
 import { appendLearningEvidence, notifyLearningJourneyChanged } from '@/lib/learning-loop/runtime';
@@ -134,6 +135,11 @@ export function KnowledgePathSidebar({
     )
       .then(() => {
         setEvidenceWriteFailed(false);
+        trackLearningLoopEvent({
+          name: 'learning_loop_component_viewed',
+          stageId: stage.id,
+          componentId: component.id,
+        });
         notifyLearningJourneyChanged(stage.id);
       })
       .catch(() => setEvidenceWriteFailed(true));
@@ -486,6 +492,21 @@ export function KnowledgePathSidebar({
                         isChinese={isChinese}
                         onMarkConfusion={() => markConfusion(knowledgeComponent)}
                         onStartRepair={() => setRepairComponent(knowledgeComponent)}
+                        onEvidenceOpened={() => {
+                          if (!stage?.id) return;
+                          trackLearningLoopEvent({
+                            name: 'learning_loop_evidence_opened',
+                            stageId: stage.id,
+                            componentId: knowledgeComponent.id,
+                          });
+                          if (learningState?.status === 'needs_revisit') {
+                            trackLearningLoopEvent({
+                              name: 'learning_loop_repair_suggested',
+                              stageId: stage.id,
+                              componentId: knowledgeComponent.id,
+                            });
+                          }
+                        }}
                       />
                     </div>
                   ) : (
@@ -594,15 +615,17 @@ function KnowledgeComponentDetailsButton({
   isChinese,
   onMarkConfusion,
   onStartRepair,
+  onEvidenceOpened,
 }: {
   readonly component: KnowledgeComponent;
   readonly learningState?: ComponentLearningState;
   readonly isChinese: boolean;
   readonly onMarkConfusion: () => Promise<void>;
   readonly onStartRepair: () => void;
+  readonly onEvidenceOpened: () => void;
 }) {
   return (
-    <Popover>
+    <Popover onOpenChange={(open) => open && onEvidenceOpened()}>
       <PopoverTrigger asChild>
         <button
           type="button"
