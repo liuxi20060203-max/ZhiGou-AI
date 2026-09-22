@@ -42,6 +42,7 @@ import type { AudioIndicatorState } from '@/components/roundtable/audio-indicato
 import type { Action, DiscussionAction, SpeechAction } from '@/lib/types/action';
 import { cn } from '@/lib/utils';
 import { ChatArea, type ChatAreaRef } from '@/components/chat/chat-area';
+import { LearningTaskBridge } from '@/components/learning/learning-task-bridge';
 import type { SessionCleanupPayload } from '@/components/chat/use-chat-sessions';
 import { agentsToParticipants, useAgentRegistry } from '@/lib/orchestration/registry/store';
 import type { AgentConfig } from '@/lib/orchestration/registry/types';
@@ -92,6 +93,7 @@ export interface PlaybackChromeRootHandle {
 
 interface PlaybackChromeRootProps {
   readonly onRetryOutline?: (outlineId: string) => Promise<void>;
+  readonly showLearningTaskPanel?: boolean;
   /** Whether the Pro Switch in Header should be enabled. */
   readonly canEnterProMode?: boolean;
   /** Pro Switch click handler — parent coordinates teardown + mode flip. */
@@ -115,6 +117,7 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
   function PlaybackChromeRoot(
     {
       onRetryOutline,
+      showLearningTaskPanel,
       canEnterProMode,
       onEnterProMode,
       proModeActive,
@@ -139,6 +142,7 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
     } = useStageStore();
     const failedOutlines = useStageStore.use.failedOutlines();
     const generationComplete = useStageStore.use.generationComplete();
+    const learningTaskPanelBoundaryRef = useRef<HTMLDivElement>(null);
 
     const currentScene = getCurrentScene();
     const piChatEnabled = isPiChatEnabled();
@@ -1486,6 +1490,7 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
 
         {/* Main Content Area */}
         <div
+          ref={learningTaskPanelBoundaryRef}
           className={cn(
             classroomShellStyles.playbackMain,
             'flex-1 flex flex-col overflow-hidden min-w-0 relative',
@@ -1784,6 +1789,15 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
               />
             </div>
           )}
+          {showLearningTaskPanel && stage?.id ? (
+            <LearningTaskBridge
+              boundaryRef={learningTaskPanelBoundaryRef}
+              classroomId={stage.id}
+              scenes={scenes}
+              currentSceneId={currentSceneId}
+              onSelectScene={setCurrentSceneId}
+            />
+          ) : null}
         </div>
 
         {/* Chat Area — playback / autonomous always renders it here; Pro

@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, type RefObject } from 'react';
 
 import type { Scene } from '@/lib/types/stage';
 import { LearningTaskPanel } from './learning-task-panel';
 
 interface LearningTaskBridgeProps {
+  boundaryRef: RefObject<HTMLDivElement | null>;
   classroomId: string;
   scenes: Scene[];
   currentSceneId: string | null;
@@ -13,6 +14,7 @@ interface LearningTaskBridgeProps {
 }
 
 export function LearningTaskBridge({
+  boundaryRef,
   classroomId,
   scenes,
   currentSceneId,
@@ -36,6 +38,7 @@ export function LearningTaskBridge({
 
   return (
     <LearningTaskPanel
+      boundaryRef={boundaryRef}
       classroomId={classroomId}
       scenes={scenes}
       currentSceneId={currentSceneId}
