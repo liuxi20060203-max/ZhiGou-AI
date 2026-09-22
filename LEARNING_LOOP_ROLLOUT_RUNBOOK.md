@@ -108,3 +108,18 @@ The release owner must record:
 - dashboard links and alert owners;
 - AI eval report path and model identifiers;
 - decision: expand, adjust, or stop.
+
+## Phase 5 checkpoint (2026-09-22)
+
+- Local regression passed: 14 learning-loop/classroom test files, 47 tests. This includes the compact knowledge-path details entry.
+- The user confirmed local acceptance on 2026-09-22 after the supplied walkthrough covering the knowledge path, details/repair flow, verification result, completion report, and refresh persistence. Specific viewport sizes were not recorded; this is one acceptance confirmation, not five moderated sessions.
+- The repair eval suite contains 20 scenarios, but the real-model run is pending: `EVAL_REPAIR_MODEL` (or `DEFAULT_MODEL`) and `EVAL_JUDGE_MODEL` are not configured in the current local environment. Do not count a template-only run as the AI gate.
+- The five moderated usability sessions, real-classroom viewport review, deployment analytics/alerts, and 10% cohort results have not been recorded. Do not infer these outcomes from automated tests.
+- Phase 6 remains gated until the Phase 5 release owner records actual results and makes an expand/adjust/stop decision.
+
+### Next acceptance actions
+
+1. Configure explicit generator and judge models in the evaluation environment, then run `pnpm eval:learning-loop-repair`. Keep model identifiers and the generated report path with the release record; all 20 cases must pass the rubric in this runbook.
+2. Run five first-use sessions on a real course. Ask each participant to find a component's objective/evidence, explain what “已有验证” means, identify a weak point, complete a repair path, and return to the course. Record whether they find “详情” unaided within 10 seconds and whether any Scene, Quiz draft, Interactive, or playback state is lost.
+3. Review the same course at 1440×900, 1280×720, and 390×844 with both side panels open/closed. Confirm the details dialog, repair panel, task entry, and completion report remain readable and operable.
+4. Attach an analytics adapter and alert owners, enable the internal cohort, then make a separate decision before 10% rollout. Record denominator definitions, baseline timings, fallback/schema rates, and rollback owner.

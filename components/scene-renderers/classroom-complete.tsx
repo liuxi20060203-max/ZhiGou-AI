@@ -375,7 +375,7 @@ export function ClassroomCompletePage({
   return (
     <MotionConfig reducedMotion={prefersReducedMotion ? 'always' : 'user'}>
       <section
-        className="absolute inset-0 z-[105] flex items-center justify-center overflow-auto"
+        className="absolute inset-0 z-[105] flex items-start justify-center overflow-y-auto overflow-x-hidden"
         aria-label={t('classroomComplete.title')}
       >
         {/* Single-shot announcement for screen readers — replaces the noisy
@@ -401,7 +401,7 @@ export function ClassroomCompletePage({
         <Confetti />
 
         {/* Content */}
-        <div className="relative flex flex-col items-center gap-6 max-w-2xl w-full px-8 py-10">
+        <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center gap-6 px-5 py-8 sm:px-8 sm:py-10">
           {/* Trophy + halo + sparkles */}
           <div className="relative" style={{ width: 200, height: 200 }}>
             <motion.div
@@ -507,10 +507,6 @@ export function ClassroomCompletePage({
             </div>
           )}
 
-          {knowledgeReport && knowledgeReport.components.length > 0 && (
-            <KnowledgeReportCard report={knowledgeReport} isChinese={locale === 'zh-CN'} />
-          )}
-
           {/* Quiz card */}
           {summary.quiz && (
             <motion.div
@@ -535,6 +531,10 @@ export function ClassroomCompletePage({
               </div>
             </motion.div>
           )}
+
+          {knowledgeReport && knowledgeReport.components.length > 0 && (
+            <KnowledgeReportCard report={knowledgeReport} isChinese={locale === 'zh-CN'} />
+          )}
         </div>
       </section>
     </MotionConfig>
@@ -557,6 +557,26 @@ function KnowledgeReportCard({
   };
   const verified = report.components.filter((item) => item.status === 'verified').length;
   const revisit = report.unresolvedComponentIds.length;
+  const underway = report.components.filter(
+    (item) => item.status === 'in_progress' || item.status === 'evidence_available',
+  ).length;
+  const notStarted = report.components.filter((item) => item.status === 'not_started').length;
+  const [expanded, setExpanded] = useState(false);
+  const priority: Record<LearningComponentStatus, number> = {
+    needs_revisit: 0,
+    evidence_available: 1,
+    in_progress: 2,
+    verified: 3,
+    not_started: 4,
+  };
+  const orderedComponents = [...report.components].sort(
+    (a, b) => priority[a.status] - priority[b.status],
+  );
+  const previewComponents = orderedComponents
+    .filter((item) => item.status !== 'not_started')
+    .slice(0, 3);
+  const visibleComponents = expanded ? orderedComponents : previewComponents;
+  const remainingCount = report.components.length - previewComponents.length;
   useEffect(() => {
     trackLearningLoopEvent({
       name: 'learning_loop_report_viewed',
@@ -580,47 +600,78 @@ function KnowledgeReportCard({
             {isChinese ? '基于本次学习证据' : 'Based on this session’s evidence'}
           </h3>
         </div>
-        <div className="flex gap-2 text-[10px]">
+        <div className="flex flex-wrap justify-end gap-2 text-[10px]">
           <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 font-medium text-emerald-700 dark:text-emerald-300">
             {isChinese ? `已有验证 ${verified}` : `Verified ${verified}`}
           </span>
           <span className="rounded-full bg-amber-500/10 px-2.5 py-1 font-medium text-amber-700 dark:text-amber-300">
             {isChinese ? `建议回看 ${revisit}` : `Revisit ${revisit}`}
           </span>
+          <span className="rounded-full bg-sky-500/10 px-2.5 py-1 font-medium text-sky-700 dark:text-sky-300">
+            {isChinese ? `构建中 ${underway}` : `Building ${underway}`}
+          </span>
+          <span className="rounded-full bg-muted px-2.5 py-1 font-medium text-muted-foreground">
+            {isChinese ? `未开始 ${notStarted}` : `Not started ${notStarted}`}
+          </span>
         </div>
       </div>
-      <div className="mt-4 space-y-2">
-        {report.components.map((item) => (
-          <div
-            key={item.componentId}
-            className="rounded-2xl border border-border/65 bg-background/70 p-3"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <p className="text-xs font-semibold leading-5 text-foreground">{item.title}</p>
-              <span
-                className={cn(
-                  'shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium',
-                  item.status === 'verified' &&
-                    'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
-                  item.status === 'needs_revisit' &&
-                    'bg-amber-500/10 text-amber-700 dark:text-amber-300',
-                  item.status !== 'verified' &&
-                    item.status !== 'needs_revisit' &&
-                    'bg-muted text-muted-foreground',
-                )}
-              >
-                {labels[item.status][isChinese ? 0 : 1]}
-              </span>
+      {previewComponents.length === 0 && !expanded && (
+        <p className="mt-4 rounded-2xl bg-muted/50 p-4 text-xs leading-5 text-muted-foreground">
+          {isChinese
+            ? '本次还没有可回顾的理解证据。进入知识构件、完成检测或标记疑问后，这里会显示学习进展。'
+            : 'No understanding evidence is ready to review yet. Visit a component, complete a check, or mark a question to see progress here.'}
+        </p>
+      )}
+      {visibleComponents.length > 0 && (
+        <div className="mt-4 space-y-2">
+          {visibleComponents.map((item) => (
+            <div
+              key={item.componentId}
+              className="rounded-2xl border border-border/65 bg-background/70 p-3"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-xs font-semibold leading-5 text-foreground">{item.title}</p>
+                <span
+                  className={cn(
+                    'shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium',
+                    item.status === 'verified' &&
+                      'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
+                    item.status === 'needs_revisit' &&
+                      'bg-amber-500/10 text-amber-700 dark:text-amber-300',
+                    item.status !== 'verified' &&
+                      item.status !== 'needs_revisit' &&
+                      'bg-muted text-muted-foreground',
+                  )}
+                >
+                  {labels[item.status][isChinese ? 0 : 1]}
+                </span>
+              </div>
+              <p className="mt-1 text-[11px] leading-5 text-muted-foreground">{item.explanation}</p>
+              {item.suggestedNextAction && (
+                <p className="mt-1 text-[11px] font-medium leading-5 text-primary">
+                  {item.suggestedNextAction}
+                </p>
+              )}
             </div>
-            <p className="mt-1 text-[11px] leading-5 text-muted-foreground">{item.explanation}</p>
-            {item.suggestedNextAction && (
-              <p className="mt-1 text-[11px] font-medium leading-5 text-primary">
-                {item.suggestedNextAction}
-              </p>
-            )}
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
+      {remainingCount > 0 && (
+        <button
+          type="button"
+          aria-expanded={expanded}
+          onClick={() => setExpanded((value) => !value)}
+          className="mt-3 w-full rounded-xl border border-primary/20 bg-primary/5 px-3 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/10"
+        >
+          {expanded
+            ? isChinese
+              ? '收起构件明细'
+              : 'Collapse component details'
+            : isChinese
+              ? `查看全部 ${report.components.length} 个构件（其余 ${remainingCount} 个）`
+              : `View all ${report.components.length} components (${remainingCount} more)`}
+        </button>
+      )}
       <p className="mt-3 text-[10px] leading-4 text-muted-foreground/75">
         {isChinese
           ? '状态仅反映当前已记录证据，不代表正式成绩或永久掌握度。'

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Check, Loader2, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { trackLearningLoopEvent } from '@/lib/learning-loop/analytics';
 import { getCurrentModelConfig } from '@/lib/utils/model-config';
 import { buildTemplateRepairPlan, isValidRepairPlan } from '@/lib/learning-loop/repair-plan';
@@ -51,6 +52,9 @@ function evidenceEvent(input: {
 }
 
 export function RepairPanel({ component, evidence, isChinese, onClose }: RepairPanelProps) {
+  // Evidence changes after every repair step. Capture the opening context so those
+  // updates cannot re-run preparation and overwrite an in-flight completion.
+  const [openingContext] = useState(() => ({ component, evidence, isChinese }));
   const [plan, setPlan] = useState<RepairPlan>();
   const [stepIndex, setStepIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number>();
@@ -58,6 +62,7 @@ export function RepairPanel({ component, evidence, isChinese, onClose }: RepairP
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    const { component, evidence, isChinese } = openingContext;
     let cancelled = false;
     async function prepare() {
       try {
@@ -138,7 +143,7 @@ export function RepairPanel({ component, evidence, isChinese, onClose }: RepairP
     return () => {
       cancelled = true;
     };
-  }, [component, evidence, isChinese]);
+  }, [openingContext]);
 
   const step = plan?.steps[stepIndex];
   const progress = useMemo(
@@ -189,6 +194,17 @@ export function RepairPanel({ component, evidence, isChinese, onClose }: RepairP
           payload: { planId: plan.id, stepId: step.id, selectedOption },
         }),
       );
+      if (passed) {
+        const completed: RepairPlan = {
+          ...plan,
+          status: 'completed',
+          updatedAt: new Date().toISOString(),
+        };
+        await appendRepairPlanSnapshot(completed);
+        setPlan(completed);
+      } else {
+        setVerificationFailed(true);
+      }
       notifyLearningJourneyChanged(component.stageId);
       trackLearningLoopEvent({
         name: 'learning_loop_verification_completed',
@@ -196,165 +212,157 @@ export function RepairPanel({ component, evidence, isChinese, onClose }: RepairP
         componentId: component.id,
         outcome: passed ? 'passed' : 'failed',
       });
-      if (!passed) {
-        setVerificationFailed(true);
-        return;
-      }
-      const completed: RepairPlan = {
-        ...plan,
-        status: 'completed',
-        updatedAt: new Date().toISOString(),
-      };
-      await appendRepairPlanSnapshot(completed);
-      setPlan(completed);
     } catch {
       setError(true);
     }
   }
 
   return (
-    <section
-      role="dialog"
-      aria-modal="false"
-      aria-label={isChinese ? '补学路径' : 'Repair path'}
-      data-testid="repair-panel"
-      className="fixed bottom-5 right-5 top-24 z-[80] flex w-[min(420px,calc(100vw-24px))] flex-col overflow-hidden rounded-3xl border border-primary/20 bg-background/95 shadow-2xl backdrop-blur-xl"
-    >
-      <header className="flex items-start justify-between border-b border-border/70 px-5 py-4">
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-primary">
-            {isChinese ? '自适应补学' : 'Adaptive repair'}
-          </p>
-          <h2 className="mt-1 text-sm font-semibold">{component.title}</h2>
-        </div>
-        <button
-          type="button"
-          onClick={onClose}
-          className="flex size-8 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted"
-          aria-label={isChinese ? '稍后继续' : 'Continue later'}
-        >
-          <X className="size-4" />
-        </button>
-      </header>
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
+        showCloseButton={false}
+        aria-describedby={undefined}
+        data-testid="repair-panel"
+        className="flex h-[min(680px,calc(100dvh-32px))] w-[min(460px,calc(100vw-32px))] max-w-none flex-col gap-0 overflow-hidden rounded-3xl border border-primary/20 bg-background p-0 shadow-2xl"
+      >
+        <header className="flex items-start justify-between border-b border-border/70 px-5 py-4">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-primary">
+              {isChinese ? '自适应补学' : 'Adaptive repair'}
+            </p>
+            <DialogTitle className="mt-1 text-sm font-semibold">{component.title}</DialogTitle>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex size-8 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted"
+            aria-label={isChinese ? '稍后继续' : 'Continue later'}
+          >
+            <X className="size-4" />
+          </button>
+        </header>
 
-      {!plan && !error && (
-        <div className="flex flex-1 items-center justify-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="size-4 animate-spin" />
-          {isChinese ? '正在组织补学路径…' : 'Preparing your repair path…'}
-        </div>
-      )}
-      {error && !plan && (
-        <div className="m-5 rounded-2xl bg-destructive/10 p-4 text-sm text-destructive">
-          {isChinese ? '补学路径暂时无法保存，请稍后重试。' : 'The repair path could not be saved.'}
-        </div>
-      )}
-      {plan && step && (
-        <>
-          <div className="border-b border-border/60 px-5 py-3">
-            <p className="text-xs leading-5 text-muted-foreground">{plan.rationale}</p>
-            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted">
-              <div
-                className="h-full rounded-full bg-primary transition-all"
-                style={{ width: `${((stepIndex + 1) / plan.steps.length) * 100}%` }}
-              />
-            </div>
+        {!plan && !error && (
+          <div className="flex flex-1 items-center justify-center gap-2 text-sm text-muted-foreground">
+            <Loader2 className="size-4 animate-spin" />
+            {isChinese ? '正在组织补学路径…' : 'Preparing your repair path…'}
           </div>
-          <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
-            {plan.status === 'completed' ? (
-              <div className="flex h-full flex-col items-center justify-center text-center">
-                <span className="flex size-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600">
-                  <Check className="size-6" />
-                </span>
-                <h3 className="mt-4 font-semibold">
-                  {isChinese ? '本轮补学已完成' : 'Repair path completed'}
-                </h3>
-                <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                  {isChinese
-                    ? '新的验证证据已经写入知识路径。'
-                    : 'New verification evidence is now reflected in the knowledge path.'}
-                </p>
+        )}
+        {error && !plan && (
+          <div className="m-5 rounded-2xl bg-destructive/10 p-4 text-sm text-destructive">
+            {isChinese
+              ? '补学路径暂时无法保存，请稍后重试。'
+              : 'The repair path could not be saved.'}
+          </div>
+        )}
+        {plan && step && (
+          <>
+            <div className="border-b border-border/60 px-5 py-3">
+              <p className="text-xs leading-5 text-muted-foreground">{plan.rationale}</p>
+              <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted">
+                <div
+                  className="h-full rounded-full bg-primary transition-all"
+                  style={{ width: `${((stepIndex + 1) / plan.steps.length) * 100}%` }}
+                />
               </div>
-            ) : (
-              <>
-                <div className="flex items-center justify-between">
-                  <span className="rounded-full bg-primary/10 px-2 py-1 text-[10px] font-semibold text-primary">
-                    {progress}
+            </div>
+            <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
+              {plan.status === 'completed' ? (
+                <div className="flex h-full flex-col items-center justify-center text-center">
+                  <span className="flex size-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600">
+                    <Check className="size-6" />
                   </span>
-                  <span className="text-[10px] text-muted-foreground">
-                    {step.type === 'explanation'
-                      ? isChinese
-                        ? '换种解释'
-                        : 'Alternative explanation'
-                      : step.type === 'example'
-                        ? isChinese
-                          ? '对比例子'
-                          : 'Contrast example'
-                        : isChinese
-                          ? '微型验证'
-                          : 'Quick check'}
-                  </span>
+                  <h3 className="mt-4 font-semibold">
+                    {isChinese ? '本轮补学已完成' : 'Repair path completed'}
+                  </h3>
+                  <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                    {isChinese
+                      ? '新的验证证据已经写入知识路径。'
+                      : 'New verification evidence is now reflected in the knowledge path.'}
+                  </p>
                 </div>
-                <h3 className="mt-4 text-base font-semibold">{step.title}</h3>
-                <p className="mt-3 text-sm leading-7 text-foreground/85">{step.content}</p>
-                {step.verification && (
-                  <div className="mt-5">
-                    <p className="text-sm font-medium leading-6">{step.verification.question}</p>
-                    <div className="mt-3 space-y-2">
-                      {step.verification.options.map((option, index) => (
-                        <button
-                          key={`${index}-${option}`}
-                          type="button"
-                          onClick={() => {
-                            setSelectedOption(index);
-                            setVerificationFailed(false);
-                          }}
-                          className={cn(
-                            'w-full rounded-xl border px-3 py-2.5 text-left text-xs transition-colors',
-                            selectedOption === index
-                              ? 'border-primary bg-primary/10 text-foreground'
-                              : 'border-border hover:border-primary/30 hover:bg-muted/50',
-                          )}
-                        >
-                          {option}
-                        </button>
-                      ))}
-                    </div>
-                    {verificationFailed && (
-                      <p className="mt-3 rounded-xl bg-amber-500/10 p-3 text-xs leading-5 text-amber-700 dark:text-amber-300">
-                        {step.verification.explanation}
-                      </p>
-                    )}
+              ) : (
+                <>
+                  <div className="flex items-center justify-between">
+                    <span className="rounded-full bg-primary/10 px-2 py-1 text-[10px] font-semibold text-primary">
+                      {progress}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">
+                      {step.type === 'explanation'
+                        ? isChinese
+                          ? '换种解释'
+                          : 'Alternative explanation'
+                        : step.type === 'example'
+                          ? isChinese
+                            ? '对比例子'
+                            : 'Contrast example'
+                          : isChinese
+                            ? '微型验证'
+                            : 'Quick check'}
+                    </span>
                   </div>
-                )}
-              </>
-            )}
-          </div>
-          <footer className="border-t border-border/70 p-4">
-            {plan.status === 'completed' ? (
-              <Button className="w-full" onClick={onClose}>
-                {isChinese ? '返回课堂' : 'Return to class'}
-              </Button>
-            ) : step.type === 'verification' ? (
-              <Button
-                className="w-full"
-                disabled={selectedOption === undefined}
-                onClick={() => void submitVerification()}
-              >
-                {isChinese ? '提交验证' : 'Submit check'}
-              </Button>
-            ) : (
-              <Button className="w-full" onClick={() => void completeContentStep()}>
-                {isChinese ? '理解了，继续' : 'Got it, continue'}
-              </Button>
-            )}
-            {error && (
-              <p className="mt-2 text-center text-[10px] text-destructive">
-                {isChinese ? '保存失败，请重试当前操作。' : 'Save failed. Please retry.'}
-              </p>
-            )}
-          </footer>
-        </>
-      )}
-    </section>
+                  <h3 className="mt-4 text-base font-semibold">{step.title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-foreground/85">{step.content}</p>
+                  {step.verification && (
+                    <div className="mt-5">
+                      <p className="text-sm font-medium leading-6">{step.verification.question}</p>
+                      <div className="mt-3 space-y-2">
+                        {step.verification.options.map((option, index) => (
+                          <button
+                            key={`${index}-${option}`}
+                            type="button"
+                            onClick={() => {
+                              setSelectedOption(index);
+                              setVerificationFailed(false);
+                            }}
+                            className={cn(
+                              'w-full rounded-xl border px-3 py-2.5 text-left text-xs transition-colors',
+                              selectedOption === index
+                                ? 'border-primary bg-primary/10 text-foreground'
+                                : 'border-border hover:border-primary/30 hover:bg-muted/50',
+                            )}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                      {verificationFailed && (
+                        <p className="mt-3 rounded-xl bg-amber-500/10 p-3 text-xs leading-5 text-amber-700 dark:text-amber-300">
+                          {step.verification.explanation}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+            <footer className="border-t border-border/70 p-4">
+              {plan.status === 'completed' ? (
+                <Button className="w-full" onClick={onClose}>
+                  {isChinese ? '返回课堂' : 'Return to class'}
+                </Button>
+              ) : step.type === 'verification' ? (
+                <Button
+                  className="w-full"
+                  disabled={selectedOption === undefined}
+                  onClick={() => void submitVerification()}
+                >
+                  {isChinese ? '提交验证' : 'Submit check'}
+                </Button>
+              ) : (
+                <Button className="w-full" onClick={() => void completeContentStep()}>
+                  {isChinese ? '理解了，继续' : 'Got it, continue'}
+                </Button>
+              )}
+              {error && (
+                <p className="mt-2 text-center text-[10px] text-destructive">
+                  {isChinese ? '保存失败，请重试当前操作。' : 'Save failed. Please retry.'}
+                </p>
+              )}
+            </footer>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }

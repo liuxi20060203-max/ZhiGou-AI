@@ -9,7 +9,6 @@ import {
   Cpu,
   Eye,
   EyeOff,
-  Info,
   Loader2,
   MousePointer2,
   PanelLeftClose,
@@ -21,8 +20,8 @@ import {
 } from 'lucide-react';
 import { SlideThumbnail } from '@/components/slide-renderer/SlideThumbnail';
 import { RepairPanel } from '@/components/learning-loop/repair-panel';
+import { ComponentDetailsDialog } from '@/components/learning-loop/component-details-dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { isLearningLoopEnabled } from '@/lib/config/feature-flags';
 import { useNearViewport } from '@/lib/hooks/use-near-viewport';
 import { useI18n } from '@/lib/hooks/use-i18n';
@@ -31,7 +30,6 @@ import { trackLearningLoopEvent } from '@/lib/learning-loop/analytics';
 import { foldComponentLearningState } from '@/lib/learning-loop/fold';
 import { buildKnowledgeModel } from '@/lib/learning-loop/knowledge-model';
 import { appendLearningEvidence, notifyLearningJourneyChanged } from '@/lib/learning-loop/runtime';
-import type { ComponentLearningState } from '@/lib/learning-loop/fold';
 import type { KnowledgeComponent, LearningComponentStatus } from '@/lib/learning-loop/types';
 import { useLearningJourney } from '@/lib/learning-loop/use-learning-journey';
 import { useCanvasStore, useStageStore } from '@/lib/store';
@@ -107,6 +105,8 @@ export function KnowledgePathSidebar({
   } = useLearningJourney(stage?.id, learningLoopEnabled);
   const [evidenceWriteFailed, setEvidenceWriteFailed] = useState(false);
   const [repairComponent, setRepairComponent] = useState<KnowledgeComponent>();
+  const [selectedComponentId, setSelectedComponentId] = useState<string | null>(null);
+  const detailsTriggerRef = useRef<HTMLButtonElement | null>(null);
   const learningStateByComponentId = useMemo(
     () =>
       new Map(
@@ -118,6 +118,16 @@ export function KnowledgePathSidebar({
     [evidence, knowledgeModel],
   );
   const currentSceneIndex = scenes.findIndex((scene) => scene.id === currentSceneId);
+  const selectedComponent = knowledgeModel?.components.find(
+    (component) => component.id === selectedComponentId,
+  );
+  const selectedLearningState = selectedComponent
+    ? learningStateByComponentId.get(selectedComponent.id)
+    : undefined;
+
+  useEffect(() => {
+    setSelectedComponentId(null);
+  }, [collapsed, currentSceneId, stage?.id]);
 
   useEffect(() => {
     if (!learningLoopEnabled || !stage?.id || !currentSceneId) return;
@@ -181,6 +191,7 @@ export function KnowledgePathSidebar({
   }, [currentSceneId, collapsed]);
 
   const selectScene = (sceneId: string) => {
+    setSelectedComponentId(null);
     if (onSceneSelect) onSceneSelect(sceneId);
     else setCurrentSceneId(sceneId);
   };
@@ -288,7 +299,10 @@ export function KnowledgePathSidebar({
             <TooltipTrigger asChild>
               <button
                 type="button"
-                onClick={() => onCollapseChange(!collapsed)}
+                onClick={() => {
+                  setSelectedComponentId(null);
+                  onCollapseChange(!collapsed);
+                }}
                 className={cn(
                   'flex size-8 shrink-0 items-center justify-center rounded-xl border border-border/70 bg-background/75 text-muted-foreground shadow-sm transition-colors hover:border-primary/25 hover:bg-primary/10 hover:text-primary',
                   collapsed && 'mx-auto',
@@ -392,8 +406,10 @@ export function KnowledgePathSidebar({
                       'group relative flex w-full text-left outline-none transition-all duration-200 focus-visible:ring-2 focus-visible:ring-primary/50',
                       collapsed
                         ? 'h-10 items-center justify-center rounded-xl'
-                        : 'min-h-[68px] gap-3 rounded-2xl py-2.5 pl-1.5 pr-2',
-                      learningLoopEnabled && !collapsed && 'pr-10',
+                        : cn(
+                            'min-h-[68px] gap-3 rounded-2xl py-2.5 pl-1.5',
+                            learningLoopEnabled && knowledgeComponent ? 'pr-16' : 'pr-2',
+                          ),
                       isActive
                         ? classroomShellStyles.knowledgeNodeActive
                         : 'hover:bg-background/65',
@@ -437,14 +453,16 @@ export function KnowledgePathSidebar({
                           >
                             {scene.title}
                           </span>
-                          <ChevronRight
-                            className={cn(
-                              'mt-0.5 size-3.5 shrink-0 transition-all',
-                              isActive
-                                ? 'text-primary opacity-100'
-                                : '-translate-x-1 text-muted-foreground opacity-0 group-hover:translate-x-0 group-hover:opacity-70',
-                            )}
-                          />
+                          {!(learningLoopEnabled && knowledgeComponent) && (
+                            <ChevronRight
+                              className={cn(
+                                'mt-0.5 size-3.5 shrink-0 transition-all',
+                                isActive
+                                  ? 'text-primary opacity-100'
+                                  : '-translate-x-1 text-muted-foreground opacity-0 group-hover:translate-x-0 group-hover:opacity-70',
+                              )}
+                            />
+                          )}
                         </span>
                         <span className="mt-1.5 flex items-center gap-1.5 text-[10px]">
                           <Icon className="size-3 text-primary/75" aria-hidden="true" />
@@ -453,14 +471,6 @@ export function KnowledgePathSidebar({
                             {status}
                           </span>
                         </span>
-                        {learningLoopEnabled && knowledgeComponent?.objective && (
-                          <span
-                            data-testid="knowledge-component-objective"
-                            className="mt-1.5 line-clamp-2 block text-[10px] leading-4 text-muted-foreground/80"
-                          >
-                            {knowledgeComponent.objective}
-                          </span>
-                        )}
                         {showPreviews && (
                           <span className="mt-2 block aspect-[16/7] overflow-hidden rounded-xl border border-border/70 bg-muted/50">
                             {scene.type === 'slide' ? (
@@ -486,13 +496,12 @@ export function KnowledgePathSidebar({
                   learningLoopEnabled && !collapsed && knowledgeComponent ? (
                     <div key={scene.id} className="relative">
                       {sceneNode}
-                      <KnowledgeComponentDetailsButton
-                        component={knowledgeComponent}
-                        learningState={learningState}
-                        isChinese={isChinese}
-                        onMarkConfusion={() => markConfusion(knowledgeComponent)}
-                        onStartRepair={() => setRepairComponent(knowledgeComponent)}
-                        onEvidenceOpened={() => {
+                      <button
+                        type="button"
+                        data-testid="knowledge-component-details-trigger"
+                        onClick={(event) => {
+                          detailsTriggerRef.current = event.currentTarget;
+                          setSelectedComponentId(knowledgeComponent.id);
                           if (!stage?.id) return;
                           trackLearningLoopEvent({
                             name: 'learning_loop_evidence_opened',
@@ -507,7 +516,15 @@ export function KnowledgePathSidebar({
                             });
                           }
                         }}
-                      />
+                        aria-label={
+                          isChinese
+                            ? `查看“${knowledgeComponent.title}”的学习目标与理解证据`
+                            : `View learning objective and evidence for ${knowledgeComponent.title}`
+                        }
+                        className="absolute right-1.5 top-2.5 flex min-h-11 min-w-11 items-center justify-center rounded-lg px-1.5 text-[11px] font-semibold text-primary/85 transition-colors hover:bg-primary/10 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                      >
+                        {isChinese ? '详情' : 'Details'}
+                      </button>
                     </div>
                   ) : (
                     sceneNode
@@ -521,6 +538,13 @@ export function KnowledgePathSidebar({
                       <p className="text-[10px] text-muted-foreground">
                         {typeLabel(scene.type)} · {status}
                       </p>
+                      {learningLoopEnabled && knowledgeComponent && (
+                        <p className="mt-1 text-[10px] text-muted-foreground">
+                          {isChinese
+                            ? '展开路径可查看目标与证据'
+                            : 'Expand path to view objective and evidence'}
+                        </p>
+                      )}
                     </TooltipContent>
                   </Tooltip>
                 ) : (
@@ -596,8 +620,31 @@ export function KnowledgePathSidebar({
               : 'Learning evidence is not synced yet. You can keep learning.'}
           </div>
         )}
+        {learningLoopEnabled && !collapsed && selectedComponent && !repairComponent && (
+          <ComponentDetailsDialog
+            key={selectedComponent.id}
+            component={selectedComponent}
+            learningState={selectedLearningState}
+            isChinese={isChinese}
+            onClose={() => {
+              setSelectedComponentId(null);
+              window.requestAnimationFrame(() => {
+                if (detailsTriggerRef.current?.isConnected) detailsTriggerRef.current.focus();
+              });
+            }}
+            onMarkConfusion={() => {
+              setSelectedComponentId(null);
+              void markConfusion(selectedComponent);
+            }}
+            onStartRepair={() => {
+              setSelectedComponentId(null);
+              setRepairComponent(selectedComponent);
+            }}
+          />
+        )}
         {learningLoopEnabled && repairComponent && (
           <RepairPanel
+            key={`${repairComponent.stageId}:${repairComponent.id}`}
             component={repairComponent}
             evidence={evidence.filter((item) => item.componentId === repairComponent.id)}
             isChinese={isChinese}
@@ -606,123 +653,6 @@ export function KnowledgePathSidebar({
         )}
       </aside>
     </TooltipProvider>
-  );
-}
-
-function KnowledgeComponentDetailsButton({
-  component,
-  learningState,
-  isChinese,
-  onMarkConfusion,
-  onStartRepair,
-  onEvidenceOpened,
-}: {
-  readonly component: KnowledgeComponent;
-  readonly learningState?: ComponentLearningState;
-  readonly isChinese: boolean;
-  readonly onMarkConfusion: () => Promise<void>;
-  readonly onStartRepair: () => void;
-  readonly onEvidenceOpened: () => void;
-}) {
-  return (
-    <Popover onOpenChange={(open) => open && onEvidenceOpened()}>
-      <PopoverTrigger asChild>
-        <button
-          type="button"
-          data-testid="knowledge-component-details-trigger"
-          className="absolute right-2 top-2.5 z-20 flex size-6 items-center justify-center rounded-lg text-muted-foreground/70 transition-colors hover:bg-primary/10 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-          aria-label={
-            isChinese ? `查看“${component.title}”构件详情` : `View ${component.title} details`
-          }
-        >
-          <Info className="size-3.5" />
-        </button>
-      </PopoverTrigger>
-      <PopoverContent
-        side="right"
-        align="start"
-        sideOffset={10}
-        data-testid="knowledge-component-details"
-        className="w-72 rounded-2xl p-4"
-      >
-        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
-          {isChinese ? '知识构件' : 'Knowledge component'}
-        </p>
-        <h3 className="mt-1 text-sm font-semibold text-foreground">{component.title}</h3>
-        <div className="mt-3 flex items-center justify-between rounded-xl bg-muted/50 px-3 py-2 text-[11px]">
-          <span className="text-muted-foreground">
-            {isChinese ? '理解状态' : 'Understanding status'}
-          </span>
-          <span className="font-medium text-foreground">
-            {learningStatusLabel(learningState?.status ?? 'not_started', isChinese)}
-          </span>
-        </div>
-        {component.objective && (
-          <div className="mt-3">
-            <p className="text-[10px] font-medium text-muted-foreground">
-              {isChinese ? '构建目标' : 'Learning objective'}
-            </p>
-            <p className="mt-1 text-xs leading-5 text-foreground/85">{component.objective}</p>
-          </div>
-        )}
-        {component.keyPoints.length > 0 && (
-          <div className="mt-3">
-            <p className="text-[10px] font-medium text-muted-foreground">
-              {isChinese ? '关键支点' : 'Key points'}
-            </p>
-            <ul className="mt-1.5 space-y-1.5">
-              {component.keyPoints.slice(0, 4).map((point) => (
-                <li key={point} className="flex gap-2 text-xs leading-5 text-foreground/80">
-                  <span className="mt-2 size-1 shrink-0 rounded-full bg-primary/70" />
-                  <span>{point}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-        {learningState && learningState.evidence.length > 0 && (
-          <div className="mt-3">
-            <p className="text-[10px] font-medium text-muted-foreground">
-              {isChinese ? '理解证据' : 'Understanding evidence'}
-            </p>
-            <ul className="mt-1.5 space-y-1.5" data-testid="learning-evidence-list">
-              {learningState.evidence.slice(-4).map((item) => (
-                <li
-                  key={item.eventId}
-                  className="rounded-lg bg-muted/40 px-2.5 py-2 text-[11px] text-foreground/80"
-                >
-                  {evidenceLabel(item.type, item.outcome, isChinese)}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-        <button
-          type="button"
-          onClick={() =>
-            learningState?.status === 'needs_revisit' ? onStartRepair() : void onMarkConfusion()
-          }
-          className="mt-3 w-full rounded-xl border border-primary/20 bg-primary/5 px-3 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35"
-        >
-          {learningState?.status === 'needs_revisit'
-            ? isChinese
-              ? '开始补学'
-              : 'Start repair path'
-            : isChinese
-              ? '这里没懂'
-              : "I don't understand this yet"}
-        </button>
-        <p className="mt-3 border-t border-border/60 pt-2 text-[10px] text-muted-foreground/75">
-          {component.source === 'outline-derived'
-            ? isChinese
-              ? '目标与关键点来自课程生成大纲'
-              : 'Objective and key points come from the course outline'
-            : isChinese
-              ? '此构件由当前教学场景安全派生'
-              : 'This component is safely derived from the current scene'}
-        </p>
-      </PopoverContent>
-    </Popover>
   );
 }
 
@@ -735,18 +665,6 @@ function learningStatusLabel(status: LearningComponentStatus, isChinese: boolean
     verified: ['已有验证', 'Verified'],
   };
   return labels[status][isChinese ? 0 : 1];
-}
-
-function evidenceLabel(type: string, outcome: string, isChinese: boolean): string {
-  if (type === 'scene_visited') return isChinese ? '已进入该知识构件' : 'Component visited';
-  if (type === 'learner_confusion') return isChinese ? '你标记了“这里没懂”' : 'Marked as unclear';
-  if (type === 'quiz_reviewed') {
-    if (outcome === 'supports') return isChinese ? '理解检测回答正确' : 'Quiz answer correct';
-    return isChinese ? '理解检测需要回看' : 'Quiz answer needs review';
-  }
-  if (type === 'verification_passed') return isChinese ? '补学验证通过' : 'Verification passed';
-  if (type === 'verification_failed') return isChinese ? '补学验证未通过' : 'Verification failed';
-  return isChinese ? '已记录一条学习证据' : 'Learning evidence recorded';
 }
 
 function PathStatusNode({
