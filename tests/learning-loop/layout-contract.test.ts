@@ -29,5 +29,7 @@ describe('learning loop layout contracts', () => {
       completion.indexOf('<KnowledgeReportCard report={knowledgeReport}'),
     );
     expect(completion).toContain('aria-expanded={expanded}');
+    expect(completion).toContain('data-testid="optional-learning-review"');
+    expect(completion).toContain('学习回顾（可选）');
   });
 });

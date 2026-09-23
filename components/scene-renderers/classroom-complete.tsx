@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { animate, motion, MotionConfig, useReducedMotion } from 'motion/react';
 import { FileText, HelpCircle, Gamepad2, Puzzle } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -329,6 +330,7 @@ export function ClassroomCompletePage({
   knowledgeReport,
 }: ClassroomCompletePageProps) {
   const { t, locale } = useI18n();
+  const [reviewOpen, setReviewOpen] = useState(false);
   const prefersReducedMotion = useReducedMotion();
 
   const [resolvedSummary, setResolvedSummary] = useState(() => ({
@@ -533,7 +535,23 @@ export function ClassroomCompletePage({
           )}
 
           {knowledgeReport && knowledgeReport.components.length > 0 && (
-            <KnowledgeReportCard report={knowledgeReport} isChinese={locale === 'zh-CN'} />
+            <details
+              className="w-full rounded-2xl border border-border/70 bg-card/60 p-4"
+              data-testid="optional-learning-review"
+              onToggle={(event) => setReviewOpen(event.currentTarget.open)}
+            >
+              <summary className="cursor-pointer text-sm font-medium text-muted-foreground">
+                {locale === 'zh-CN' ? '学习回顾（可选）' : 'Learning review (optional)'}
+              </summary>
+              <p className="my-3 text-xs leading-6 text-muted-foreground">
+                {locale === 'zh-CN'
+                  ? '本节课程已结束。你可以直接离开，也可以按需查看理解记录、回看内容或补学；无需全部验证通过。'
+                  : 'The class has ended. You can leave, or optionally review your learning records. Passing every verification is not required.'}
+              </p>
+              {reviewOpen && (
+                <KnowledgeReportCard report={knowledgeReport} isChinese={locale === 'zh-CN'} />
+              )}
+            </details>
           )}
         </div>
       </section>
@@ -615,6 +633,12 @@ function KnowledgeReportCard({
           </span>
         </div>
       </div>
+      <Link
+        href={`/review?course=${encodeURIComponent(report.stageId)}`}
+        className="mt-4 inline-flex min-h-11 items-center rounded-xl border border-border px-4 text-sm font-medium text-primary"
+      >
+        {isChinese ? '按需进入复习 →' : 'Review if helpful →'}
+      </Link>
       {previewComponents.length === 0 && !expanded && (
         <p className="mt-4 rounded-2xl bg-muted/50 p-4 text-xs leading-5 text-muted-foreground">
           {isChinese

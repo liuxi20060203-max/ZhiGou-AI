@@ -2,6 +2,7 @@ import type { SceneOutline } from '@/lib/types/generation';
 import type { Scene, Stage } from '@/lib/types/stage';
 
 import type { KnowledgeComponent, KnowledgeModel, LearningEvidenceType } from './types';
+import { readAuthoredKnowledgeContent } from './authoring';
 
 const VERIFICATION_EVIDENCE: LearningEvidenceType[] = [
   'verification_passed',
@@ -43,7 +44,7 @@ function outlineForScene(
 }
 
 /**
- * Build the read-only knowledge model without changing the Stage/Scene DSL.
+ * Derive the knowledge model, preferring validated app-owned scene annotations.
  *
  * Outline enrichment is identity-only. Scene order is mutable in Pro mode, so
  * using it as a fallback can attach another page's teaching objective after a
@@ -67,10 +68,16 @@ export function buildKnowledgeModel(
     const outline = outlineForScene(scene, outlinesById);
     const id = knowledgeComponentId(stageId, scene.id);
     const previous = components.at(-1);
+    const authored = readAuthoredKnowledgeContent(scene.knowledgeContent);
     const title =
       cleanText(scene.title) ?? cleanText(outline?.title) ?? `Knowledge component ${scene.order}`;
-    const objective = cleanText(outline?.teachingObjective) ?? cleanText(outline?.description);
-    const keyPoints = outline ? cleanKeyPoints(outline.keyPoints) : fallbackKeyPoints(scene);
+    const objective =
+      authored?.objective ??
+      cleanText(outline?.teachingObjective) ??
+      cleanText(outline?.description);
+    const keyPoints =
+      authored?.keyPoints ??
+      (outline ? cleanKeyPoints(outline.keyPoints) : fallbackKeyPoints(scene));
     const acceptedEvidenceTypes =
       scene.type === 'quiz'
         ? (['quiz_reviewed', ...VERIFICATION_EVIDENCE] satisfies LearningEvidenceType[])
@@ -82,13 +89,16 @@ export function buildKnowledgeModel(
       title,
       ...(objective ? { objective } : {}),
       keyPoints,
+      ...(authored
+        ? { contentRevision: authored.revision, authoredVerification: authored.verification }
+        : {}),
       sceneIds: [scene.id],
       prerequisiteIds: previous ? [previous.id] : [],
       verification: {
         requiredEvidenceCount: 1,
         acceptedEvidenceTypes,
       },
-      source: outline ? 'outline-derived' : 'scene-derived',
+      source: authored ? 'authored' : outline ? 'outline-derived' : 'scene-derived',
       version: 1,
     });
   }

@@ -42,7 +42,12 @@ export function buildKnowledgeConstructionReport(input: {
       title: component.title,
       status: state.status,
       evidenceIds: state.evidence.map((item) => item.eventId),
-      explanation: explanation(state.status, state.evidence.length, chinese),
+      explanation:
+        (state.historicalEvidence?.length
+          ? chinese
+            ? '内容已更新；旧版记录作为历史保留。'
+            : 'Content has changed; older evidence is retained as history. '
+          : '') + explanation(state.status, state.evidence.length, chinese),
       ...(state.status === 'needs_revisit'
         ? {
             suggestedNextAction: chinese
@@ -61,7 +66,8 @@ export function buildKnowledgeConstructionReport(input: {
   const repairedComponentIds = components
     .filter((component) =>
       input.evidence.some(
-        (item) => item.componentId === component.componentId && item.type === 'verification_passed',
+        (item) =>
+          component.evidenceIds.includes(item.eventId) && item.type === 'verification_passed',
       ),
     )
     .map((component) => component.componentId);

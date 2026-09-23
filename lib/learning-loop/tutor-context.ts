@@ -23,6 +23,7 @@ export function buildTutorLearningContext(input: {
     .find(
       (plan) =>
         plan.componentId === component.id &&
+        plan.componentRevision === component.contentRevision &&
         (plan.status === 'proposed' || plan.status === 'active'),
     );
   return {

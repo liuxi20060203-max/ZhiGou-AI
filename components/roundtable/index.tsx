@@ -39,6 +39,7 @@ import type { DiscussionAction } from '@/lib/types/action';
 import type { EngineMode, PlaybackView } from '@/lib/playback';
 import { getCoursePlaybackProgress } from '@/components/canvas/course-playback-progress';
 import type { Participant } from '@/lib/types/roundtable';
+import { CurrentSpeechCardAction } from '@/components/knowledge-cards/save-message-card';
 
 export interface DiscussionRequest {
   topic: string;
@@ -53,6 +54,7 @@ interface RoundtableProps {
   readonly initialParticipants?: Participant[];
   readonly playbackView?: PlaybackView; // Centralised derived state from Stage
   readonly currentSpeech?: string | null; // Live SSE speech (from StreamBuffer — discussion/QA)
+  readonly activeMessageId?: string | null;
   readonly lectureSpeech?: string | null; // Active lecture speech (from PlaybackEngine, full text)
   readonly idleText?: string | null; // Static idle text (first speech action)
   readonly playbackCompleted?: boolean; // True when engine finished all actions (show restart icon)
@@ -163,6 +165,7 @@ export function Roundtable({
   initialParticipants = [],
   playbackView,
   currentSpeech,
+  activeMessageId,
   lectureSpeech,
   idleText,
   playbackCompleted,
@@ -1276,6 +1279,12 @@ export function Roundtable({
         >
           <ChevronDown className="size-4" />
         </button>
+        <div className="absolute right-12 top-1 z-40 rounded-lg bg-background/90 px-1">
+          <CurrentSpeechCardAction
+            messageId={!collapsed && currentSpeech ? activeMessageId : null}
+            streaming={!!isStreaming}
+          />
+        </div>
         {/* Left: Teacher identity */}
         <div
           className={cn(

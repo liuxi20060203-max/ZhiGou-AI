@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { trackLearningLoopEvent } from '@/lib/learning-loop/analytics';
 import { getCurrentModelConfig } from '@/lib/utils/model-config';
 import { buildTemplateRepairPlan, isValidRepairPlan } from '@/lib/learning-loop/repair-plan';
+import { applyAuthoredVerification } from '@/lib/learning-loop/authoring';
 import {
   appendLearningEvidence,
   appendRepairPlanSnapshot,
@@ -27,6 +28,7 @@ interface RepairPanelProps {
   readonly evidence: LearningEvidence[];
   readonly isChinese: boolean;
   readonly onClose: () => void;
+  readonly returnLabel?: string;
 }
 
 function evidenceEvent(input: {
@@ -45,13 +47,24 @@ function evidenceEvent(input: {
     outcome: input.outcome,
     strength: input.strength,
     source: 'repair',
-    payload: input.payload,
+    payload: {
+      ...input.payload,
+      ...(input.component.contentRevision
+        ? { componentRevision: input.component.contentRevision }
+        : {}),
+    },
     occurredAt: new Date().toISOString(),
     schemaVersion: 1,
   };
 }
 
-export function RepairPanel({ component, evidence, isChinese, onClose }: RepairPanelProps) {
+export function RepairPanel({
+  component,
+  evidence,
+  isChinese,
+  onClose,
+  returnLabel,
+}: RepairPanelProps) {
   // Evidence changes after every repair step. Capture the opening context so those
   // updates cannot re-run preparation and overwrite an in-flight completion.
   const [openingContext] = useState(() => ({ component, evidence, isChinese }));
@@ -70,6 +83,7 @@ export function RepairPanel({ component, evidence, isChinese, onClose }: RepairP
           .filter(
             (item) =>
               item.componentId === component.id &&
+              item.componentRevision === component.contentRevision &&
               (item.status === 'proposed' || item.status === 'active'),
           )
           .at(-1);
@@ -105,7 +119,8 @@ export function RepairPanel({ component, evidence, isChinese, onClose }: RepairP
           });
           if (response.ok) {
             const body = (await response.json()) as { plan?: RepairPlan };
-            if (body.plan && isValidRepairPlan(body.plan)) resolved = body.plan;
+            if (body.plan && isValidRepairPlan(body.plan))
+              resolved = applyAuthoredVerification(body.plan, component);
           } else {
             trackLearningLoopEvent({
               name: 'learning_loop_generation_failed',
@@ -223,7 +238,7 @@ export function RepairPanel({ component, evidence, isChinese, onClose }: RepairP
         showCloseButton={false}
         aria-describedby={undefined}
         data-testid="repair-panel"
-        className="flex h-[min(680px,calc(100dvh-32px))] w-[min(460px,calc(100vw-32px))] max-w-none flex-col gap-0 overflow-hidden rounded-3xl border border-primary/20 bg-background p-0 shadow-2xl"
+        className="flex h-[min(680px,calc(100dvh-32px))] w-[min(460px,calc(100vw-32px))] max-w-none flex-col gap-0 overflow-hidden rounded-3xl border border-primary/20 bg-background p-0 shadow-2xl transition-none"
       >
         <header className="flex items-start justify-between border-b border-border/70 px-5 py-4">
           <div>
@@ -339,7 +354,7 @@ export function RepairPanel({ component, evidence, isChinese, onClose }: RepairP
             <footer className="border-t border-border/70 p-4">
               {plan.status === 'completed' ? (
                 <Button className="w-full" onClick={onClose}>
-                  {isChinese ? '返回课堂' : 'Return to class'}
+                  {returnLabel ?? (isChinese ? '返回课堂' : 'Return to class')}
                 </Button>
               ) : step.type === 'verification' ? (
                 <Button

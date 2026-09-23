@@ -1,4 +1,5 @@
 import type { KnowledgeComponent, LearningEvidence, RepairPlan, RepairStep } from './types';
+import { repairVerificationSchema } from './authoring';
 
 function distractors(component: KnowledgeComponent, answer: string): string[] {
   const candidates = [
@@ -40,7 +41,7 @@ export function buildTemplateRepairPlan(input: {
       type: 'verification',
       title: '快速验证',
       content: '选择最符合当前知识构件目标的一项。',
-      verification: {
+      verification: component.authoredVerification ?? {
         question: `关于“${component.title}”，哪一项最符合本节的关键内容？`,
         options,
         correctIndex: 0,
@@ -52,6 +53,7 @@ export function buildTemplateRepairPlan(input: {
     id: input.id ?? `repair:${component.id}:${Date.parse(now)}`,
     stageId: component.stageId,
     componentId: component.id,
+    ...(component.contentRevision ? { componentRevision: component.contentRevision } : {}),
     triggerEvidenceIds: input.evidence
       .filter((item) => item.outcome === 'contradicts')
       .map((item) => item.eventId),
@@ -70,19 +72,12 @@ export function buildTemplateRepairPlan(input: {
 
 export function isValidRepairPlan(plan: RepairPlan): boolean {
   if (plan.contentVersion !== 1 || plan.steps.length < 1 || plan.steps.length > 3) return false;
-  if (!plan.steps.some((step) => step.type === 'verification' && step.verification)) return false;
+  if (plan.steps.filter((step) => step.type === 'verification' && step.verification).length !== 1)
+    return false;
   return plan.steps.every((step) => {
     if (!step.id || !step.title || !step.content) return false;
     if (!['explanation', 'example', 'verification'].includes(step.type)) return false;
     if (step.type !== 'verification') return step.verification === undefined;
-    const check = step.verification;
-    return Boolean(
-      check &&
-      check.question &&
-      check.options.length >= 2 &&
-      check.correctIndex >= 0 &&
-      check.correctIndex < check.options.length &&
-      check.explanation,
-    );
+    return repairVerificationSchema.safeParse(step.verification).success;
   });
 }

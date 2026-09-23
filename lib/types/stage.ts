@@ -16,6 +16,7 @@ import type {
   SceneContent as DslSceneContent,
 } from '@openmaic/dsl';
 import type { Action } from '@/lib/types/action';
+import type { AuthoredKnowledgeContent } from '@/lib/learning-loop/types';
 import type { WidgetConfig } from '@/lib/types/widgets';
 import type { PBLProjectConfig } from '@/lib/pbl/legacy/read';
 import type { PBLProjectV2 } from '@/lib/pbl/v2/types';
@@ -107,6 +108,8 @@ export type AppScene = DslScene<Action, SceneContent> & {
    * scene-derived outline.
    */
   outlineId?: string;
+  /** Creator-authored learning objectives and repair verification, saved with the course. */
+  knowledgeContent?: AuthoredKnowledgeContent;
 };
 export type Scene = AppScene;
 

@@ -4,6 +4,7 @@ import {
   LEARNING_TASK_STORAGE_KEY,
   LEARNING_TASK_DRAFT_SESSION_KEY,
   findLearningTaskByClassroomId,
+  ensureClassroomLearningTask,
   getLearningTask,
   loadLearningTasks,
   recordVisitedScene,
@@ -25,6 +26,61 @@ function createMemoryStorage(initial?: string): LearningTaskStorage {
 }
 
 describe('learning task storage', () => {
+  it('backfills a free-created classroom once and restores real progress, notes and bookmarks', () => {
+    const storage = createMemoryStorage();
+    const task = ensureClassroomLearningTask('free-course', '小数课程', { storage, now: 1 })!;
+    expect(task).toMatchObject({
+      classroomId: 'free-course',
+      status: 'ready',
+      visitedSceneIds: [],
+      notes: {},
+    });
+    recordVisitedScene(task.id, 'first', { storage });
+    saveLearningTaskNote(task.id, 'first', '我的笔记', { storage });
+    toggleLearningTaskReviewScene(task.id, 'first', { storage });
+    const restored = ensureClassroomLearningTask('free-course', '新的课程名称', {
+      storage,
+      now: 2,
+    });
+    expect(restored).toMatchObject({
+      id: task.id,
+      visitedSceneIds: ['first'],
+      reviewSceneIds: ['first'],
+    });
+    expect(restored?.notes.first?.content).toBe('我的笔记');
+    expect(loadLearningTasks(storage)).toHaveLength(1);
+  });
+  it('preserves the user-created task and its original goal without making a second task', () => {
+    const storage = createMemoryStorage();
+    const task = {
+      ...createConceptLearningTask(
+        { courseName: '数学', knowledgePoint: '小数', learningGoal: '我自定的目标' },
+        { id: 'custom' },
+      ),
+      classroomId: 'course',
+    };
+    upsertLearningTask(task, storage);
+    expect(ensureClassroomLearningTask('course', '生成课堂', { storage })).toEqual(task);
+    expect(loadLearningTasks(storage)).toHaveLength(1);
+  });
+  it('fails without overwriting damaged, unsupported or unavailable task storage', () => {
+    for (const raw of ['broken', '{}', '[{"schemaVersion":99}]']) {
+      const storage = createMemoryStorage(raw);
+      expect(ensureClassroomLearningTask('course', '课程', { storage })).toBeNull();
+      expect(storage.getItem(LEARNING_TASK_STORAGE_KEY)).toBe(raw);
+    }
+    expect(ensureClassroomLearningTask('course', '课程', { storage: null })).toBeNull();
+    expect(
+      ensureClassroomLearningTask('course', '课程', {
+        storage: {
+          getItem: () => null,
+          setItem: () => {
+            throw Error('quota');
+          },
+        },
+      }),
+    ).toBeNull();
+  });
   it('uses separate versioned keys for durable tasks and active-tab recovery', () => {
     expect(LEARNING_TASK_STORAGE_KEY).toBe('zhigou.learning.tasks.v1');
     expect(LEARNING_TASK_DRAFT_SESSION_KEY).toBe('zhigou.learning.activeDraft.v1');

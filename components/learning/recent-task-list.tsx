@@ -27,8 +27,13 @@ import {
   updateLearningTask,
 } from '@/lib/learning/task-storage';
 import type { LearningTask, LearningTaskStatus } from '@/lib/learning/types';
+import { isAutomaticLearningRecord, learningRecordHref } from '@/lib/learning/task-presentation';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { TaskNoteList } from './task-note-list';
+import { KnowledgeCardList } from '@/components/knowledge-cards/card-list';
+import { KNOWLEDGE_CARDS_CHANGED, readAllKnowledgeCards } from '@/lib/knowledge-cards/storage';
+import { isLearningLoopEnabled } from '@/lib/config/feature-flags';
 
 const STATUS_LABELS: Record<'zh-CN' | 'en-US', Record<LearningTaskStatus, string>> = {
   'zh-CN': { draft: '待继续', generating: '生成中', ready: '学习中', reviewed: '已回顾' },
@@ -50,6 +55,31 @@ export function RecentTaskList() {
   const [tasks, setTasks] = useState<LearningTask[]>([]);
   const [activeFilter, setActiveFilter] = useState<TaskFilter>('all');
   const [launchingDemo, setLaunchingDemo] = useState(false);
+  const [cardCount, setCardCount] = useState<number | null>(null);
+  const cardsEnabled = isLearningLoopEnabled();
+
+  useEffect(() => {
+    if (!cardsEnabled) return;
+    let cancelled = false;
+    let generation = 0;
+    const refreshCards = async () => {
+      const current = ++generation;
+      try {
+        const cards = await readAllKnowledgeCards();
+        if (!cancelled && current === generation) setCardCount(cards.length);
+      } catch {
+        if (!cancelled && current === generation) setCardCount(null);
+      }
+    };
+    void refreshCards();
+    window.addEventListener('focus', refreshCards);
+    window.addEventListener(KNOWLEDGE_CARDS_CHANGED, refreshCards);
+    return () => {
+      cancelled = true;
+      window.removeEventListener('focus', refreshCards);
+      window.removeEventListener(KNOWLEDGE_CARDS_CHANGED, refreshCards);
+    };
+  }, [cardsEnabled]);
 
   const refresh = useCallback(() => setTasks(loadLearningTasks()), []);
   useEffect(() => {
@@ -93,13 +123,15 @@ export function RecentTaskList() {
     (task) => task.status === 'generating' || task.status === 'ready',
   );
   const reviewTasks = tasks.filter((task) => task.reviewSceneIds.length > 0);
-  const noteTasks = tasks.filter((task) => Object.keys(task.notes).length > 0);
+  const noteTasks = tasks.filter((task) =>
+    Object.values(task.notes).some((note) => note.content.trim()),
+  );
   const reviewItemCount = reviewTasks.reduce(
     (total, task) => total + task.reviewSceneIds.length,
     0,
   );
   const noteItemCount = noteTasks.reduce(
-    (total, task) => total + Object.keys(task.notes).length,
+    (total, task) => total + Object.values(task.notes).filter((note) => note.content.trim()).length,
     0,
   );
   const filteredTasks =
@@ -113,9 +145,9 @@ export function RecentTaskList() {
   const summaryItems = [
     {
       id: 'all' as const,
-      label: zh ? '全部任务' : 'All tasks',
+      label: zh ? '学习记录' : 'Learning history',
       value: tasks.length,
-      detail: zh ? '全部学习任务' : 'Every learning task',
+      detail: zh ? '课程访问与自主学习计划' : 'Course visits and your learning plans',
       icon: Target,
     },
     {
@@ -127,53 +159,61 @@ export function RecentTaskList() {
     },
     {
       id: 'review' as const,
-      label: zh ? '待复习' : 'To review',
+      label: zh ? '复习收藏' : 'Review bookmarks',
       value: reviewTasks.length,
-      detail: zh ? `共 ${reviewItemCount} 个环节` : `${reviewItemCount} scenes in total`,
+      detail: zh ? `主动收藏 ${reviewItemCount} 个环节` : `${reviewItemCount} bookmarked scenes`,
       icon: Bookmark,
     },
     {
       id: 'notes' as const,
       label: zh ? '学习笔记' : 'Notes',
-      value: noteTasks.length,
-      detail: zh ? `共 ${noteItemCount} 条笔记` : `${noteItemCount} notes in total`,
+      value: noteItemCount + (cardsEnabled ? (cardCount ?? 0) : 0),
+      detail: cardsEnabled
+        ? zh
+          ? `${noteItemCount} 条笔记 · ${cardCount ?? '—'} 张知识卡`
+          : `${noteItemCount} notes · ${cardCount ?? '—'} cards`
+        : zh
+          ? `共 ${noteItemCount} 条笔记`
+          : `${noteItemCount} notes in total`,
       icon: FileText,
     },
   ];
   const filterCopy = {
     all: {
-      title: zh ? '全部学习任务' : 'All learning tasks',
-      description: zh ? '查看并继续你的目标学习任务。' : 'View and continue your goal-based tasks.',
-      emptyTitle: zh ? '从第一个明确的学习目标开始' : 'Start with one clear learning goal',
+      title: zh ? '最近学习' : 'Recent learning',
+      description: zh
+        ? '随时继续课堂；笔记、复习和学习计划均可按需使用。'
+        : 'Continue a course anytime. Notes, review and learning plans are optional.',
+      emptyTitle: zh ? '从一门感兴趣的课程开始' : 'Start with a course that interests you',
       emptyDescription: zh
-        ? '创建目标任务后，课堂访问、笔记和复习重点会自动汇总在这里。'
-        : 'Classroom visits, notes, and review points will be collected here.',
+        ? '直接创作课程或体验示例，无需先创建学习任务。'
+        : 'Create a course or try a demo. No learning task is required.',
     },
     active: {
-      title: zh ? '进行中的任务' : 'Active tasks',
+      title: zh ? '可继续的学习' : 'Continue learning',
       description: zh
-        ? '只显示正在生成或已经进入学习的任务。'
-        : 'Tasks being generated or studied.',
-      emptyTitle: zh ? '当前没有进行中的任务' : 'No active tasks',
+        ? '查看正在生成或已访问的课程，按自己的节奏继续。'
+        : 'Courses being generated or visited. Continue at your own pace.',
+      emptyTitle: zh ? '暂时没有可继续的课程' : 'No courses to continue yet',
       emptyDescription: zh
         ? '草稿不会计入进行中，继续草稿后即可开始学习。'
         : 'Drafts are not counted as active.',
     },
     review: {
-      title: zh ? '待复习任务' : 'Tasks to review',
+      title: zh ? '你收藏的复习内容' : 'Your review bookmarks',
       description: zh
         ? '这些任务包含你主动标记的待复习环节。'
         : 'Tasks with scenes you marked to revisit.',
-      emptyTitle: zh ? '暂时没有待复习内容' : 'Nothing to review yet',
+      emptyTitle: zh ? '还没有复习收藏' : 'No review bookmarks yet',
       emptyDescription: zh
         ? '进入课堂后，可以在学习任务面板中标记重点环节。'
         : 'Mark important scenes from the classroom task panel.',
     },
     notes: {
-      title: zh ? '包含笔记的任务' : 'Tasks with notes',
+      title: zh ? '学习笔记' : 'Learning notes',
       description: zh
-        ? '只显示已经留下有效学习笔记的任务。'
-        : 'Tasks that contain saved learning notes.',
+        ? '集中查看任务笔记与课堂中保存的知识卡。'
+        : 'Find task notes and knowledge cards saved in class.',
       emptyTitle: zh ? '暂时还没有学习笔记' : 'No learning notes yet',
       emptyDescription: zh
         ? '在关联课堂的学习任务面板中记录你的理解。'
@@ -196,21 +236,17 @@ export function RecentTaskList() {
                 {zh ? '知构学习空间' : 'ZhiGou learning space'}
               </div>
               <h1 className="mt-3 max-w-2xl text-2xl font-semibold tracking-[-0.025em] text-foreground sm:text-[30px] sm:leading-10">
-                {zh ? '围绕目标，组织你的每一次学习' : 'Organize every session around a clear goal'}
+                {zh ? '从好奇出发，开始一堂课' : 'Follow your curiosity. Start a class.'}
               </h1>
               <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
                 {zh
-                  ? '从目标出发连接课程、笔记与复习重点，让生成的内容真正沉淀为学习成果。'
-                  : 'Connect courses, notes, and review points so generated content becomes lasting learning.'}
+                  ? '输入想学的内容，生成课程并开始学习。笔记、知识卡和复习，在你需要时提供帮助。'
+                  : 'Describe what you want to learn and start a generated course. Notes, cards and review are there when you need them.'}
               </p>
               <div className="mt-5 flex flex-wrap gap-2.5">
-                <Button onClick={() => router.push('/learn/new')}>
-                  <Plus className="size-4" />
-                  {zh ? '创建学习任务' : 'Create learning task'}
-                </Button>
-                <Button variant="outline" onClick={() => router.push('/create')}>
+                <Button onClick={() => router.push('/create')}>
                   <Sparkles className="size-4" />
-                  {zh ? '自由创作课程' : 'Create a course'}
+                  {zh ? '创作课程' : 'Create a course'}
                 </Button>
                 <Button
                   variant="secondary"
@@ -232,7 +268,20 @@ export function RecentTaskList() {
                       ? '体验示例课堂'
                       : 'Try demo classroom'}
                 </Button>
+                <Button variant="ghost" onClick={() => router.push('/learn/new')}>
+                  <Plus className="size-4" />
+                  {zh ? '按目标规划学习（可选）' : 'Plan by goal (optional)'}
+                </Button>
               </div>
+              {cardsEnabled && (
+                <Link
+                  href="/review"
+                  className="mt-2 inline-flex min-h-10 items-center gap-2 text-xs text-muted-foreground hover:text-primary"
+                >
+                  <BookOpenCheck className="size-3.5" />
+                  {zh ? '按需回顾已学内容 →' : 'Review when you need it →'}
+                </Link>
+              )}
             </div>
 
             <div
@@ -301,7 +350,10 @@ export function RecentTaskList() {
               >
                 {filterCopy.title}
                 <span className="ml-1.5 text-sm font-medium text-muted-foreground">
-                  · {filteredTasks.length}
+                  ·{' '}
+                  {activeFilter === 'notes'
+                    ? noteItemCount + (cardsEnabled ? (cardCount ?? 0) : 0)
+                    : filteredTasks.length}
                 </span>
               </h2>
             </div>
@@ -318,7 +370,39 @@ export function RecentTaskList() {
           ) : null}
         </div>
 
-        {filteredTasks.length ? (
+        {activeFilter === 'review' && cardsEnabled && (
+          <div className="mx-5 mb-4 rounded-2xl bg-primary/5 p-4 text-sm sm:mx-7">
+            <p className="text-muted-foreground">
+              {zh
+                ? '下方为主动标记的任务；复习工作台还会整理尚未解决的问题。'
+                : 'Tasks below contain your bookmarks. The review workspace also includes unresolved questions.'}
+            </p>
+            <Link
+              href="/review"
+              className="mt-2 inline-flex min-h-10 items-center font-medium text-primary"
+            >
+              {zh ? '进入复习工作台 →' : 'Open review workspace →'}
+            </Link>
+          </div>
+        )}
+        {activeFilter === 'notes' && <TaskNoteList tasks={noteTasks} zh={zh} />}
+        {activeFilter === 'notes' && cardsEnabled && (
+          <section
+            className="mx-5 mb-5 rounded-2xl border border-border/70 bg-background/55 sm:mx-7"
+            aria-label={zh ? '知识卡' : 'Knowledge cards'}
+          >
+            <h3 className="px-3 pt-4 text-sm font-semibold">{zh ? '知识卡' : 'Knowledge cards'}</h3>
+            <KnowledgeCardList
+              sourceActionLabel={zh ? '返回来源课堂' : 'Open source classroom'}
+              onOpenSource={(source) =>
+                router.push(
+                  `/classroom/${encodeURIComponent(source.stageId)}${source.sceneId ? `?scene=${encodeURIComponent(source.sceneId)}` : ''}`,
+                )
+              }
+            />
+          </section>
+        )}
+        {activeFilter === 'notes' ? null : filteredTasks.length ? (
           <div className="grid gap-3 px-5 pb-6 sm:grid-cols-2 sm:px-7 lg:grid-cols-4">
             {filteredTasks.map((task) => {
               const visitedCount = task.visitedSceneIds.length;
@@ -330,7 +414,7 @@ export function RecentTaskList() {
                   className="group flex min-h-60 flex-col rounded-2xl border border-border/70 bg-background/55 p-4 transition-[border-color,transform,box-shadow] hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_16px_35px_-28px_color-mix(in_oklab,var(--primary)_70%,transparent)]"
                 >
                   <Link
-                    href={`/learn/${task.id}`}
+                    href={learningRecordHref(task)}
                     data-testid={`learning-task-card-${task.id}`}
                     className="rounded-xl outline-none ring-primary/35 focus-visible:ring-2"
                   >
@@ -343,7 +427,11 @@ export function RecentTaskList() {
                             : 'bg-primary/10 text-primary',
                         )}
                       >
-                        {STATUS_LABELS[language][task.status]}
+                        {isAutomaticLearningRecord(task)
+                          ? zh
+                            ? '课程记录'
+                            : 'Course history'
+                          : STATUS_LABELS[language][task.status]}
                       </span>
                       <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
                         <Clock3 className="size-3" />
@@ -355,7 +443,11 @@ export function RecentTaskList() {
                       {task.knowledgePoint}
                     </h3>
                     <p className="mt-2 line-clamp-2 text-xs leading-5 text-muted-foreground">
-                      {task.learningGoal}
+                      {isAutomaticLearningRecord(task)
+                        ? zh
+                          ? '自动保留访问进度，随时继续；笔记与复习按需使用。'
+                          : 'Your visits are saved. Continue anytime; notes and review are optional.'
+                        : task.learningGoal}
                     </p>
                     <div className="mt-4 grid grid-cols-3 gap-1 rounded-xl bg-muted/55 p-2 text-center">
                       <TaskMetric value={visitedCount} label={zh ? '访问' : 'Visits'} />

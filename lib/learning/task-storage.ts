@@ -103,6 +103,48 @@ export function findLearningTaskByClassroomId(
   return loadLearningTasks(storage).find((task) => task.classroomId === classroomId) ?? null;
 }
 
+/** Backfill ordinary classrooms without replacing a deliberately authored learning task. */
+export function ensureClassroomLearningTask(
+  classroomId: string,
+  courseName: string,
+  options: { storage?: LearningTaskStorage | null; now?: number } = {},
+): LearningTask | null {
+  const storage = options.storage === undefined ? getBrowserStorage() : options.storage;
+  if (!storage || !classroomId.trim() || !courseName.trim()) return null;
+  try {
+    // Do not interpret unreadable or newer task data as an empty collection and overwrite it.
+    const raw = storage.getItem(LEARNING_TASK_STORAGE_KEY);
+    const values: unknown = raw === null ? [] : JSON.parse(raw);
+    if (!Array.isArray(values)) return null;
+    const tasks = values.map(parseTask);
+    if (tasks.some((task) => !task)) return null;
+    const existing = tasks.find((task) => task?.classroomId === classroomId);
+    if (existing) return existing;
+    const id = `classroom:${encodeURIComponent(classroomId)}`;
+    if (tasks.some((task) => task?.id === id)) return null;
+    const now = options.now ?? Date.now();
+    const task: LearningTask = {
+      schemaVersion: LEARNING_TASK_SCHEMA_VERSION,
+      id,
+      template: 'concept-understanding',
+      courseName: courseName.trim(),
+      knowledgePoint: courseName.trim(),
+      learningGoal: '按课程路径逐步学习，记录理解与疑问，完成检测后回顾需要巩固的内容。',
+      priorKnowledge: '',
+      status: 'ready',
+      classroomId,
+      visitedSceneIds: [],
+      reviewSceneIds: [],
+      notes: {},
+      createdAt: now,
+      updatedAt: now,
+    };
+    return saveLearningTasks([task, ...(tasks as LearningTask[])], storage) ? task : null;
+  } catch {
+    return null;
+  }
+}
+
 export function recordVisitedScene(
   taskId: string,
   sceneId: string,

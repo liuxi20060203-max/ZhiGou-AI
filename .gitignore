@@ -89,6 +89,14 @@ e2e/screenshots/
 /zhigou-*.png
 /ZHIGOU_PHASE_1_HANDOFF.md
 
+# Local product planning and acceptance notes (keep out of release tree)
+/ZHIGOU_LEARNING_LOOP_EXECUTION_PLAN.md
+/LEARNING_LOOP_DETAIL_DISCOVERABILITY_PLAN.md
+/LEARNING_LOOP_AUTHORING_ACCEPTANCE.md
+/LEARNING_LOOP_KNOWLEDGE_CARDS_ACCEPTANCE.md
+/LEARNING_REVIEW_WORKBENCH_PLAN.md
+/OPTIONAL_LEARNING_EXPERIENCE.md
+
 # local-only sandbox/demo pages (do not ship)
 /app/slide-renderer-demo
 

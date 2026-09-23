@@ -1,4 +1,5 @@
 import type { RuntimePayloadValidator } from '@openmaic/storage';
+import { knowledgeCardPayloadSchema } from '@/lib/knowledge-cards/types';
 
 import { LEARNING_EVIDENCE_SOURCES, LEARNING_EVIDENCE_TYPES } from './evidence';
 import { isValidRepairPlan } from './repair-plan';
@@ -58,6 +59,7 @@ export function isRepairPlanRecordPayload(payload: unknown): payload is RepairPl
     typeof plan.id !== 'string' ||
     typeof plan.stageId !== 'string' ||
     typeof plan.componentId !== 'string' ||
+    (plan.componentRevision !== undefined && typeof plan.componentRevision !== 'string') ||
     !Array.isArray(plan.triggerEvidenceIds) ||
     !plan.triggerEvidenceIds.every((id) => typeof id === 'string') ||
     typeof plan.rationale !== 'string' ||
@@ -85,6 +87,6 @@ export function isLearningJourneyRecordPayload(
 }
 
 export const learningJourneyPayloadValidator: RuntimePayloadValidator = (payload) =>
-  isLearningJourneyRecordPayload(payload)
+  isLearningJourneyRecordPayload(payload) || knowledgeCardPayloadSchema.safeParse(payload).success
     ? { valid: true }
     : invalid('learningJourney payload must be a supported versioned journey record');

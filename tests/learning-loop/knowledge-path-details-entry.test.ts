@@ -48,6 +48,7 @@ vi.mock('@/lib/learning-loop/runtime', () => ({
   notifyLearningJourneyChanged: mocks.notify,
 }));
 vi.mock('@/lib/learning-loop/analytics', () => ({ trackLearningLoopEvent: mocks.track }));
+vi.mock('@/lib/learning-loop/save-authoring', () => ({ saveKnowledgeContent: vi.fn() }));
 vi.mock('@/components/slide-renderer/SlideThumbnail', () => ({ SlideThumbnail: () => null }));
 vi.mock('@/components/learning-loop/repair-panel', () => ({ RepairPanel: () => null }));
 vi.mock('@/components/learning-loop/component-details-dialog', async () => {

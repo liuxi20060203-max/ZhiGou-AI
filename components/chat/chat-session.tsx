@@ -11,6 +11,7 @@ import { CircleStop, MessageCircleMore } from 'lucide-react';
 import { InlineActionTag } from './inline-action-tag';
 import { useUserProfileStore } from '@/lib/store/user-profile';
 import { useSoftCloseCountdown } from './use-soft-close-countdown';
+import { SaveMessageCard } from '@/components/knowledge-cards/save-message-card';
 
 /** Extended message part type covering standard + custom action parts */
 interface MessagePart {
@@ -285,7 +286,11 @@ export function ChatSessionComponent({
               </div>
 
               {/* Content */}
-              <div className={cn('flex-1 min-w-0', isUser && 'text-right')}>
+              <div
+                data-knowledge-message-id={message.id}
+                data-knowledge-session-id={session.id}
+                className={cn('flex-1 min-w-0', isUser && 'text-right')}
+              >
                 <span
                   className={cn(
                     'text-[9px] font-bold uppercase tracking-wider block mb-0.5',
@@ -309,6 +314,11 @@ export function ChatSessionComponent({
                   isStreaming={!!isStreaming}
                   isLastMessage={isLastMessage}
                   isActive={isActive}
+                />
+                <SaveMessageCard
+                  session={session}
+                  message={message}
+                  streaming={!!isStreaming && isLastMessage}
                 />
               </div>
             </motion.div>

@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { RepairPanel } from '@/components/learning-loop/repair-panel';
 import type { KnowledgeComponent, RepairPlan } from '@/lib/learning-loop/types';
+import { buildTemplateRepairPlan } from '@/lib/learning-loop/repair-plan';
 
 const runtime = vi.hoisted(() => ({
   readRepairPlans: vi.fn(),
@@ -70,6 +71,52 @@ describe('repair panel lifecycle', () => {
     container.remove();
     vi.unstubAllGlobals();
     vi.clearAllMocks();
+  });
+
+  it('starts a fresh plan for edited content and writes revision-tagged verification', async () => {
+    snapshots = [buildTemplateRepairPlan({ component, evidence: [], id: 'old-plan' })];
+    const revised = {
+      ...component,
+      contentRevision: 'edited',
+      authoredVerification: {
+        question: 'Which value is larger?',
+        options: ['0.2', '0.3'],
+        correctIndex: 1,
+        explanation: 'Three tenths is larger.',
+      },
+    };
+    await act(async () =>
+      root.render(
+        createElement(RepairPanel, {
+          component: revised,
+          evidence: [],
+          isChinese: true,
+          onClose: vi.fn(),
+        }),
+      ),
+    );
+    const click = async (label: string) => {
+      const button = [...container.querySelectorAll('button')].find(
+        (item) => item.textContent?.trim() === label,
+      )!;
+      expect(button).toBeDefined();
+      await act(async () => button.click());
+    };
+    await click('理解了，继续');
+    await click('理解了，继续');
+    expect(container.textContent).toContain('Which value is larger?');
+    await click('0.3');
+    await click('提交验证');
+    expect(container.textContent).toContain('本轮补学已完成');
+    expect(runtime.appendLearningEvidence).toHaveBeenLastCalledWith(
+      component.stageId,
+      expect.objectContaining({
+        type: 'verification_passed',
+        payload: expect.objectContaining({ componentRevision: 'edited' }),
+      }),
+    );
+    expect(snapshots.find((plan) => plan.id === 'old-plan')?.status).toBe('proposed');
+    expect(snapshots.at(-1)?.componentRevision).toBe('edited');
   });
 
   it('does not restart preparation when evidence changes after verification', async () => {

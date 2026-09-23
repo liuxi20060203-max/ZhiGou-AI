@@ -15,12 +15,13 @@ import { Bookmark, BookOpenCheck, Check, ChevronRight, NotebookPen, Target, X } 
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import {
-  findLearningTaskByClassroomId,
+  ensureClassroomLearningTask,
   recordVisitedScene,
   saveLearningTaskNote,
   toggleLearningTaskReviewScene,
 } from '@/lib/learning/task-storage';
 import type { LearningTask } from '@/lib/learning/types';
+import { isAutomaticLearningRecord } from '@/lib/learning/task-presentation';
 import { getLearningTaskPanelBounds } from '@/lib/learning/panel-layout';
 import type { Scene } from '@/lib/types/stage';
 import { cn } from '@/lib/utils';
@@ -28,6 +29,7 @@ import { cn } from '@/lib/utils';
 interface LearningTaskPanelProps {
   boundaryRef: RefObject<HTMLDivElement | null>;
   classroomId: string;
+  courseName: string;
   scenes: Scene[];
   currentSceneId: string | null;
   onSelectScene: (sceneId: string) => void;
@@ -36,15 +38,22 @@ interface LearningTaskPanelProps {
 export function LearningTaskPanel({
   boundaryRef,
   classroomId,
+  courseName,
   scenes,
   currentSceneId,
   onSelectScene,
 }: LearningTaskPanelProps) {
   const router = useRouter();
   const [task, setTask] = useState<LearningTask | null>(null);
+  const [recordError, setRecordError] = useState(false);
+  const [retry, setRetry] = useState(0);
   const [open, setOpen] = useState(false);
-  const [noteDraft, setNoteDraft] = useState('');
-  const [noteSaved, setNoteSaved] = useState(false);
+  const [noteEdit, setNoteEdit] = useState<{ sceneId: string; content: string; saved: boolean }>();
+  const noteDraft =
+    noteEdit?.sceneId === currentSceneId
+      ? noteEdit.content
+      : (task?.notes[currentSceneId ?? '']?.content ?? '');
+  const noteSaved = noteEdit?.sceneId === currentSceneId && noteEdit.saved;
   const [panelBounds, setPanelBounds] = useState<CSSProperties | null>(null);
   const [portalTarget, setPortalTarget] = useState<Element | null>(null);
 
@@ -74,27 +83,51 @@ export function LearningTaskPanel({
   }, [open, boundaryRef]);
 
   useEffect(() => {
-    setTask(findLearningTaskByClassroomId(classroomId));
-  }, [classroomId]);
+    if (scenes.length === 0) return;
+    let cancelled = false;
+    void Promise.resolve().then(() => {
+      if (cancelled) return;
+      const next = ensureClassroomLearningTask(classroomId, courseName);
+      setTask(next);
+      setRecordError(!next);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [classroomId, courseName, scenes.length, retry]);
 
   const taskId = task?.id;
   useEffect(() => {
-    if (!taskId || !currentSceneId) return;
-    const updated = recordVisitedScene(taskId, currentSceneId);
-    if (updated) setTask(updated);
-  }, [currentSceneId, taskId]);
-
-  useEffect(() => {
-    if (!task || !currentSceneId) {
-      setNoteDraft('');
+    if (
+      !taskId ||
+      task?.classroomId !== classroomId ||
+      !currentSceneId ||
+      !scenes.some((scene) => scene.id === currentSceneId)
+    )
       return;
-    }
-    setNoteDraft(task.notes[currentSceneId]?.content ?? '');
-    setNoteSaved(false);
-  }, [currentSceneId, task]);
+    let cancelled = false;
+    void Promise.resolve().then(() => {
+      if (cancelled) return;
+      const updated = recordVisitedScene(taskId, currentSceneId);
+      if (updated) setTask(updated);
+      setRecordError(!updated);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [currentSceneId, taskId, task?.classroomId, classroomId, scenes]);
 
   const orderedScenes = useMemo(() => [...scenes].sort((a, b) => a.order - b.order), [scenes]);
-  if (!task) return null;
+  if (!task || task.classroomId !== classroomId)
+    return recordError ? (
+      <button
+        type="button"
+        onClick={() => setRetry((value) => value + 1)}
+        className="absolute right-4 top-20 z-[70] rounded-xl border bg-background px-3 py-2 text-xs text-destructive"
+      >
+        学习记录不可用，点击重试
+      </button>
+    ) : null;
 
   const currentMarked = !!currentSceneId && task.reviewSceneIds.includes(currentSceneId);
   const progress = scenes.length
@@ -106,18 +139,28 @@ export function LearningTaskPanel({
     : 0;
 
   const saveNote = () => {
-    if (!currentSceneId) return;
+    if (!currentSceneId || !scenes.some((scene) => scene.id === currentSceneId)) return;
     const updated = saveLearningTaskNote(task.id, currentSceneId, noteDraft);
-    if (!updated) return;
+    if (!updated) {
+      setRecordError(true);
+      return;
+    }
+    setRecordError(false);
     setTask(updated);
-    setNoteSaved(true);
-    window.setTimeout(() => setNoteSaved(false), 1600);
+    const savedEdit = { sceneId: currentSceneId, content: noteDraft, saved: true };
+    setNoteEdit(savedEdit);
+    window.setTimeout(
+      () =>
+        setNoteEdit((current) => (current === savedEdit ? { ...current, saved: false } : current)),
+      1600,
+    );
   };
 
   const toggleReview = () => {
-    if (!currentSceneId) return;
+    if (!currentSceneId || !scenes.some((scene) => scene.id === currentSceneId)) return;
     const updated = toggleLearningTaskReviewScene(task.id, currentSceneId);
     if (updated) setTask(updated);
+    setRecordError(!updated);
   };
 
   return (
@@ -132,7 +175,7 @@ export function LearningTaskPanel({
         )}
       >
         <Target className="size-4 text-primary" aria-hidden="true" />
-        <span className="hidden sm:inline">学习任务</span>
+        <span className="hidden sm:inline">学习记录</span>
         <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[11px] text-primary">
           {progress}%
         </span>
@@ -149,7 +192,7 @@ export function LearningTaskPanel({
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 text-xs font-semibold text-primary">
                     <BookOpenCheck className="size-4" aria-hidden="true" />
-                    目标学习任务
+                    学习记录 · 按需使用
                   </div>
                   <h2 className="mt-2 truncate text-lg font-semibold">{task.knowledgePoint}</h2>
                   <p className="mt-1 text-xs text-muted-foreground">{task.courseName}</p>
@@ -158,7 +201,7 @@ export function LearningTaskPanel({
                   variant="ghost"
                   size="icon"
                   onClick={() => setOpen(false)}
-                  aria-label="关闭学习任务"
+                  aria-label="关闭学习记录"
                 >
                   <X className="size-4" />
                 </Button>
@@ -167,7 +210,7 @@ export function LearningTaskPanel({
               <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 py-4">
                 <section>
                   <div className="mb-2 flex items-center justify-between text-xs">
-                    <span className="font-medium text-foreground">学习进度</span>
+                    <span className="font-medium text-foreground">访问进度</span>
                     <span className="text-muted-foreground">{progress}%</span>
                   </div>
                   <div className="h-1.5 overflow-hidden rounded-full bg-muted">
@@ -176,9 +219,19 @@ export function LearningTaskPanel({
                       style={{ width: `${progress}%` }}
                     />
                   </div>
-                  <p className="mt-3 rounded-xl bg-primary/[0.06] p-3 text-sm leading-6 text-foreground">
-                    {task.learningGoal}
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    自动记录已访问环节。笔记与复习可选，不影响继续上课或结课。
                   </p>
+                  {recordError && (
+                    <p role="alert" className="mt-2 text-xs text-destructive">
+                      学习记录保存失败，请重试；当前进度可能尚未保存。
+                    </p>
+                  )}
+                  {!isAutomaticLearningRecord(task) && (
+                    <p className="mt-3 rounded-xl bg-primary/[0.06] p-3 text-sm leading-6 text-foreground">
+                      {task.learningGoal}
+                    </p>
+                  )}
                 </section>
 
                 <section>
@@ -218,7 +271,7 @@ export function LearningTaskPanel({
                   </div>
                 </section>
 
-                {currentSceneId ? (
+                {currentSceneId && scenes.some((scene) => scene.id === currentSceneId) ? (
                   <section>
                     <div className="mb-2 flex items-center justify-between gap-3">
                       <h3 className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
@@ -241,8 +294,11 @@ export function LearningTaskPanel({
                     <Textarea
                       value={noteDraft}
                       onChange={(event) => {
-                        setNoteDraft(event.target.value);
-                        setNoteSaved(false);
+                        setNoteEdit({
+                          sceneId: currentSceneId,
+                          content: event.target.value,
+                          saved: false,
+                        });
                       }}
                       onBlur={saveNote}
                       className="min-h-28 resize-none"

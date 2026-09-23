@@ -73,6 +73,47 @@ describe('component details dialog', () => {
     vi.unstubAllGlobals();
   });
 
+  it('opens owner editing in the same dialog and retains the form on a failed save', async () => {
+    const onSave = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('offline'))
+      .mockResolvedValueOnce(undefined);
+    await act(async () =>
+      root.render(
+        createElement(ComponentDetailsDialog, {
+          component,
+          isChinese: true,
+          onClose: vi.fn(),
+          onMarkConfusion: vi.fn(),
+          onStartRepair: vi.fn(),
+          onSave,
+        }),
+      ),
+    );
+    const edit = [...container.querySelectorAll('button')].find(
+      (button) => button.textContent === '编辑目标与验证题',
+    )!;
+    await act(async () => edit.click());
+    expect(container.querySelectorAll('[data-testid="knowledge-component-details"]')).toHaveLength(
+      1,
+    );
+    const form = container.querySelector('form')!;
+    await act(async () => {
+      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    });
+    expect(container.querySelector('[role="alert"]')?.textContent).toContain('保存未成功确认');
+    expect(container.querySelector('textarea')?.value).toBe(component.objective);
+    await act(async () => {
+      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    });
+    expect(onSave).toHaveBeenLastCalledWith({
+      objective: component.objective,
+      keyPoints: component.keyPoints,
+    });
+    expect(container.querySelector('form')).toBeNull();
+    expect(container.querySelector('[role="status"]')?.textContent).toContain('修改已保存');
+  });
+
   it('shows the objective and a clear empty state without inventing evidence', async () => {
     const onMarkConfusion = vi.fn();
     await act(async () => {
@@ -91,6 +132,7 @@ describe('component details dialog', () => {
     expect(container.textContent).toContain('小数的定义与表示方法');
     expect(container.textContent).toContain('理解证据 · 0 条');
     expect(container.textContent).toContain('尚未记录理解证据');
+    expect(container.textContent).not.toContain('编辑目标与验证题');
     const action = [...container.querySelectorAll('button')].find(
       (button) => button.textContent?.trim() === '这里没懂',
     );

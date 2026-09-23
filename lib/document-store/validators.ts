@@ -8,6 +8,7 @@ import {
 import type { SceneValidator, StageValidator } from '@openmaic/storage';
 import { hasPBLProjectV2Containers } from '@/lib/pbl/v2/types';
 import { isEmptyLegacyPBLConfig, type PBLProjectConfig } from '@/lib/pbl/legacy/read';
+import { readAuthoredKnowledgeContent } from '@/lib/learning-loop/authoring';
 
 function objectValue(value: unknown): Record<string, unknown> | null {
   return typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : null;
@@ -28,6 +29,15 @@ export const validateAppScene: SceneValidator = (scene) => {
   const value = objectValue(scene);
   if (!value) {
     return { valid: false, errors: [{ path: '/', message: 'scene must be an object' }] };
+  }
+  if (
+    value.knowledgeContent !== undefined &&
+    !readAuthoredKnowledgeContent(value.knowledgeContent)
+  ) {
+    return {
+      valid: false,
+      errors: [{ path: '/knowledgeContent', message: 'invalid authored knowledge content' }],
+    };
   }
   if (value.type === 'slide' || value.type === 'quiz') return validateScene(scene);
 

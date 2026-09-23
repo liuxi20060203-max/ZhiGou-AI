@@ -4,6 +4,7 @@ import { callLLM } from '@/lib/ai/llm';
 import { isLearningLoopAiEnabled } from '@/lib/config/feature-flags';
 import { createLogger } from '@/lib/logger';
 import { isValidRepairPlan } from '@/lib/learning-loop/repair-plan';
+import { applyAuthoredVerification, repairVerificationSchema } from '@/lib/learning-loop/authoring';
 import { buildRepairPlanPrompts } from '@/lib/learning-loop/repair-prompts';
 import type { KnowledgeComponent, RepairPlan, RepairStep } from '@/lib/learning-loop/types';
 import { apiError, apiSuccess } from '@/lib/server/api-response';
@@ -35,6 +36,17 @@ export async function POST(req: NextRequest) {
   }
   if (!body.component?.id || !body.plan || body.plan.componentId !== body.component.id) {
     return apiError('INVALID_REQUEST', 400, 'component and matching plan are required');
+  }
+  if (
+    body.plan.componentRevision !== body.component.contentRevision ||
+    (body.component.authoredVerification !== undefined &&
+      !repairVerificationSchema.safeParse(body.component.authoredVerification).success)
+  ) {
+    return apiError(
+      'INVALID_REQUEST',
+      400,
+      'Invalid authored verification or mismatched content revision',
+    );
   }
   if (!Array.isArray(body.plan.steps) || !isValidRepairPlan(body.plan)) {
     return apiError('INVALID_REQUEST', 400, 'fallback plan is invalid');
@@ -78,7 +90,7 @@ export async function POST(req: NextRequest) {
     if (!plan.rationale || !isValidRepairPlan(plan)) {
       return apiError('PARSE_FAILED', 502, 'Repair plan failed validation');
     }
-    return apiSuccess({ plan });
+    return apiSuccess({ plan: applyAuthoredVerification(plan, body.component) });
   } catch (error) {
     log.error('Repair plan generation failed:', error);
     return apiError('INTERNAL_ERROR', 500, 'Failed to generate repair plan');

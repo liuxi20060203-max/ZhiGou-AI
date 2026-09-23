@@ -52,6 +52,16 @@ export interface RepairVerification {
   explanation: string;
 }
 
+/** App-owned course content, persisted with the scene rather than learner runtime. */
+export interface AuthoredKnowledgeContent {
+  version: 1;
+  revision: string;
+  updatedAt: string;
+  objective: string;
+  keyPoints: string[];
+  verification?: RepairVerification;
+}
+
 export interface RepairStep {
   id: string;
   type: 'explanation' | 'example' | 'verification';
@@ -64,6 +74,7 @@ export interface RepairPlan {
   id: string;
   stageId: string;
   componentId: string;
+  componentRevision?: string;
   triggerEvidenceIds: string[];
   rationale: string;
   steps: RepairStep[];
@@ -87,6 +98,8 @@ export interface KnowledgeComponent {
   title: string;
   objective?: string;
   keyPoints: string[];
+  contentRevision?: string;
+  authoredVerification?: RepairVerification;
   sceneIds: string[];
   prerequisiteIds: string[];
   verification: {

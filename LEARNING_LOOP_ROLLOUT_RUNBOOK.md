@@ -115,7 +115,7 @@ The release owner must record:
 - The user confirmed local acceptance on 2026-09-22 after the supplied walkthrough covering the knowledge path, details/repair flow, verification result, completion report, and refresh persistence. Specific viewport sizes were not recorded; this is one acceptance confirmation, not five moderated sessions.
 - The repair eval suite contains 20 scenarios, but the real-model run is pending: `EVAL_REPAIR_MODEL` (or `DEFAULT_MODEL`) and `EVAL_JUDGE_MODEL` are not configured in the current local environment. Do not count a template-only run as the AI gate.
 - The five moderated usability sessions, real-classroom viewport review, deployment analytics/alerts, and 10% cohort results have not been recorded. Do not infer these outcomes from automated tests.
-- Phase 6 remains gated until the Phase 5 release owner records actual results and makes an expand/adjust/stop decision.
+- Subsequent user decision (2026-09-23): defer the real-model eval and proceed with internal Phase 6 knowledge-component authoring. This authorizes development; the uncompleted eval, five-user study, and deployment rollout checks remain pending before public release.
 
 ### Next acceptance actions
 

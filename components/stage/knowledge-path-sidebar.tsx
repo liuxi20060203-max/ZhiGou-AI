@@ -29,6 +29,7 @@ import { learnerConfusionEvidence, sceneVisitedEvidence } from '@/lib/learning-l
 import { trackLearningLoopEvent } from '@/lib/learning-loop/analytics';
 import { foldComponentLearningState } from '@/lib/learning-loop/fold';
 import { buildKnowledgeModel } from '@/lib/learning-loop/knowledge-model';
+import { saveKnowledgeContent } from '@/lib/learning-loop/save-authoring';
 import { appendLearningEvidence, notifyLearningJourneyChanged } from '@/lib/learning-loop/runtime';
 import type { KnowledgeComponent, LearningComponentStatus } from '@/lib/learning-loop/types';
 import { useLearningJourney } from '@/lib/learning-loop/use-learning-journey';
@@ -74,6 +75,8 @@ export function KnowledgePathSidebar({
     setCurrentSceneId,
     generatingOutlines,
     generationStatus,
+    isOwner,
+    readOnly,
   } = useStageStore();
   const failedOutlines = useStageStore.use.failedOutlines();
   const viewportSize = useCanvasStore.use.viewportSize();
@@ -140,6 +143,7 @@ export function KnowledgePathSidebar({
         stageId: stage.id,
         sceneId: currentSceneId,
         componentId: component.id,
+        componentRevision: component.contentRevision,
         occurredAt,
       }),
     )
@@ -172,6 +176,7 @@ export function KnowledgePathSidebar({
             eventId: `confusion:${component.id}:${randomPart}`,
             sceneId,
             componentId: component.id,
+            componentRevision: component.contentRevision,
             occurredAt,
           }),
         );
@@ -626,6 +631,16 @@ export function KnowledgePathSidebar({
             component={selectedComponent}
             learningState={selectedLearningState}
             isChinese={isChinese}
+            onSave={
+              isOwner && !readOnly && generatingOutlines.length === 0
+                ? (input) =>
+                    saveKnowledgeContent(
+                      selectedComponent.stageId,
+                      selectedComponent.sceneIds[0],
+                      input,
+                    )
+                : undefined
+            }
             onClose={() => {
               setSelectedComponentId(null);
               window.requestAnimationFrame(() => {
@@ -646,7 +661,7 @@ export function KnowledgePathSidebar({
           <RepairPanel
             key={`${repairComponent.stageId}:${repairComponent.id}`}
             component={repairComponent}
-            evidence={evidence.filter((item) => item.componentId === repairComponent.id)}
+            evidence={foldComponentLearningState(repairComponent, evidence).evidence}
             isChinese={isChinese}
             onClose={() => setRepairComponent(undefined)}
           />

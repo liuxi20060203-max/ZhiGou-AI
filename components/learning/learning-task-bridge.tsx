@@ -8,6 +8,7 @@ import { LearningTaskPanel } from './learning-task-panel';
 interface LearningTaskBridgeProps {
   boundaryRef: RefObject<HTMLDivElement | null>;
   classroomId: string;
+  courseName: string;
   scenes: Scene[];
   currentSceneId: string | null;
   onSelectScene: (sceneId: string) => void;
@@ -16,6 +17,7 @@ interface LearningTaskBridgeProps {
 export function LearningTaskBridge({
   boundaryRef,
   classroomId,
+  courseName,
   scenes,
   currentSceneId,
   onSelectScene,
@@ -40,6 +42,7 @@ export function LearningTaskBridge({
     <LearningTaskPanel
       boundaryRef={boundaryRef}
       classroomId={classroomId}
+      courseName={courseName}
       scenes={scenes}
       currentSceneId={currentSceneId}
       onSelectScene={onSelectScene}

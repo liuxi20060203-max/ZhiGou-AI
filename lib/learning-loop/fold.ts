@@ -4,6 +4,7 @@ export interface ComponentLearningState {
   componentId: string;
   status: LearningComponentStatus;
   evidence: LearningEvidence[];
+  historicalEvidence?: LearningEvidence[];
 }
 
 function eventTime(event: LearningEvidence): number {
@@ -47,6 +48,22 @@ export function foldComponentLearningState(
   component: KnowledgeComponent,
   allEvidence: readonly LearningEvidence[],
 ): ComponentLearningState {
+  if (component.contentRevision) {
+    const current = allEvidence.filter(
+      (event) => event.payload.componentRevision === component.contentRevision,
+    );
+    const state = foldComponentLearningState({ ...component, contentRevision: undefined }, current);
+    return {
+      ...state,
+      historicalEvidence: uniqueOrderedEvidence(
+        allEvidence.filter(
+          (event) =>
+            event.componentId === component.id &&
+            event.payload.componentRevision !== component.contentRevision,
+        ),
+      ),
+    };
+  }
   const evidence = uniqueOrderedEvidence(
     allEvidence.filter((event) => event.componentId === component.id),
   );

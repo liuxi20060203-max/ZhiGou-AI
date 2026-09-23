@@ -15,16 +15,17 @@ export function sceneVisitedEvidence(input: {
   sceneId: string;
   componentId: string;
   occurredAt: string;
+  componentRevision?: string;
 }): LearningEvidencePayload {
   return {
-    eventId: `visit:${segment(input.stageId)}:${segment(input.sceneId)}`,
+    eventId: `visit:${segment(input.stageId)}:${segment(input.sceneId)}${input.componentRevision ? `:${segment(input.componentRevision)}` : ''}`,
     componentId: input.componentId,
     sceneId: input.sceneId,
     type: 'scene_visited',
     outcome: 'neutral',
     strength: 'weak',
     source: 'playback',
-    payload: {},
+    payload: input.componentRevision ? { componentRevision: input.componentRevision } : {},
     occurredAt: input.occurredAt,
     schemaVersion: 1,
   };
@@ -35,6 +36,7 @@ export function learnerConfusionEvidence(input: {
   sceneId: string;
   componentId: string;
   occurredAt: string;
+  componentRevision?: string;
 }): LearningEvidencePayload {
   return {
     eventId: input.eventId,
@@ -44,7 +46,7 @@ export function learnerConfusionEvidence(input: {
     outcome: 'contradicts',
     strength: 'medium',
     source: 'learner',
-    payload: {},
+    payload: input.componentRevision ? { componentRevision: input.componentRevision } : {},
     occurredAt: input.occurredAt,
     schemaVersion: 1,
   };

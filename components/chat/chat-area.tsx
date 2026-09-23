@@ -27,6 +27,10 @@ import {
 } from './use-chat-sessions';
 import { SessionList } from './session-list';
 import { LectureNotesView } from './lecture-notes-view';
+import { KnowledgeCardList } from '@/components/knowledge-cards/card-list';
+import type { KnowledgeCardSource } from '@/lib/knowledge-cards/types';
+import { isLearningLoopEnabled } from '@/lib/config/feature-flags';
+import { toast } from 'sonner';
 
 interface ChatAreaProps {
   className?: string;
@@ -114,6 +118,10 @@ export const ChatArea = forwardRef<ChatAreaRef, ChatAreaProps>(
   ) => {
     const { locale } = useI18n();
     const scenes = useStageStore((s) => s.scenes);
+    const stageId = useStageStore((s) => s.stage?.id);
+    const [notesView, setNotesView] = useState<'lecture' | 'cards'>('lecture');
+    const [sourceFocus, setSourceFocus] = useState<KnowledgeCardSource>();
+    const cardsEnabled = isLearningLoopEnabled();
     const [assistantThinking, setAssistantThinking] = useState(false);
     const handleAssistantThinking = useCallback(
       (state: { stage: string; agentId?: string } | null) => {
@@ -158,6 +166,47 @@ export const ChatArea = forwardRef<ChatAreaRef, ChatAreaProps>(
     });
 
     const [activeTab, setActiveTab] = useState<'lecture' | 'chat'>('lecture');
+    const openCardSource = (source: KnowledgeCardSource) => {
+      if (source.stageId !== stageId) return;
+      const scene = scenes.find((item) => item.id === source.sceneId);
+      if (scene) useStageStore.getState().setCurrentSceneId(scene.id);
+      const session = sessions.find((item) => item.id === source.chatSessionId);
+      if (session?.messages.some((message) => message.id === source.messageId)) {
+        if (!expandedSessionIds.has(session.id)) toggleSessionExpand(session.id);
+        setActiveTab('chat');
+        setSourceFocus(source);
+      } else {
+        toast.info(
+          locale === 'zh-CN'
+            ? scene
+              ? '原始发言已不可用，已返回对应构件。'
+              : '来源已不可用，知识卡正文仍保留。'
+            : scene
+              ? 'The original message is unavailable. Returned to its learning block.'
+              : 'Source unavailable. Your saved card is still available.',
+        );
+      }
+    };
+    useEffect(() => {
+      if (!sourceFocus || activeTab !== 'chat' || sourceFocus.stageId !== stageId) return;
+      let frame = 0;
+      let attempts = 0;
+      const locate = () => {
+        const target = [
+          ...document.querySelectorAll<HTMLElement>('[data-knowledge-message-id]'),
+        ].find(
+          (node) =>
+            node.dataset.knowledgeMessageId === sourceFocus.messageId &&
+            node.dataset.knowledgeSessionId === sourceFocus.chatSessionId,
+        );
+        if (target) {
+          target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          setSourceFocus(undefined);
+        } else if (++attempts < 60) frame = requestAnimationFrame(locate);
+      };
+      frame = requestAnimationFrame(locate);
+      return () => cancelAnimationFrame(frame);
+    }, [sourceFocus, activeTab, stageId, expandedSessionIds]);
     const isDraggingRef = useRef(false);
     const [isDragging, setIsDragging] = useState(false);
     const bottomRef = useRef<HTMLDivElement>(null);
@@ -454,13 +503,51 @@ export const ChatArea = forwardRef<ChatAreaRef, ChatAreaProps>(
 
             {/* Notes Tab */}
             <TabsContent value="lecture" className="flex-1 overflow-hidden flex flex-col">
-              <LectureNotesView
-                notes={lectureNotes}
-                currentSceneId={currentSceneId}
-                currentActionIndex={currentActionIndex}
-                canJumpToAction={canJumpToAction}
-                onJumpToAction={onJumpToAction}
-              />
+              {cardsEnabled && stageId && (
+                <div
+                  role="group"
+                  aria-label={locale === 'zh-CN' ? '笔记视图' : 'Notes view'}
+                  className="flex shrink-0 gap-1 border-b border-border/60 px-3 py-2"
+                >
+                  <button
+                    type="button"
+                    aria-pressed={notesView === 'lecture'}
+                    onClick={() => setNotesView('lecture')}
+                    className={cn(
+                      'min-h-9 rounded-lg px-3 text-xs',
+                      notesView === 'lecture'
+                        ? 'bg-primary/10 font-semibold text-primary'
+                        : 'text-muted-foreground',
+                    )}
+                  >
+                    {locale === 'zh-CN' ? '讲解笔记' : 'Lecture notes'}
+                  </button>
+                  <button
+                    type="button"
+                    aria-pressed={notesView === 'cards'}
+                    onClick={() => setNotesView('cards')}
+                    className={cn(
+                      'min-h-9 rounded-lg px-3 text-xs',
+                      notesView === 'cards'
+                        ? 'bg-primary/10 font-semibold text-primary'
+                        : 'text-muted-foreground',
+                    )}
+                  >
+                    {locale === 'zh-CN' ? '知识卡' : 'Knowledge cards'}
+                  </button>
+                </div>
+              )}
+              {cardsEnabled && stageId && notesView === 'cards' ? (
+                <KnowledgeCardList key={stageId} stageId={stageId} onOpenSource={openCardSource} />
+              ) : (
+                <LectureNotesView
+                  notes={lectureNotes}
+                  currentSceneId={currentSceneId}
+                  currentActionIndex={currentActionIndex}
+                  canJumpToAction={canJumpToAction}
+                  onJumpToAction={onJumpToAction}
+                />
+              )}
             </TabsContent>
 
             {/* Chat Tab */}

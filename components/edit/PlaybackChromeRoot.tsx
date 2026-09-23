@@ -1626,6 +1626,7 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
                 initialParticipants={participants}
                 playbackView={playbackView}
                 currentSpeech={liveSpeech}
+                activeMessageId={activeBubbleId}
                 lectureSpeech={lectureSpeech}
                 idleText={firstSpeechText}
                 playbackCompleted={playbackCompleted}
@@ -1791,6 +1792,8 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
           )}
           {showLearningTaskPanel && stage?.id ? (
             <LearningTaskBridge
+              key={stage.id}
+              courseName={stage.name}
               boundaryRef={learningTaskPanelBoundaryRef}
               classroomId={stage.id}
               scenes={scenes}
